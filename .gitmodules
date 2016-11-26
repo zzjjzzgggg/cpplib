@@ -1,0 +1,6 @@
+[submodule "fmt"]
+	path = fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "Assert"]
+	path = Assert
+	url = https://github.com/gpakosz/Assert.git
