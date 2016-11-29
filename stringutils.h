@@ -27,5 +27,7 @@ std::string pretty_number(const int num);
 static const double Kilobytes = 1 << 10, Megabytes = 1 << 20,
                     Gigabytes = 1 << 30;
 std::string pretty_size(const int size);
+
+std::string pretty_time(const double seconds);
 }
 #endif /* __STRINGUTILS_H__ */

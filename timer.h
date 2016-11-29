@@ -4,6 +4,9 @@
 #include <cstdio>
 #include <chrono>
 
+#include <string>
+#include <stringutils.h>
+
 class Timer {
 private:
   std::chrono::steady_clock::time_point last_tick;
@@ -20,23 +23,11 @@ public:
 
   double seconds() const { return milliseconds() / 1000; }
 
-  const char* str() const {
-    double secs = seconds();
-    static char buf[32];
-    if (secs < 60)
-      sprintf(buf, "%.2fs", secs);
-    else {
-      int isecs = int(secs);
-      if (isecs < 3600)
-        sprintf(buf, "%02dm%02ds", isecs / 60, isecs % 60);
-      else
-        sprintf(buf, "%02dh%02dm", isecs / 3600,
-                isecs % 3600 / 60);
-    }
-    return buf;
+  const std::string getStr() const {
+    return strutils::pretty_time(seconds());
   }
 
-  static char* curtime() {
+  static char* curTime() {
     std::time_t t = std::time(NULL);
     static char buf[100];
     std::strftime(buf, sizeof(buf), "%F %T", std::localtime(&t));
