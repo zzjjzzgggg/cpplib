@@ -47,4 +47,26 @@ std::string get_base_path(const std::string &fullname) {
     return "./";
   }
 }
+
+  std::string pretty_number(const int num) {
+    if (num < 1e3)
+      return fmt::format("{}", num);
+    else if (num < 1e6)
+      return fmt::format("{}K", num/1000);
+    else if (num <1e9)
+      return fmt::format("{}M", num/1000000);
+    else
+      return fmt::format("{}G", num/1000000000);
+  }
+
+  std::string pretty_size(const int size) {
+    if (size < Kilobytes)
+      return fmt::format("{}B", size);
+    else if (size < Megabytes)
+      return fmt::format("{:.2f}K", size/Kilobytes);
+    else if (size < Gigabytes)
+      return fmt::format("{:.2f}M", size/Megabytes);
+    else
+      return fmt::format("{:.2f}G", size/Gigabytes);
+  }
 }

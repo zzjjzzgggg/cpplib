@@ -3,6 +3,9 @@
 
 #include <string>
 
+#define FMT_HEADER_ONLY
+#include <fmt/fmt/format.h>
+
 namespace strutils {
 
 void split_filename(const std::string &fullname,
@@ -18,5 +21,11 @@ std::string insert_middle(const std::string &filename,
                           const std::string &sufix);
 
 std::string get_base_path(const std::string &fullname);
+
+std::string pretty_number(const int num);
+
+static const double Kilobytes = 1 << 10, Megabytes = 1 << 20,
+                    Gigabytes = 1 << 30;
+std::string pretty_size(const int size);
 }
 #endif /* __STRINGUTILS_H__ */

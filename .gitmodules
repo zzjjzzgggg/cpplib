@@ -4,3 +4,6 @@
 [submodule "Assert"]
 	path = Assert
 	url = https://github.com/gpakosz/Assert.git
+[submodule "cereal"]
+	path = cereal
+	url = https://github.com/USCiLab/cereal.git
