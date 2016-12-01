@@ -2,6 +2,7 @@
 #define __STRINGUTILS_H__
 
 #include <string>
+#include <sstream>
 
 #define FMT_HEADER_ONLY
 #include <fmt/fmt/format.h>
@@ -29,5 +30,10 @@ static const double Kilobytes = 1 << 10, Megabytes = 1 << 20,
 std::string pretty_size(const int size);
 
 std::string pretty_time(const double seconds);
+
+void split(const std::string &s, char delim,
+           std::vector<std::string> &elems);
+
+std::vector<std::string> split(const std::string &s, char delim);
 }
 #endif /* __STRINGUTILS_H__ */
