@@ -1,6 +1,8 @@
 #ifndef __EIGENUTILS_H__
 #define __EIGENUTILS_H__
 
+#include <cstdlib>
+#include <iostream>
 #include <fstream>
 #include <string>
 
@@ -22,6 +24,10 @@ void write(const std::string &filename, const Matrix &matrix) {
 template <class Matrix>
 void read(const std::string &filename, Matrix &matrix) {
   std::ifstream in(filename, std::ios::in | std::ios::binary);
+  if (!in) {
+    std::cout << "Cannot open file " << filename << std::endl;
+    std::exit(-1);
+  }
   typename Matrix::Index rows = 0, cols = 0;
   in.read((char *)(&rows), sizeof(typename Matrix::Index));
   in.read((char *)(&cols), sizeof(typename Matrix::Index));
@@ -32,14 +38,14 @@ void read(const std::string &filename, Matrix &matrix) {
 }
 
 template <class Tensor>
-void write_tensor(const std::string &filename, const Tensor &tensor) {
+void write_tensor(const std::string &filename,
+                  const Tensor &tensor) {
   std::ofstream out(filename, std::ios::out | std::ios::binary |
                                   std::ios::trunc);
   typename Tensor::Index rank = tensor.rank();
   out.write((char *)(&rank), sizeof(typename Tensor::Index));
-  out.write(
-      (char *)tensor.dimensions().data(),
-      rank * sizeof(typename Tensor::Index));
+  out.write((char *)tensor.dimensions().data(),
+            rank * sizeof(typename Tensor::Index));
   out.write((char *)tensor.data(),
             tensor.size() * sizeof(typename Tensor::Scalar));
   out.close();
@@ -48,6 +54,10 @@ void write_tensor(const std::string &filename, const Tensor &tensor) {
 template <class Tensor>
 void read_tensor(const std::string &filename, Tensor &tensor) {
   std::ifstream in(filename, std::ios::in | std::ios::binary);
+  if (!in) {
+    std::cout << "Cannot open file " << filename << std::endl;
+    std::exit(-1);
+  }
   typename Tensor::Index rank;
   in.read((char *)(&rank), sizeof(typename Tensor::Index));
   typename Tensor::Dimensions dimensions;

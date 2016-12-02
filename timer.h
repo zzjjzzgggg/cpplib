@@ -24,7 +24,7 @@ public:
   double seconds() const { return milliseconds() / 1000; }
 
   const std::string getStr() const {
-    return strutils::pretty_time(seconds());
+    return strutils::prettyTime(seconds());
   }
 
   static char* curTime() {

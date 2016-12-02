@@ -9,7 +9,7 @@
 
 namespace strutils {
 
-void split_filename(const std::string &fullname,
+void splitFilename(const std::string &fullname,
                     std::string &base,
                     std::string &filename_wo_ext,
                     std::string &ext);
@@ -18,18 +18,18 @@ void split_filename(const std::string &fullname,
  * ../syn/events2_U100_I10_T100.dat -->
  * ../syn/events2_U100_I10_T100_test.dat
  */
-std::string insert_middle(const std::string &filename,
+std::string insertMiddle(const std::string &filename,
                           const std::string &sufix);
 
-std::string get_base_path(const std::string &fullname);
+std::string getBasePath(const std::string &fullname);
 
-std::string pretty_number(const int num);
+std::string prettyNumber(const int num);
 
 static const double Kilobytes = 1 << 10, Megabytes = 1 << 20,
                     Gigabytes = 1 << 30;
-std::string pretty_size(const int size);
+std::string prettySize(const int size);
 
-std::string pretty_time(const double seconds);
+std::string prettyTime(const double seconds);
 
 void split(const std::string &s, char delim,
            std::vector<std::string> &elems);

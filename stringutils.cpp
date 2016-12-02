@@ -1,7 +1,7 @@
 #include "stringutils.h"
 
 namespace strutils {
-void split_filename(const std::string &fullname,
+void splitFilename(const std::string &fullname,
                     std::string &base,
                     std::string &filename_wo_ext,
                     std::string &ext) {
@@ -28,7 +28,7 @@ void split_filename(const std::string &fullname,
  * ../syn/events2_U100_I10_T100.dat -->
  * ../syn/events2_U100_I10_T100_test.dat
  */
-std::string insert_middle(const std::string &filename,
+std::string insertMiddle(const std::string &filename,
                           const std::string &sufix) {
   auto idx = filename.rfind('.');
   if (idx != std::string::npos) {
@@ -39,7 +39,7 @@ std::string insert_middle(const std::string &filename,
     return filename + "_" + sufix;
 }
 
-std::string get_base_path(const std::string &fullname) {
+std::string getBasePath(const std::string &fullname) {
   auto idx = fullname.rfind('/');
   if (idx != std::string::npos) {
     return fullname.substr(0, idx + 1);
@@ -48,7 +48,7 @@ std::string get_base_path(const std::string &fullname) {
   }
 }
 
-std::string pretty_number(const int num) {
+std::string prettyNumber(const int num) {
   if (num < 1e3)
     return fmt::format("{}", num);
   else if (num < 1e6)
@@ -59,7 +59,7 @@ std::string pretty_number(const int num) {
     return fmt::format("{}G", num / 1000000000);
 }
 
-std::string pretty_size(const int size) {
+std::string prettySize(const int size) {
   if (size < Kilobytes)
     return fmt::format("{}B", size);
   else if (size < Megabytes)
@@ -70,7 +70,7 @@ std::string pretty_size(const int size) {
     return fmt::format("{:.2f}G", size / Gigabytes);
 }
 
-std::string pretty_time(const double secs) {
+std::string prettyTime(const double secs) {
   if (secs < 60)
     return fmt::format("{:.2f}s", secs);
   else {
