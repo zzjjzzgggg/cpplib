@@ -3,7 +3,6 @@
 
 #include <cstdio>
 #include <chrono>
-
 #include <string>
 #include <stringutils.h>
 
@@ -18,27 +17,29 @@ public:
 
   double milliseconds() const {
     auto&& dif = std::chrono::steady_clock::now() - last_tick;
-    return std::chrono::duration<double, std::milli>(dif).count();
+    return std::chrono::duration<double, std::milli>(dif)
+        .count();
   }
 
   double seconds() const { return milliseconds() / 1000; }
 
   const std::string getStr() const {
-    return strutils::prettyTime(seconds());
+    return stringutils::prettyTime(seconds());
   }
 
   static char* curTime() {
     std::time_t t = std::time(NULL);
     static char buf[100];
-    std::strftime(buf, sizeof(buf), "%F %T", std::localtime(&t));
+    std::strftime(buf, sizeof(buf), "%F %T",
+                  std::localtime(&t));
     return buf;
   }
 
   static int timestamp() {
     auto dur =
         std::chrono::steady_clock::now().time_since_epoch();
-    return std::chrono::duration_cast<std::chrono::milliseconds>(
-               dur)
+    return std::chrono::duration_cast<
+               std::chrono::milliseconds>(dur)
         .count();
   }
 };

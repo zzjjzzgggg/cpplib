@@ -94,7 +94,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <functional> // for std::hash
+#include <functional>  // for std::hash
 #include <initializer_list>
 #include <iterator>
 #include <random>
@@ -127,7 +127,7 @@
 #elif defined(_WIN64) || defined(_WIN32)
 #include <process.h>
 #define RANDUTILS_GETPID _getpid()
-#elif defined(__unix__) || defined(__unix) ||                                  \
+#elif defined(__unix__) || defined(__unix) || \
     (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>
 #define RANDUTILS_GETPID getpid()
@@ -250,11 +250,13 @@ public:
   seed_seq_fe(const seed_seq_fe &) = delete;
   void operator=(const seed_seq_fe &) = delete;
 
-  template <typename T> seed_seq_fe(std::initializer_list<T> init) {
+  template <typename T>
+  seed_seq_fe(std::initializer_list<T> init) {
     seed(init.begin(), init.end());
   }
 
-  template <typename InputIter> seed_seq_fe(InputIter begin, InputIter end) {
+  template <typename InputIter>
+  seed_seq_fe(InputIter begin, InputIter end) {
     seed(begin, end);
   }
 
@@ -264,14 +266,15 @@ public:
 
   static constexpr size_t size() { return count; }
 
-  template <typename OutputIterator> void param(OutputIterator dest) const;
+  template <typename OutputIterator>
+  void param(OutputIterator dest) const;
 
-  template <typename InputIter> void seed(InputIter begin, InputIter end) {
+  template <typename InputIter>
+  void seed(InputIter begin, InputIter end) {
     mix_entropy(begin, end);
     // For very small sizes, we do some additional mixing.  For normal
     // sizes, this loop never performs any iterations.
-    for (size_t i = 1; i < mix_rounds; ++i)
-      stir();
+    for (size_t i = 1; i < mix_rounds; ++i) stir();
   }
 
   seed_seq_fe &stir() {
@@ -307,11 +310,9 @@ void seed_seq_fe<count, IntRep, r>::mix_entropy(InputIter begin,
   }
   for (auto &src : mixer_)
     for (auto &dest : mixer_)
-      if (&src != &dest)
-        dest = mix(dest, hash(src));
+      if (&src != &dest) dest = mix(dest, hash(src));
   for (; current != end; ++current)
-    for (auto &dest : mixer_)
-      dest = mix(dest, hash(*current));
+    for (auto &dest : mixer_) dest = mix(dest, hash(*current));
 }
 
 template <size_t count, typename IntRep, size_t mix_rounds>
@@ -362,8 +363,7 @@ void seed_seq_fe<count, IntRep, mix_rounds>::generate(
   auto hash_const = INIT_B;
   for (auto dest = dest_begin; dest != dest_end; ++dest) {
     auto dataval = *src;
-    if (++src == src_end)
-      src = src_begin;
+    if (++src == src_end) src = src_begin;
     dataval ^= hash_const;
     hash_const *= MULT_B;
     dataval *= hash_const;
@@ -400,10 +400,12 @@ using seed_seq_fe256 = seed_seq_fe<8, uint32_t>;
  *       http://www.pcg-random.org/posts/cpps-random_device.html
  */
 
-template <typename SeedSeq> class auto_seeded : public SeedSeq {
+template <typename SeedSeq>
+class auto_seeded : public SeedSeq {
   using default_seeds = std::array<uint32_t, 11>;
 
-  template <typename T> static uint32_t crushto32(T value) {
+  template <typename T>
+  static uint32_t crushto32(T value) {
     if (sizeof(T) <= 4)
       return uint32_t(value);
     else {
@@ -413,7 +415,8 @@ template <typename SeedSeq> class auto_seeded : public SeedSeq {
     }
   }
 
-  template <typename T> static uint32_t hash(T &&value) {
+  template <typename T>
+  static uint32_t hash(T &&value) {
     return crushto32(
         std::hash<typename std::remove_reference<
             typename std::remove_cv<T>::type>::type>{}(std::forward<T>(value)));
@@ -579,7 +582,8 @@ private:
     return true;
   }
 
-  template <typename T> static constexpr bool has_base_seed_seq(...) {
+  template <typename T>
+  static constexpr bool has_base_seed_seq(...) {
     return false;
   }
 
@@ -637,17 +641,16 @@ public:
             typename... Params>
   ResultType variate(Params &&... params) {
     DistTmpl<ResultType> dist(std::forward<Params>(params)...);
-
     return dist(engine_);
   }
 
-  template <typename Numeric> Numeric uniform(Numeric lower, Numeric upper) {
+  template <typename Numeric>
+  Numeric uniform(Numeric lower, Numeric upper) {
     return variate<Numeric, uniform_distribution>(lower, upper);
   }
 
-  double uniform() {
-    return variate<double, uniform_distribution>(0.0, 1.0);
-  }
+  // [0, 1)
+  double uniform() { return variate<double, uniform_distribution>(0.0, 1.0); }
 
   double normal(double mean = 0, double variance = 1) {
     return variate<double, std::normal_distribution>(mean, variance);
@@ -671,18 +674,20 @@ public:
                        std::forward<Params>(params)...);
   }
 
-  template <typename Iter> void shuffle(Iter first, Iter last) {
+  template <typename Iter>
+  void shuffle(Iter first, Iter last) {
     std::shuffle(first, last, engine_);
   }
 
-  template <typename Range> void shuffle(Range &&range) {
+  template <typename Range>
+  void shuffle(Range &&range) {
     shuffle(std::begin(range), std::end(range));
   }
 
-  template <typename Iter> Iter choose(Iter first, Iter last) {
+  template <typename Iter>
+  Iter choose(Iter first, Iter last) {
     auto dist = std::distance(first, last);
-    if (dist < 2)
-      return first;
+    if (dist < 2) return first;
     using distance_type = decltype(dist);
     distance_type choice = uniform(distance_type(0), --dist);
     std::advance(first, choice);
@@ -730,6 +735,22 @@ public:
 
 using default_rng = random_generator<std::default_random_engine>;
 using mt19937_rng = random_generator<std::mt19937>;
+
+class RandUtils {
+private:
+  default_rng rng;
+
+public:
+  RandUtils() { rng.seed(time(NULL)); }
+
+  // distribution: a distribution, require that sum(distribution)=1
+  const int sampleDistribution(const std::vector<double> distribution) {
+    int id = 0;
+    double r = rng.uniform(), accu = distribution[0];
+    while (r > accu) accu += distribution[++id];
+    return id;
+  }
+};
 }
 
-#endif // RANDUTILS_HPP
+#endif  // RANDUTILS_HPP

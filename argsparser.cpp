@@ -4,7 +4,7 @@ const string ArgsParser::SPACES(24, ' ');
 
 string ArgsParser::formatHelp(const string& help) const {
   if (help.find('\n') == std::string::npos) return help;
-  std::vector<string> elems = strutils::split(help, '\n');
+  std::vector<string> elems = stringutils::split(help, '\n');
   fmt::MemoryWriter w;
   w.write("{}", elems[0]);
   for (size_t i = 1; i < elems.size(); i++) {

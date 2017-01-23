@@ -1,22 +1,20 @@
 #include "stringutils.h"
 
-namespace strutils {
-void splitFilename(const std::string &fullname,
-                    std::string &base,
-                    std::string &filename_wo_ext,
-                    std::string &ext) {
-  // base.clear();
-  // filename_wo_ext.clear();
-  // ext.clear();
-  if (fullname.empty()) return;
-  auto dir_idx = fullname.rfind('/');
+namespace stringutils {
+
+void splitFilename(const std::string &filename,
+                   std::string &base,
+                   std::string &filename_wo_ext,
+                   std::string &ext) {
+  if (filename.empty()) return;
+  auto dir_idx = filename.rfind('/');
   std::string filename_w_ext;
   if (dir_idx != std::string::npos) {
-    base = fullname.substr(0, dir_idx + 1);
-    filename_w_ext = fullname.substr(dir_idx + 1);
+    base = filename.substr(0, dir_idx + 1);
+    filename_w_ext = filename.substr(dir_idx + 1);
   } else {
     base = "./";
-    filename_w_ext = fullname;
+    filename_w_ext = filename;
   }
   auto ext_idx = filename_w_ext.rfind('.');
   filename_wo_ext = filename_w_ext.substr(0, ext_idx);
@@ -29,7 +27,7 @@ void splitFilename(const std::string &fullname,
  * ../syn/events2_U100_I10_T100_test.dat
  */
 std::string insertMiddle(const std::string &filename,
-                          const std::string &sufix) {
+                         const std::string &sufix) {
   auto idx = filename.rfind('.');
   if (idx != std::string::npos) {
     std::string extension = filename.substr(idx + 1);
@@ -39,13 +37,27 @@ std::string insertMiddle(const std::string &filename,
     return filename + "_" + sufix;
 }
 
-std::string getBasePath(const std::string &fullname) {
-  auto idx = fullname.rfind('/');
+std::string getBasePath(const std::string &filename) {
+  auto idx = filename.rfind('/');
   if (idx != std::string::npos) {
-    return fullname.substr(0, idx + 1);
+    return filename.substr(0, idx + 1);
   } else {
     return "./";
   }
+}
+
+std::string joinPath(const std::string &parent,
+                     const std::string &child) {
+  if (!parent.empty()) {
+    if (parent.back() == pathSeparator())
+      return parent + child;
+    else {
+      std::string new_parent{parent};
+      new_parent.push_back(pathSeparator());
+      return new_parent + child;
+    }
+  } else
+    return joinPath("./", child);
 }
 
 std::string prettyNumber(const int num) {
@@ -84,16 +96,16 @@ std::string prettyTime(const double secs) {
   }
 }
 
-void split(const std::string &s, char delim,
+void split(const std::string &s, const char delim,
            std::vector<std::string> &elems) {
   std::stringstream ss;
   ss.str(s);
   std::string item;
-  while (std::getline(ss, item, delim))
-    elems.push_back(item);
+  while (std::getline(ss, item, delim)) elems.push_back(item);
 }
 
-std::vector<std::string> split(const std::string &s, char delim) {
+std::vector<std::string> split(const std::string &s,
+                               const char delim) {
   std::vector<std::string> elems;
   split(s, delim, elems);
   return elems;
