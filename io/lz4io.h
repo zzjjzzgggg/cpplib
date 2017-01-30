@@ -8,7 +8,6 @@
 #include "iobase.h"
 #include "../lz4/lib/lz4.h"
 
-
 namespace ioutils {
 
 enum {
@@ -19,14 +18,13 @@ static const size_t DATA_CAPACITY = BLOCK_BYTES;
 static const size_t CHUNK_CAPACITY =
     LZ4_COMPRESSBOUND(BLOCK_BYTES);
 
-class LZ4Out: public IOOut {
+class LZ4Out : public IOOut {
 private:
-  char *data_buf_, *chunk_buf_;
+  char *data_buf_ = nullptr, *chunk_buf_ = nullptr;
   size_t len_dat_;
-  FILE* output_;
+  FILE* output_ = nullptr;
 
 private:
-
   /**
    * Compress the data in internal data buffer, and compressed
    * data is buffered in the internal chunk buffer.
@@ -43,8 +41,36 @@ public:
       : LZ4Out() {
     open(file_name, append);
   }
-
   ~LZ4Out();
+
+  // disable copy constructor
+  LZ4Out(const LZ4Out&) = delete;
+
+  // disable copy assignment
+  LZ4Out& operator=(const LZ4Out&) = delete;
+
+  // move constructor
+  LZ4Out(LZ4Out&& other)
+      : data_buf_(std::move(other.data_buf_)),
+        chunk_buf_(std::move(other.chunk_buf_)),
+        len_dat_(std::move(other.len_dat_)),
+        output_(std::move(other.output_)) {
+    other.data_buf_ = other.chunk_buf_ = nullptr;
+    other.output_ = nullptr;
+    other.len_dat_ = 0;
+  }
+
+  // move assignment
+  LZ4Out& operator=(LZ4Out&& other) {
+    data_buf_ = std::move(other.data_buf_);
+    chunk_buf_ = std::move(other.chunk_buf_);
+    len_dat_ = std::move(other.len_dat_);
+    output_ = std::move(other.output_);
+    other.len_dat_ = 0;
+    other.data_buf_ = other.chunk_buf_ = nullptr;
+    other.output_ = nullptr;
+    return *this;
+  }
 
   void open(const char* file_name, const bool append = false);
 
@@ -58,16 +84,16 @@ public:
   void write(const void* data, const size_t length) override;
 
   void close() override;
-  bool isClosed() const { return output_ == NULL; }
+  bool isClosed() const { return output_ == nullptr; }
 
   void compress(const char* input_file_name);
 };
 
-class LZ4In: public IOIn {
+class LZ4In : public IOIn {
 private:
-  char *chunk_buf_, *data_buf_;
+  char *chunk_buf_ = nullptr, *data_buf_ = nullptr;
   size_t len_data_, num_read_;
-  FILE* input_;
+  FILE* input_ = nullptr;
 
 private:
   bool fillBuffer();
@@ -78,12 +104,43 @@ public:
   LZ4In();
   LZ4In(const char* file_name) : LZ4In() {
     input_ = fopen(file_name, "rb");
-    if (input_ == NULL) {
+    if (input_ == nullptr) {
       fprintf(stderr, "Open file '%s' failed!\n", file_name);
       exit(1);
     }
   }
   ~LZ4In();
+
+  // disalbe copy constructor
+  LZ4In(const LZ4In&) = delete;
+
+  // disable copy assignment
+  LZ4In& operator=(const LZ4In&) = delete;
+
+  // move constructor
+  LZ4In(LZ4In&& other)
+      : chunk_buf_(std::move(other.chunk_buf_)),
+        data_buf_(std::move(other.data_buf_)),
+        len_data_(std::move(other.len_data_)),
+        num_read_(std::move(other.num_read_)),
+        input_(std::move(other.input_)) {
+    other.chunk_buf_ = other.data_buf_ = nullptr;
+    other.input_ = nullptr;
+    other.len_data_ = other.num_read_ = 0;
+  }
+
+  // move assignment
+  LZ4In& operator=(LZ4In&& other) {
+    chunk_buf_ = std::move(other.chunk_buf_);
+    data_buf_ = std::move(other.data_buf_);
+    len_data_ = std::move(other.len_data_);
+    num_read_ = std::move(other.num_read_);
+    input_ = std::move(other.input_);
+    other.chunk_buf_ = other.data_buf_ = nullptr;
+    other.input_ = nullptr;
+    other.len_data_ = other.num_read_ = 0;
+    return *this;
+  }
 
   void open(const char* file_name);
   void close() override;

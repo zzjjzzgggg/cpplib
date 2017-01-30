@@ -25,25 +25,25 @@ size_t readBin(FILE* fp, void* array,
 LZ4Out::LZ4Out() {
   data_buf_ = new char[DATA_CAPACITY];
   chunk_buf_ = new char[CHUNK_CAPACITY];
-  if (data_buf_ == NULL || chunk_buf_ == NULL) {
+  if (data_buf_ == nullptr || chunk_buf_ == nullptr) {
     std::fprintf(stderr, "Allocate space failed!\n");
     exit(1);
   }
   len_dat_ = 0;
-  output_ = NULL;
+  output_ = nullptr;
 }
 
 LZ4Out::~LZ4Out() {
   close();
-  if (data_buf_ != NULL) delete[] data_buf_;
-  if (chunk_buf_ != NULL) delete[] chunk_buf_;
+  if (data_buf_ != nullptr) delete[] data_buf_;
+  if (chunk_buf_ != nullptr) delete[] chunk_buf_;
 }
 
 void LZ4Out::close() {
-  if (output_ != NULL) {
+  if (output_ != nullptr) {
     writeChunk();
     fclose(output_);
-    output_ = NULL;
+    output_ = nullptr;
   }
 }
 
@@ -51,7 +51,7 @@ void LZ4Out::open(const char* file_name, const bool append) {
   close();
   const char* mode = append ? "ab" : "wb";
   output_ = std::fopen(file_name, mode);
-  if (output_ == NULL) {
+  if (output_ == nullptr) {
     std::fprintf(stderr, "Open file '%s' failed!\n",
                  file_name);
     exit(1);
@@ -85,7 +85,7 @@ void LZ4Out::writeChunk() {
 
 void LZ4Out::compress(const char* file_name) {
   FILE* file_id = std::fopen(file_name, "rb");
-  if (file_id == NULL) {
+  if (file_id == nullptr) {
     std::fprintf(stderr, "Open file '%s' failed!\n",
                  file_name);
     exit(1);
@@ -109,24 +109,24 @@ void LZ4Out::compress(const char* file_name) {
 LZ4In::LZ4In() {
   chunk_buf_ = new char[CHUNK_CAPACITY];
   data_buf_ = new char[DATA_CAPACITY];
-  if (data_buf_ == NULL || chunk_buf_ == NULL) {
+  if (data_buf_ == nullptr || chunk_buf_ == nullptr) {
     std::fprintf(stderr, "Allocate space failed!\n");
     exit(1);
   }
-  input_ = NULL;
+  input_ = nullptr;
   len_data_ = num_read_ = 0;
 }
 
 LZ4In::~LZ4In() {
   close();
-  if (chunk_buf_ != NULL) delete[] chunk_buf_;
-  if (data_buf_ != NULL) delete[] data_buf_;
+  if (chunk_buf_ != nullptr) delete[] chunk_buf_;
+  if (data_buf_ != nullptr) delete[] data_buf_;
 }
 
 void LZ4In::close() {
-  if (input_ != NULL) {
+  if (input_ != nullptr) {
     fclose(input_);
-    input_ = NULL;
+    input_ = nullptr;
   }
   len_data_ = num_read_ = 0;
 }
@@ -134,7 +134,7 @@ void LZ4In::close() {
 void LZ4In::open(const char* file_name) {
   close();
   input_ = std::fopen(file_name, "rb");
-  if (input_ == NULL) {
+  if (input_ == nullptr) {
     std::fprintf(stderr, "Open file '%s' failed!\n",
                  file_name);
     exit(1);
@@ -172,7 +172,7 @@ bool LZ4In::fillBuffer() {
 }
 
 size_t LZ4In::read(const void* data, const size_t len) {
-  if (len <= 0 || data == NULL) return 0;
+  if (len <= 0 || data == nullptr) return 0;
   size_t num_have_read = 0, num_to_read = 0;
   while (!eof() && num_have_read < len) {
     // min(num_requirement, num_available)
@@ -187,7 +187,7 @@ size_t LZ4In::read(const void* data, const size_t len) {
 }
 
 size_t LZ4In::readLine(const void* data, const size_t len) {
-  if (len <= 0 || data == NULL) return 0;
+  if (len <= 0 || data == nullptr) return 0;
   size_t num_have_read = 0, num_to_read = 0;
   while (!eof() && num_have_read < len - 1) {
     // min(num_requirement, num_available)
