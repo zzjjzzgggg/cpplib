@@ -14,16 +14,19 @@
 #include <cassert>
 #include <cstring>
 
+#include <string>
 #include <unordered_set>
-#include <stringutils.h>
 
-#include <ppk_assert.h>
+#include "iobase.h"
+#include "../str/stringutils.h"
+#include "../Assert/src/ppk_assert.h"
 #define assert_msg PPK_ASSERT
 
-class GZipOut {
+namespace ioutils {
+
+class GZipOut : public IOOut {
 private:
   static const size_t MxBfL;
-  static const std::unordered_set<std::string> gzip_ext_set;
   FILE *ZipStdinRd, *ZipStdinWr;
   char* Bf;
   size_t BfL;
@@ -38,23 +41,18 @@ public:
   ~GZipOut();
 
   int putChar(const char& ch);
-  void write(const void* data, const size_t length);
-  void save(const char* str) { write(str, strlen(str)); }
-  void save(const int val) { write(&val, sizeof(int)); }
-  void save(const long val) { write(&val, sizeof(long)); }
-  void save(const double val) { write(&val, sizeof(double)); }
+
+  void write(const void* data, const size_t length) override;
+  void close() override;
 
   void Flush();
-  void close();
 
-  static bool isZip(const std::string& filename);
   std::string getCmd(const std::string& filename);
 };
 
-class GZipIn {
+class GZipIn : public IOIn {
 private:
   static const int MxBfL;
-  static const std::unordered_set<std::string> gzip_ext_set;
   FILE *ZipStdoutRd, *ZipStdoutWr;
   size_t CurFPos;
   char* Bf;
@@ -69,19 +67,31 @@ public:
   GZipIn(const std::string& filename);
   ~GZipIn();
 
-  bool eof() { return BfL < MxBfL && BfC == BfL; }
+  void close() override {};
+
+  bool eof() override { return BfL < MxBfL && BfC == BfL; }
   char getChar() {
     if (BfC == BfL) FillBf();
     return Bf[BfC++];
   }
 
-  size_t read(const void* LBf, const size_t LBfL);
-  void load(int& val) { read(&val, sizeof(int)); }
-  void load(long& val) { read(&val, sizeof(long)); }
-  void load(double& val) { read(&val, sizeof(double)); }
+  size_t read(const void* LBf, const size_t LBfL) override;
+
+  /**
+   * Read characters until a newline ('\n') is encountered.
+   * If a newline character is not encountered in the first
+   * (len - 1) bytes, then the excess characters are
+   * discarded.
+   * The returned string placed in 'data' is null-terminated
+   * and includes the newline character if it was read in the
+   * first (n - 1) bytes.
+   * The function return value is the number of bytes placed
+   * in buffer (which includes the newline character if
+   * encountered, but excludes the terminating null byte).
+   **/
+  size_t readLine(const void* data, const size_t len) override;
 
   std::string getCmd(const std::string& zip_fnm);
-  static bool isZip(const std::string& filename);
 };
-
+}
 #endif /* __GZIPIO_H__ */

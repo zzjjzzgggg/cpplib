@@ -1,7 +1,7 @@
 #include "gzipio.h"
 
-const std::unordered_set<std::string> GZipOut::gzip_ext_set{
-    {".gz", ".zip", ".7z", ".bzip2", ".bz2"}};
+namespace ioutils{
+
 const size_t GZipOut::MxBfL = 4 * 1024;
 
 void GZipOut::FlushBf() {
@@ -58,23 +58,13 @@ void GZipOut::write(const void* data, const size_t length) {
 
 void GZipOut::Flush() { FlushBf(); }
 
-bool GZipOut::isZip(const std::string& filename) {
-  std::string base, name, ext;
-  stringutils::splitFilename(filename, base, name, ext);
-  return gzip_ext_set.find(ext) != gzip_ext_set.end();
-}
-
 std::string GZipOut::getCmd(const std::string& zip_fnm) {
   std::string base, name, ext;
   stringutils::splitFilename(zip_fnm, base, name, ext);
-  assert_msg(gzip_ext_set.find(ext) != gzip_ext_set.end(),
-             "Unknown file extension '%s'.", ext.c_str());
   return "7za a -y -bd -si" + name;
 }
 
 /////////////////////////////////////////////////////////
-const std::unordered_set<std::string> GZipIn::gzip_ext_set{
-    {".gz", ".zip", ".7z", ".bzip2", ".bz2"}};
 const int GZipIn::MxBfL = 32 * 1024;
 
 void GZipIn::CreateZipProcess(const std::string& cmd,
@@ -124,15 +114,21 @@ size_t GZipIn::read(const void* LBf, const size_t LBfL) {
   return LBfS;
 }
 
-bool GZipIn::isZip(const std::string& filename) {
-  std::string base, name, ext;
-  stringutils::splitFilename(filename, base, name, ext);
-  return gzip_ext_set.find(ext) != gzip_ext_set.end();
+size_t GZipIn::readLine(const void* data, const size_t len) {
+  char* dst_ptr = (char*)data;
+  size_t num_have_read = 0;
+  while(!eof() && num_have_read < len - 1) {
+    *dst_ptr = getChar();
+    num_have_read++;
+    if(*dst_ptr == '\n') break;
+    dst_ptr++;
+  }
+  *((char*)data + num_have_read) = '\0';
+  return num_have_read;
 }
 
 std::string GZipIn::getCmd(const std::string& zip_fnm) {
-  assert_msg(isZip(zip_fnm),
-             "Unsupported file extension '%s'",
-             zip_fnm.c_str());
   return "7za e -y -bd -so";
+}
+
 }

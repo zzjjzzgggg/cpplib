@@ -46,19 +46,6 @@ std::string getBasePath(const std::string &filename) {
   }
 }
 
-std::string joinPath(const std::string &parent,
-                     const std::string &child) {
-  if (!parent.empty()) {
-    if (parent.back() == pathSeparator())
-      return parent + child;
-    else {
-      std::string new_parent{parent};
-      new_parent.push_back(pathSeparator());
-      return new_parent + child;
-    }
-  } else
-    return joinPath("./", child);
-}
 
 std::string prettyNumber(const int num) {
   if (num < 1e3)
@@ -80,20 +67,6 @@ std::string prettySize(const int size) {
     return fmt::format("{:.2f}M", size / Megabytes);
   else
     return fmt::format("{:.2f}G", size / Gigabytes);
-}
-
-std::string prettyTime(const double secs) {
-  if (secs < 60)
-    return fmt::format("{:.2f}s", secs);
-  else {
-    int isecs = int(secs);
-    if (isecs < 3600)
-      return fmt::format("{:02d}m{:02d}s", isecs / 60,
-                         isecs % 60);
-    else
-      return fmt::format("{:02d}h{:02d}m", isecs / 3600,
-                         isecs % 3600 / 60);
-  }
 }
 
 void split(const std::string &s, const char delim,

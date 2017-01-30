@@ -1,10 +1,12 @@
 #include "argsparser.h"
 
-const string ArgsParser::SPACES(24, ' ');
+const std::string ArgsParser::SPACES(24, ' ');
 
-string ArgsParser::formatHelp(const string& help) const {
+std::string ArgsParser::formatHelp(
+    const std::string& help) const {
   if (help.find('\n') == std::string::npos) return help;
-  std::vector<string> elems = stringutils::split(help, '\n');
+  std::vector<std::string> elems =
+      stringutils::split(help, '\n');
   fmt::MemoryWriter w;
   w.write("{}", elems[0]);
   for (size_t i = 1; i < elems.size(); i++) {
@@ -13,24 +15,25 @@ string ArgsParser::formatHelp(const string& help) const {
   return w.str();
 }
 
-void ArgsParser::showHelp(const string& arg, const string& type,
-                          const string& help,
-                          const string& default_val) const {
+void ArgsParser::showHelp(
+    const std::string& arg, const std::string& type,
+    const std::string& help,
+    const std::string& default_val) const {
   if (verbose)
     fmt::print("{:4}{:<12}{:<8}{} (default: {})\n", " ", arg,
                type, formatHelp(help), default_val);
 }
 
-string ArgsParser::getCmd() const {
-  string cmd = arg_vec[0];
+std::string ArgsParser::getCmd() const {
+  std::string cmd = arg_vec[0];
   size_t pos = cmd.find_last_of('/');
-  if (pos == string::npos)
+  if (pos == std::string::npos)
     return cmd;
   else
     return cmd.substr(pos + 1);
 }
 
-int ArgsParser::getArgPos(const string& arg) const {
+int ArgsParser::getArgPos(const std::string& arg) const {
   int arg_pos = 0;
   for (auto&& a : arg_vec) {
     if (a == arg) return arg_pos;
@@ -39,10 +42,11 @@ int ArgsParser::getArgPos(const string& arg) const {
   return -1;
 }
 
-bool ArgsParser::getBool(const string& arg,
+bool ArgsParser::getBool(const std::string& arg,
                          const bool default_val,
-                         const string& help) const {
-  showHelp(arg, "[bool]", help, default_val ? "true" : "false");
+                         const std::string& help) const {
+  showHelp(arg, "[bool]", help,
+           default_val ? "true" : "false");
   int arg_pos = getArgPos(arg);
   if (arg_pos < 0 || num_args < arg_pos + 2)
     return default_val;
@@ -50,8 +54,9 @@ bool ArgsParser::getBool(const string& arg,
     return arg_vec[arg_pos + 1] == "true";
 }
 
-int ArgsParser::getInt(const string& arg, const int default_val,
-                       const string& help) const {
+int ArgsParser::getInt(const std::string& arg,
+                       const int default_val,
+                       const std::string& help) const {
   showHelp(arg, "[int]", help, std::to_string(default_val));
   int rst;
   int arg_pos = getArgPos(arg);
@@ -62,9 +67,9 @@ int ArgsParser::getInt(const string& arg, const int default_val,
   return rst;
 }
 
-double ArgsParser::getFlt(const string& arg,
+double ArgsParser::getFlt(const std::string& arg,
                           const double default_val,
-                          const string& help) const {
+                          const std::string& help) const {
   showHelp(arg, "[flt]", help, std::to_string(default_val));
   double rst;
   int arg_pos = getArgPos(arg);
@@ -75,25 +80,28 @@ double ArgsParser::getFlt(const string& arg,
   return rst;
 }
 
-string ArgsParser::getStr(const string& arg,
-                          const string& default_val,
-                          const string& help) const {
+std::string ArgsParser::getStr(const std::string& arg,
+                               const std::string& default_val,
+                               const std::string& help) const {
   showHelp(arg, "[str]", help, default_val);
   int arg_pos = getArgPos(arg);
-  if (arg_pos < 0 || num_args < arg_pos + 2) return default_val;
+  if (arg_pos < 0 || num_args < arg_pos + 2)
+    return default_val;
   return arg_vec[arg_pos + 1];
 }
 
 std::vector<int> ArgsParser::getIntVec(
-    const string& arg, const std::vector<int>& default_val,
-    const string& help) const {
+    const std::string& arg,
+    const std::vector<int>& default_val,
+    const std::string& help) const {
   std::vector<int> arg_ints;
   return arg_ints;
 }
 
-std::vector<string> ArgsParser::getStrVec(
-    const string& arg, const std::vector<string>& default_val,
-    const string& help) const {
-  std::vector<string> arg_strs;
+std::vector<std::string> ArgsParser::getStrVec(
+    const std::string& arg,
+    const std::vector<std::string>& default_val,
+    const std::string& help) const {
+  std::vector<std::string> arg_strs;
   return arg_strs;
 }

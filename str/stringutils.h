@@ -5,7 +5,7 @@
 #include <sstream>
 
 #define FMT_HEADER_ONLY
-#include <fmt/fmt/format.h>
+#include "../fmt/fmt/format.h"
 
 namespace stringutils {
 
@@ -31,24 +31,11 @@ std::string insertMiddle(const std::string &filename,
  */
 std::string getBasePath(const std::string &fullname);
 
-inline char pathSeparator() {
-#ifdef _WIN32
-  return '\\';
-#else
-  return '/';
-#endif
-}
-
-std::string joinPath(const std::string& parent,
-                     const std::string& child);
-
 std::string prettyNumber(const int num);
 
 static const double Kilobytes = 1 << 10, Megabytes = 1 << 20,
                     Gigabytes = 1 << 30;
 std::string prettySize(const int size);
-
-std::string prettyTime(const double seconds);
 
 void split(const std::string &s, char delim,
            std::vector<std::string> &elems);
