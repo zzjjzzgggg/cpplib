@@ -19,15 +19,18 @@ endif()
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
 
+add_library(lz4 SHARED lz4/lib/lz4.c)
+set_target_properties(lz4 PROPERTIES COMPILE_FLAGS "-c -x c")
+
+include_directories(Assert/src)
+add_library(ppk_assert SHARED Assert/src/ppk_assert.cpp)
+
 include_directories(str)
 include_directories(os)
 include_directories(io)
-include_directories(Assert/src)
 
-add_subdirectory(Assert/src)
 add_subdirectory(str)
 add_subdirectory(os)
 add_subdirectory(io)
-add_subdirectory(lz4/lib)
 
 add_subdirectory(test)
