@@ -7,3 +7,11 @@
 [submodule "cereal"]
 	path = cereal
 	url = https://github.com/USCiLab/cereal.git
+[submodule "lz4"]
+	path = lz4
+	url = https://github.com/lz4/lz4.git
+	ignore = dirty
+[submodule "Assert"]
+	path = Assert
+	url = https://github.com/gpakosz/Assert.git
+	ignore = dirty
