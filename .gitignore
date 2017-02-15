@@ -1,5 +1,3 @@
 build/
 lib/
-lz4
-Assert
 *.swp
