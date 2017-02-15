@@ -9,19 +9,18 @@
 
 namespace stringutils {
 
-
-// ~/workspace/test/cmp.sh
-// base: ~/workspace/test/
-// filename_wo_ext: cmp
-// ext: .sh
+/**
+ * Split a full filename into three parts: base path, filename
+ * without extension, and extension prefixed with '.'.
+ * E.g., "~/work/test/cmp.sh" -> "~/work/test/", "cmp", ".sh"
+ */
 void splitFilename(const std::string &fullname,
-                   std::string &base,
-                   std::string &fnm_wo_ext,
+                   std::string &base, std::string &fnm_wo_ext,
                    std::string &ext);
 
 /**
- * ../syn/events2_U100_I10_T100.dat -->
- * ../syn/events2_U100_I10_T100_test.dat
+ * Insert a short string into the middle of a filename.
+ * E.g., "./syn/event.dat", "test" --> "./syn/event_test.dat"
  */
 std::string insertMiddle(const std::string &filename,
                          const std::string &sufix);
@@ -31,13 +30,25 @@ std::string insertMiddle(const std::string &filename,
  */
 std::string getBasePath(const std::string &fullname);
 
+/**
+ * Return a string representation of a number.
+ * E.g., 1000 -> 1K; 10000 -> 10K
+ */
 std::string prettyNumber(const int num);
 
 static const double Kilobytes = 1 << 10, Megabytes = 1 << 20,
                     Gigabytes = 1 << 30;
+
+/**
+ * Return a string representation of a size.
+ * E.g., 100 -> 1B, 1024 -> 1K, 10240 -> 10K
+ */
 std::string prettySize(const int size);
 
-void split(const std::string &s, char delim,
+/**
+ * Split a string into parts by specified char.
+ */
+void split(const std::string &s, const char delim,
            std::vector<std::string> &elems);
 
 std::vector<std::string> split(const std::string &s,

@@ -779,23 +779,42 @@ using default_rng =
     random_generator<std::default_random_engine>;
 using mt19937_rng = random_generator<std::mt19937>;
 
-class RandUtils {
-private:
-  default_rng rng;
+///////////////////////////////////////////////////////////
 
-public:
-  RandUtils() { rng.seed(time(NULL)); }
+/**
+ * Sample from a distribution.
+ * Return: the index of the sampled element in the vector.
+ * Require: sum(distribution) == 1
+ */
+template <typename RandomEngine = std::default_random_engine,
+          typename DefaultSeedSeq = auto_seed_256>
+const int sample(
+    const std::vector<double> distribution,
+    random_generator<RandomEngine, DefaultSeedSeq> &rng) {
+  int id = 0;
+  double r = rng.uniform(), accu = distribution[0];
+  while (r > accu) accu += distribution[++id];
+  return id;
+}
 
-  // distribution: a distribution, require that
-  // sum(distribution) = 1
-  const int sampleDistribution(
-      const std::vector<double> distribution) {
-    int id = 0;
-    double r = rng.uniform(), accu = distribution[0];
-    while (r > accu) accu += distribution[++id];
-    return id;
-  }
-};
+/**
+ * Sample from a distribution.
+ * Return: the index of the sampled element in the vector.
+ * Require: sum(distribution) == 1
+ * NOTE: This version does not need the weight vector is
+ * normalized, but need to known the sum of weights.
+ */
+template <typename RandomEngine = std::default_random_engine,
+          typename DefaultSeedSeq = auto_seed_256>
+const int sampleFast(
+    const std::vector<double> weights,
+    const double sum_weights,
+    random_generator<RandomEngine, DefaultSeedSeq> &rng) {
+  int id = 0;
+  double r = rng.uniform() * sum_weights, accu = weights[0];
+  while (r > accu) accu += weights[++id];
+  return id;
+}
 }
 
 #endif  // RANDUTILS_HPP

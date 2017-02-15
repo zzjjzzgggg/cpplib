@@ -21,12 +21,13 @@ bool isLZ4(const std::string& filename) {
   return true;
 }
 
-std::unique_ptr<IOOut> getIOOut(const std::string& filename) {
+std::unique_ptr<IOOut> getIOOut(const std::string& filename,
+                                const bool append) {
   if (isGZip(filename))
     return std::make_unique<GZipOut>(filename);
   else if (isLZ4(filename))
-    return std::make_unique<LZ4Out>(filename.c_str());
-  return std::make_unique<NormOut>(filename);
+    return std::make_unique<LZ4Out>(filename.c_str(), append);
+  return std::make_unique<NormOut>(filename, append);
 }
 
 std::unique_ptr<IOIn> getIOIn(const std::string& filename) {
@@ -119,4 +120,18 @@ void loadFltPrVec(const std::string& filename,
   while (ss.next())
     vec.emplace_back(ss.getFlt(c0), ss.getFlt(c1));
 }
+
+
+void saveIntMap(const std::unordered_map<int, int>& mp,
+                const std::string& filename,
+                const std::string& ano) {
+  saveMap(mp, filename, "{}\t{}\n", ano);
+}
+
+void saveIntFltMap(const std::unordered_map<int, double>& mp,
+                   const std::string& filename,
+                   const std::string& ano) {
+  saveMap(mp, filename, "{}\t{:.6e}\n", ano);
+}
+
 }

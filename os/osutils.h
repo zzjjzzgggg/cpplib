@@ -14,9 +14,17 @@
 
 namespace osutils {
 
-inline bool fileExists(const std::string& name) {
+inline bool fileExists(const std::string& filename) {
   struct stat buffer;
-  return (stat(name.c_str(), &buffer) == 0);
+  return (stat(filename.c_str(), &buffer) == 0);
+}
+
+inline void mkdirs(const std::string& filename) {
+  system(fmt::format("mkdir -p {}", filename).c_str());
+}
+
+inline void rmfile(const std::string& filename) {
+  system(fmt::format("rm -rf {}", filename).c_str());
 }
 
 inline char pathSeparator() {

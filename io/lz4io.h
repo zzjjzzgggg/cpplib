@@ -41,7 +41,7 @@ public:
       : LZ4Out() {
     open(file_name, append);
   }
-  ~LZ4Out();
+  virtual ~LZ4Out();
 
   // disable copy constructor
   LZ4Out(const LZ4Out&) = delete;
@@ -109,7 +109,7 @@ public:
       exit(1);
     }
   }
-  ~LZ4In();
+  virtual ~LZ4In();
 
   // disalbe copy constructor
   LZ4In(const LZ4In&) = delete;

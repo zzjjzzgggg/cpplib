@@ -46,7 +46,6 @@ std::string getBasePath(const std::string &filename) {
   }
 }
 
-
 std::string prettyNumber(const int num) {
   if (num < 1e3)
     return fmt::format("{}", num);

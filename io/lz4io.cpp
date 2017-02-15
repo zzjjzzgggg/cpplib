@@ -37,6 +37,7 @@ LZ4Out::~LZ4Out() {
   close();
   if (data_buf_ != nullptr) delete[] data_buf_;
   if (chunk_buf_ != nullptr) delete[] chunk_buf_;
+  data_buf_ = chunk_buf_ = nullptr;
 }
 
 void LZ4Out::close() {

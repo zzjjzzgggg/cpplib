@@ -11,6 +11,7 @@ namespace ioutils {
 
 class IOOut {
 public:
+  virtual ~IOOut() = default;
   virtual void close() = 0;
   virtual void write(const void* data,
                      const size_t length) = 0;
@@ -34,6 +35,7 @@ public:
 
 class IOIn {
 public:
+  virtual ~IOIn() = default;
   virtual void close() = 0;
   virtual bool eof() = 0;
 
@@ -70,56 +72,64 @@ public:
 
 class NormOut : public IOOut {
 private:
-  FILE* fw = nullptr;
+  FILE* fw_ = nullptr;
 
 public:
-  NormOut(const std::string& filename) {
-    fw = std::fopen(filename.c_str(), "w");
-    if (fw == nullptr) {
+  NormOut(const std::string& filename, const bool append) {
+    const char* mode = append ? "ab" : "wb";
+    fw_ = std::fopen(filename.c_str(), mode);
+    if (fw_ == nullptr) {
       std::fprintf(stderr, "Open file '%s' failed!\n",
                    filename.c_str());
       exit(1);
     }
   }
-  ~NormOut() { close(); }
+  virtual ~NormOut() { close(); }
 
   void close() override {
-    if (fw != nullptr) fclose(fw);
+    if (fw_ != nullptr) {
+      fclose(fw_);
+      fw_ = nullptr;
+    }
   }
   void write(const void* data, const size_t length) override {
-    std::fwrite(data, 1, length, fw);
+    std::fwrite(data, 1, length, fw_);
   }
 };
 
 class NormIn : public IOIn {
 private:
-  FILE* fr = nullptr;
+  FILE* fr_ = nullptr;
 
 public:
   NormIn(const std::string& filename) {
-    fr = std::fopen(filename.c_str(), "r");
-    if (fr == NULL) {
+    fr_ = std::fopen(filename.c_str(), "r");
+    if (fr_ == NULL) {
       std::fprintf(stderr, "Open file '%s' failed!\n",
                    filename.c_str());
       exit(1);
     }
   }
-  ~NormIn() { close(); }
+  virtual ~NormIn() { close(); }
 
   void close() override {
-    if (fr != nullptr) std::fclose(fr);
+    if (fr_ != nullptr) {
+      std::fclose(fr_);
+      fr_ = nullptr;
+    }
   }
-  bool eof() override { return feof(fr); }
+  bool eof() override { return feof(fr_); }
   size_t read(const void* data, const size_t len) override {
-    return std::fread(const_cast<void*>(data), 1, len, fr);
+    return std::fread(const_cast<void*>(data), 1, len, fr_);
   }
   size_t readLine(const void* data,
                   const size_t len) override {
     char* dst = (char*)data;
-    fgets(dst, len, fr);
-    return feof(fr) ? 0 : strlen(dst); // if fgets reaches the
-                                       // end of file, data buf
-                                       // is not altered.
+    fgets(dst, len, fr_);
+    return feof(fr_) ? 0
+                     : strlen(dst);  // if fgets reaches the
+    // end of file, data buf
+    // is not altered.
   }
 };
 }

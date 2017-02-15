@@ -1,6 +1,8 @@
 #ifndef __IOUTILS_H__
 #define __IOUTILS_H__
 
+#include <unordered_map>
+
 #include "iobase.h"
 #include "lz4io.h"
 #include "gzipio.h"
@@ -11,7 +13,8 @@ bool isGZip(const std::string& filename);
 
 bool isLZ4(const std::string& filename);
 
-std::unique_ptr<IOOut> getIOOut(const std::string& filename);
+std::unique_ptr<IOOut> getIOOut(const std::string& filename,
+                                const bool append = false);
 
 std::unique_ptr<IOIn> getIOIn(const std::string& filename);
 
@@ -52,7 +55,6 @@ public:
   int getInt(const int& id) const;
 
   double getFlt(const int& id) const;
-
 };
 
 template <class TVal>
@@ -64,7 +66,6 @@ void saveVec(const std::vector<TVal>& vec,
   if (!ano.empty()) out_ptr->save(ano);
   for (auto val : vec)
     out_ptr->save(fmt::format(line_fmt, val));
-  out_ptr->close();
 }
 
 void saveIntVec(const std::vector<int>& vec,
@@ -108,6 +109,25 @@ void loadIntPrVec(const std::string& filename,
 void loadFltPrVec(const std::string& filename,
                   std::vector<std::pair<double, double>>& vec,
                   const int c0 = 0, const int c1 = 1);
+
+template <class TKey, class TVal>
+void saveMap(const std::unordered_map<TKey, TVal>& mp,
+             const std::string& filename,
+             const std::string& line_fmt,
+             const std::string& ano) {
+  std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
+  if (!ano.empty()) out_ptr->save(ano);
+  for (auto& pr : mp)
+    out_ptr->save(fmt::format(line_fmt, pr.first, pr.second));
+}
+
+void saveIntMap(const std::unordered_map<int, int>& mp,
+                const std::string& filename,
+                const std::string& ano = "");
+
+void saveIntFltMap(const std::unordered_map<int, double>& mp,
+                   const std::string& filename,
+                   const std::string& ano = "");
 
 } /* namespace ioutils */
 
