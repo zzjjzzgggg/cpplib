@@ -69,6 +69,8 @@ double TSVParser::getFlt(const int& id) const {
   return val;
 }
 
+////////////////////////////////////////////////////////////
+// vector saver
 void saveIntVec(const std::vector<int>& vec,
                 const std::string& filename,
                 const std::string& ano) {
@@ -81,18 +83,6 @@ void saveFltVec(const std::vector<double>& vec,
   saveVec(vec, filename, "{:.6e}\n", ano);
 }
 
-void loadIntVec(const std::string& filename,
-                std::vector<int>& vec, const int col) {
-  TSVParser ss(filename);
-  while (ss.next()) vec.push_back(ss.getInt(col));
-}
-
-void loadFltVec(const std::string& filename,
-                std::vector<double>& vec, const int col) {
-  TSVParser ss(filename);
-  while (ss.next()) vec.push_back(ss.getFlt(col));
-}
-
 void saveIntPrVec(const std::vector<std::pair<int, int>>& vec,
                   const std::string& filename,
                   const std::string& ano) {
@@ -103,6 +93,20 @@ void saveFltPrVec(
     const std::vector<std::pair<double, double>>& vec,
     const std::string& filename, const std::string& ano) {
   savePrVec(vec, filename, "{:.6e}\t{:.6e}\n", ano);
+}
+
+////////////////////////////////////////////////////////////
+// vector loader
+void loadIntVec(const std::string& filename,
+                std::vector<int>& vec, const int col) {
+  TSVParser ss(filename);
+  while (ss.next()) vec.push_back(ss.getInt(col));
+}
+
+void loadFltVec(const std::string& filename,
+                std::vector<double>& vec, const int col) {
+  TSVParser ss(filename);
+  while (ss.next()) vec.push_back(ss.getFlt(col));
 }
 
 void loadIntPrVec(const std::string& filename,
@@ -121,7 +125,16 @@ void loadFltPrVec(const std::string& filename,
     vec.emplace_back(ss.getFlt(c0), ss.getFlt(c1));
 }
 
+void loadIntFltPrVec(const std::string& filename,
+                     std::vector<std::pair<int, double>>& vec,
+                     const int c0, const int c1) {
+  TSVParser ss(filename);
+  while (ss.next())
+    vec.emplace_back(ss.getInt(c0), ss.getFlt(c1));
+}
 
+////////////////////////////////////////////////////////////
+// map saver
 void saveIntMap(const std::unordered_map<int, int>& mp,
                 const std::string& filename,
                 const std::string& ano) {
@@ -134,4 +147,19 @@ void saveIntFltMap(const std::unordered_map<int, double>& mp,
   saveMap(mp, filename, "{}\t{:.6e}\n", ano);
 }
 
+////////////////////////////////////////////////////////////
+// map loader
+void loadIntMap(const std::string& filename,
+                std::unordered_map<int, int>& mp, const int kc,
+                const int vc) {
+  TSVParser ss(filename);
+  while (ss.next()) mp[ss.getInt(kc)] = ss.getInt(vc);
+}
+
+void loadIntFltMap(const std::string& filename,
+                   std::unordered_map<int, double>& mp,
+                   const int kc, const int vc) {
+  TSVParser ss(filename);
+  while (ss.next()) mp[ss.getInt(kc)] = ss.getFlt(vc);
+}
 }
