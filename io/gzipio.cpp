@@ -60,7 +60,7 @@ void GZipOut::Flush() { FlushBf(); }
 
 std::string GZipOut::getCmd(const std::string& zip_fnm) {
   std::string base, name, ext;
-  stringutils::splitFilename(zip_fnm, base, name, ext);
+  strutils::splitFilename(zip_fnm, base, name, ext);
   return "7za a -y -bd -si" + name;
 }
 

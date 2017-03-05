@@ -1,6 +1,6 @@
 #include "stringutils.h"
 
-namespace stringutils {
+namespace strutils {
 
 void splitFilename(const std::string &filename,
                    std::string &base,

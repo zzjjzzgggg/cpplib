@@ -7,7 +7,7 @@
 #define FMT_HEADER_ONLY
 #include "../fmt/fmt/format.h"
 
-namespace stringutils {
+namespace strutils {
 
 /**
  * Split a full filename into three parts: base path, filename

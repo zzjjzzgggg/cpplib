@@ -7,7 +7,7 @@ bool isGZip(const std::string& filename) {
   gzip_exts.insert(".gz");
   gzip_exts.insert(".zip");
   std::string base, name, ext;
-  stringutils::splitFilename(filename, base, name, ext);
+  strutils::splitFilename(filename, base, name, ext);
   return gzip_exts.find(ext) != gzip_exts.end();
 }
 
@@ -16,7 +16,7 @@ bool isLZ4(const std::string& filename) {
   lz4_exts.insert(".lz");
   lz4_exts.insert(".lz4");
   std::string base, name, ext;
-  stringutils::splitFilename(filename, base, name, ext);
+  strutils::splitFilename(filename, base, name, ext);
   return lz4_exts.find(ext) != lz4_exts.end();
   return true;
 }
@@ -43,7 +43,7 @@ bool TSVParser::next() {
   line_NO++;
   if (in_ptr->readLine(buf, 1024) == 0) return false;
   if (buf[0] == '#') return next();
-  stringutils::split(buf, split_ch, field_vec);
+  strutils::split(buf, split_ch, field_vec);
   return true;
 }
 

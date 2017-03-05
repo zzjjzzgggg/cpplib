@@ -6,7 +6,7 @@ std::string ArgsParser::formatHelp(
     const std::string& help) const {
   if (help.find('\n') == std::string::npos) return help;
   std::vector<std::string> elems =
-      stringutils::split(help, '\n');
+      strutils::split(help, '\n');
   fmt::MemoryWriter w;
   w.write("{}", elems[0]);
   for (size_t i = 1; i < elems.size(); i++) {
