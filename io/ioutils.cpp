@@ -52,8 +52,7 @@ int TSVParser::getInt(const int& id) const {
   try {
     val = std::stoi(field_vec[id]);
   } catch (const std::invalid_argument& err) {
-    fprintf(stderr, "Field %d in line %lu is not integer\n",
-            id, line_NO);
+    fprintf(stderr, "Field %d in line %lu is not integer\n", id, line_NO);
   }
   return val;
 }
@@ -63,102 +62,95 @@ double TSVParser::getFlt(const int& id) const {
   try {
     val = std::stod(field_vec[id]);
   } catch (const std::invalid_argument& err) {
-    fprintf(stderr, "Field %d in line %lu is not double\n", id,
-            line_NO);
+    fprintf(stderr, "Field %d in line %lu is not double\n", id, line_NO);
   }
   return val;
 }
 
 ////////////////////////////////////////////////////////////
 // vector saver
-void saveIntVec(const std::vector<int>& vec,
-                const std::string& filename,
+void saveIntVec(const std::vector<int>& vec, const std::string& filename,
                 const std::string& ano) {
   saveVec(vec, filename, "{}\n", ano);
 }
 
-void saveFltVec(const std::vector<double>& vec,
-                const std::string& filename,
+void saveFltVec(const std::vector<double>& vec, const std::string& filename,
                 const std::string& ano) {
   saveVec(vec, filename, "{:.6e}\n", ano);
 }
 
 void saveIntPrVec(const std::vector<std::pair<int, int>>& vec,
-                  const std::string& filename,
-                  const std::string& ano) {
+                  const std::string& filename, const std::string& ano) {
   savePrVec(vec, filename, "{}\t{}\n", ano);
 }
 
-void saveFltPrVec(
-    const std::vector<std::pair<double, double>>& vec,
-    const std::string& filename, const std::string& ano) {
+void saveFltPrVec(const std::vector<std::pair<double, double>>& vec,
+                  const std::string& filename, const std::string& ano) {
   savePrVec(vec, filename, "{:.6e}\t{:.6e}\n", ano);
 }
 
+void saveIntFltPrVec(const std::vector<std::pair<int, double>>& vec,
+                     const std::string& filename, const std::string& ano) {
+  savePrVec(vec, filename, "{}\t{:.6e}\n", ano);
+}
 ////////////////////////////////////////////////////////////
 // vector loader
-void loadIntVec(const std::string& filename,
-                std::vector<int>& vec, const int col) {
+void loadIntVec(const std::string& filename, std::vector<int>& vec,
+                const int col) {
   TSVParser ss(filename);
   while (ss.next()) vec.push_back(ss.getInt(col));
 }
 
-void loadFltVec(const std::string& filename,
-                std::vector<double>& vec, const int col) {
+void loadFltVec(const std::string& filename, std::vector<double>& vec,
+                const int col) {
   TSVParser ss(filename);
   while (ss.next()) vec.push_back(ss.getFlt(col));
 }
 
 void loadIntPrVec(const std::string& filename,
-                  std::vector<std::pair<int, int>>& vec,
-                  const int c0, const int c1) {
+                  std::vector<std::pair<int, int>>& vec, const int c0,
+                  const int c1) {
   TSVParser ss(filename);
-  while (ss.next())
-    vec.emplace_back(ss.getInt(c0), ss.getInt(c1));
+  while (ss.next()) vec.emplace_back(ss.getInt(c0), ss.getInt(c1));
 }
 
 void loadFltPrVec(const std::string& filename,
-                  std::vector<std::pair<double, double>>& vec,
-                  const int c0, const int c1) {
+                  std::vector<std::pair<double, double>>& vec, const int c0,
+                  const int c1) {
   TSVParser ss(filename);
-  while (ss.next())
-    vec.emplace_back(ss.getFlt(c0), ss.getFlt(c1));
+  while (ss.next()) vec.emplace_back(ss.getFlt(c0), ss.getFlt(c1));
 }
 
 void loadIntFltPrVec(const std::string& filename,
-                     std::vector<std::pair<int, double>>& vec,
-                     const int c0, const int c1) {
+                     std::vector<std::pair<int, double>>& vec, const int c0,
+                     const int c1) {
   TSVParser ss(filename);
-  while (ss.next())
-    vec.emplace_back(ss.getInt(c0), ss.getFlt(c1));
+  while (ss.next()) vec.emplace_back(ss.getInt(c0), ss.getFlt(c1));
 }
 
 ////////////////////////////////////////////////////////////
 // map saver
 void saveIntMap(const std::unordered_map<int, int>& mp,
-                const std::string& filename,
-                const std::string& ano) {
+                const std::string& filename, const std::string& ano) {
   saveMap(mp, filename, "{}\t{}\n", ano);
 }
 
 void saveIntFltMap(const std::unordered_map<int, double>& mp,
-                   const std::string& filename,
-                   const std::string& ano) {
+                   const std::string& filename, const std::string& ano) {
   saveMap(mp, filename, "{}\t{:.6e}\n", ano);
 }
 
 ////////////////////////////////////////////////////////////
 // map loader
-void loadIntMap(const std::string& filename,
-                std::unordered_map<int, int>& mp, const int kc,
-                const int vc) {
+void loadIntMap(const std::string& filename, std::unordered_map<int, int>& mp,
+                const int kc, const int vc) {
   TSVParser ss(filename);
   while (ss.next()) mp[ss.getInt(kc)] = ss.getInt(vc);
 }
 
 void loadIntFltMap(const std::string& filename,
-                   std::unordered_map<int, double>& mp,
-                   const int kc, const int vc) {
+                   std::unordered_map<int, double>& mp, const int kc,
+                   const int vc) {
   TSVParser ss(filename);
   while (ss.next()) mp[ss.getInt(kc)] = ss.getFlt(vc);
 }

@@ -28,8 +28,7 @@ private:
   std::unique_ptr<IOIn> in_ptr;
 
 public:
-  TSVParser(const std::string& filename)
-      : line_NO(0), split_ch('\t') {
+  TSVParser(const std::string& filename) : line_NO(0), split_ch('\t') {
     in_ptr = getIOIn(filename);
   }
 
@@ -44,13 +43,9 @@ public:
 
   size_t getLineNO() const { return line_NO; }
 
-  const std::string getLineString() const {
-    return std::string(buf);
-  }
+  const std::string getLineString() const { return std::string(buf); }
 
-  const char* getField(const int& id) const {
-    return field_vec[id].c_str();
-  }
+  const char* getField(const int& id) const { return field_vec[id].c_str(); }
 
   int getInt(const int& id) const;
 
@@ -60,28 +55,22 @@ public:
 ////////////////////////////////////////////////////////////
 // vector saver
 template <class TVal>
-void saveVec(const std::vector<TVal>& vec,
-             const std::string& filename,
-             const std::string& line_fmt,
-             const std::string& ano) {
+void saveVec(const std::vector<TVal>& vec, const std::string& filename,
+             const std::string& line_fmt, const std::string& ano) {
   std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
   if (!ano.empty()) out_ptr->save(ano);
-  for (auto val : vec)
-    out_ptr->save(fmt::format(line_fmt, val));
+  for (auto val : vec) out_ptr->save(fmt::format(line_fmt, val));
 }
 
-void saveIntVec(const std::vector<int>& vec,
-                const std::string& filename,
+void saveIntVec(const std::vector<int>& vec, const std::string& filename,
                 const std::string& ano = "");
 
-void saveFltVec(const std::vector<double>& vec,
-                const std::string& filename,
+void saveFltVec(const std::vector<double>& vec, const std::string& filename,
                 const std::string& ano = "");
 
 template <class T1, class T2>
 void savePrVec(const std::vector<std::pair<T1, T2>>& vec,
-               const std::string& filename,
-               const std::string& line_fmt,
+               const std::string& filename, const std::string& line_fmt,
                const std::string& ano = "") {
   std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
   if (!ano.empty()) out_ptr->save(ano);
@@ -91,64 +80,59 @@ void savePrVec(const std::vector<std::pair<T1, T2>>& vec,
 }
 
 void saveIntPrVec(const std::vector<std::pair<int, int>>& vec,
-                  const std::string& filename,
-                  const std::string& ano = "");
+                  const std::string& filename, const std::string& ano = "");
 
-void saveFltPrVec(
-    const std::vector<std::pair<double, double>>& vec,
-    const std::string& filename, const std::string& ano = "");
+void saveFltPrVec(const std::vector<std::pair<double, double>>& vec,
+                  const std::string& filename, const std::string& ano = "");
 
+void saveIntFltPrVec(const std::vector<std::pair<int, double>>& vec,
+                     const std::string& filename, const std::string& ano = "");
 ////////////////////////////////////////////////////////////
 // vector loader
-void loadIntVec(const std::string& filename,
-                std::vector<int>& vec, const int col = 0);
+void loadIntVec(const std::string& filename, std::vector<int>& vec,
+                const int col = 0);
 
-void loadFltVec(const std::string& filename,
-                std::vector<double>& vec, const int col = 0);
+void loadFltVec(const std::string& filename, std::vector<double>& vec,
+                const int col = 0);
 
 void loadIntPrVec(const std::string& filename,
-                  std::vector<std::pair<int, int>>& vec,
-                  const int c0 = 0, const int c1 = 1);
+                  std::vector<std::pair<int, int>>& vec, const int c0 = 0,
+                  const int c1 = 1);
 
 void loadFltPrVec(const std::string& filename,
-                  std::vector<std::pair<double, double>>& vec,
-                  const int c0 = 0, const int c1 = 1);
+                  std::vector<std::pair<double, double>>& vec, const int c0 = 0,
+                  const int c1 = 1);
 
 void loadIntFltPrVec(const std::string& filename,
-                     std::vector<std::pair<int, double>>& vec,
-                     const int c0 = 0, const int c1 = 1);
+                     std::vector<std::pair<int, double>>& vec, const int c0 = 0,
+                     const int c1 = 1);
 
 ////////////////////////////////////////////////////////////
 // map saver
 template <class TKey, class TVal>
 void saveMap(const std::unordered_map<TKey, TVal>& mp,
-             const std::string& filename,
-             const std::string& line_fmt,
+             const std::string& filename, const std::string& line_fmt,
              const std::string& ano) {
   std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
   if (!ano.empty()) out_ptr->save(ano);
-  for (auto& pr : mp)
-    out_ptr->save(fmt::format(line_fmt, pr.first, pr.second));
+  for (auto& pr : mp) out_ptr->save(fmt::format(line_fmt, pr.first, pr.second));
 }
 
 void saveIntMap(const std::unordered_map<int, int>& mp,
-                const std::string& filename,
-                const std::string& ano = "");
+                const std::string& filename, const std::string& ano = "");
 
 void saveIntFltMap(const std::unordered_map<int, double>& mp,
-                   const std::string& filename,
-                   const std::string& ano = "");
+                   const std::string& filename, const std::string& ano = "");
 
 ////////////////////////////////////////////////////////////
 // map loader
 
-void loadIntMap(const std::string& filename,
-                std::unordered_map<int, int>& mp,
+void loadIntMap(const std::string& filename, std::unordered_map<int, int>& mp,
                 const int kc = 0, const int vc = 1);
 
 void loadIntFltMap(const std::string& filename,
-                   std::unordered_map<int, double>& mp,
-                   const int kc = 0, const int vc = 1);
+                   std::unordered_map<int, double>& mp, const int kc = 0,
+                   const int vc = 1);
 
 } /* namespace ioutils */
 

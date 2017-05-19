@@ -9,8 +9,10 @@
 #include "osutils.h"
 
 int main(int argc, char *argv[]) {
-  printf("%d\n", osutils::fileExists("/home/jzzhao"));
-  printf("%s\n", osutils::joinPath("/home/jzzhao", "greedy").c_str());
+  std::string prefix = osutils::join("../../syngraphs/", "./");
+  printf("%s\n", prefix.c_str());
+  printf("%d\n", osutils::exists("/home/jzzhao"));
+  printf("%s\n", osutils::join("/home/jzzhao", "greedy").c_str());
   osutils::rmfile("/home/jzzhao/workspace/test/test");
   return 0;
 }

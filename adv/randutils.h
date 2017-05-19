@@ -1,55 +1,53 @@
 /*
- * Random-Number Utilities (randutil) Addresses common issues
- * with C++11 random number generation. Makes good seeding
- * easier, and makes using RNGs easy while retaining all the
- * power.
+ * Random-Number Utilities (randutil) Addresses common issues with C++11 random
+ * number generation. Makes good seeding easier, and makes using RNGs easy while
+ * retaining all the power.
  */
 
 #ifndef RANDUTILS_HPP
 #define RANDUTILS_HPP 1
 
 /*
- * This header includes three class templates that can help
- * make C++11 random number generation easier to use.
+ * This header includes three class templates that can help make C++11 random
+ * number generation easier to use.
  *
  * randutils::seed_seq_fe
  *
  * Fixed-Entropy Seed sequence
  *
- * Provides a replacement for std::seed_seq that avoids
- * problems with bias, performs better in empirical statistical
- * tests, and executes faster in normal-sized use cases.
+ * Provides a replacement for std::seed_seq that avoids problems with bias,
+ * performs better in empirical statistical tests, and executes faster in
+ * normal-sized use cases.
  *
- * In normal use, it's accessed via one of the following type
- * aliases
+ * In normal use, it's accessed via one of the following type aliases
  *
  *       randutils::seed_seq_fe128
  *       randutils::seed_seq_fe256
  *
  * It's discussed in detail at
- * http://www.pcg-random.org/posts/developing-a-seed_seq-alternative.html
- * and the motivation for its creation (what's wrong with
- * std::seed_seq) here
+ * http://www.pcg-random.org/posts/developing-a-seed_seq-alternative.html and
+ * the
+ * motivation for its creation (what's wrong with std::seed_seq) here
  * http://www.pcg-random.org/posts/cpp-seeding-surprises.html
  *
  *
  * randutils::auto_seeded
  *
- * Extends a seed sequence class with a nondeterministic
- * default constructor.
- * Uses a variety of local sources of entropy to portably
- * initialize any seed sequence to a good default state.
+ * Extends a seed sequence class with a nondeterministic default constructor.
+ * Uses
+ * a variety of local sources of entropy to portably initialize any seed
+ * sequence
+ * to a good default state.
  *
- * In normal use, it's accessed via one of the following type
- * aliases, which use seed_seq_fe128 and seed_seq_fe256 above.
+ * In normal use, it's accessed via one of the following type aliases, which use
+ * seed_seq_fe128 and seed_seq_fe256 above.
  *
  *       randutils::auto_seed_128
  *       randutils::auto_seed_256
  *
  * It's discussed in detail at
- * http://www.pcg-random.org/posts/simple-portable-cpp-seed-entropy.html
- * and its motivation (why you can't just use
- * std::random_device) here
+ * http://www.pcg-random.org/posts/simple-portable-cpp-seed-entropy.html and its
+ * motivation (why you can't just use std::random_device) here
  * http://www.pcg-random.org/posts/cpps-random_device.html
  *
  *
@@ -57,11 +55,12 @@
  *
  * An Easy-to-Use Random API
  *
- * Provides all the power of C++11's random number facility in
- * an easy-to use wrapper.
+ * Provides all the power of C++11's random number facility in an easy-to use
+ * wrapper.
  *
- * In normal use, it's accessed via one of the following type
- * aliases, which also use auto_seed_256 by default
+ * In normal use, it's accessed via one of the following type aliases, which
+ * also
+ * use auto_seed_256 by default
  *
  *       randutils::default_rng
  *       randutils::mt19937_rng
@@ -132,69 +131,67 @@ namespace randutils {
 ///////////////////////////////////////////////////
 
 /*
- * seed_seq_fe implements a fixed-entropy seed sequence; it
- * conforms to all the requirements of a Seed Sequence concept.
+ * seed_seq_fe implements a fixed-entropy seed sequence; it conforms to all the
+ * requirements of a Seed Sequence concept.
  *
- * seed_seq_fe<N> implements a seed sequence which seeds based
- * on a store of N * 32 bits of entropy. Typically, it would be
- * initialized with N or more integers.
+ * seed_seq_fe<N> implements a seed sequence which seeds based on a store of N *
+ * 32 bits of entropy. Typically, it would be initialized with N or more
+ * integers.
  *
- * seed_seq_fe128 and seed_seq_fe256 are provided as
- * convenience typedefs for 128- and 256-bit entropy stores
- * respectively. These variants outperform std::seed_seq, while
- * being better mixing the bits it is provided as entropy. In
- * almost all common use cases, they serve as better drop-in
- * replacements for seed_seq.
+ * seed_seq_fe128 and seed_seq_fe256 are provided as convenience typedefs for
+ * 128-
+ * and 256-bit entropy stores respectively. These variants outperform
+ * std::seed_seq, while being better mixing the bits it is provided as entropy.
+ * In
+ * almost all common use cases, they serve as better drop-in replacements for
+ * seed_seq.
  *
  * Technical details
  *
- * Assuming it constructed with M seed integers as input, it
- * exhibits the following properties
+ * Assuming it constructed with M seed integers as input, it exhibits the
+ * following properties
  *
- * * Diffusion/Avalanche: A single-bit change in any of the M
- * inputs has a 50% chance of flipping every bit in the
- * bitstream produced by generate. Initializing the N-word
- * entropy store with M words requires O(N * M) time precisely
- * because of the avalanche requirements. Once constructed,
- * calls to generate are linear in the number of words
- * generated.
+ * * Diffusion/Avalanche: A single-bit change in any of the M inputs has a 50%
+ * chance of flipping every bit in the bitstream produced by generate.
+ * Initializing the N-word entropy store with M words requires O(N * M) time
+ * precisely because of the avalanche requirements. Once constructed, calls to
+ * generate are linear in the number of words generated.
  *
- * * Bias freedom/Bijection: If M == N, the state of the
- * entropy store is a bijection from the M inputs (i.e., no
- * states occur twice, none are omitted). If M > N the number
- * of times each state can occur is the same (each state occurs
- * 2**(32*(M-N)) times, where ** is the power function). If M <
- * N, some states cannot occur (bias) but no state occurs more
- * than once (it's impossible to avoid bias if M < N; ideally N
- * should not be chosen so that it is more than M).
+ * * Bias freedom/Bijection: If M == N, the state of the entropy store is a
+ * bijection from the M inputs (i.e., no states occur twice, none are omitted).
+ * If
+ * M > N the number of times each state can occur is the same (each state occurs
+ * 2**(32*(M-N)) times, where ** is the power function). If M < N, some states
+ * cannot occur (bias) but no state occurs more than once (it's impossible to
+ * avoid bias if M < N; ideally N should not be chosen so that it is more than
+ * M).
  *
- *   Likewise, the generate function has similar properties
- * (with the entropy store as the input data). If more outputs
- * are requested than there is entropy, some outputs cannot
- * occur. For example, the Mersenne Twister will request 624
- * outputs, to initialize it's 19937-bit state, which is much
- * larger than a 128-bit or 256-bit entropy pool. But in
- * practice, limiting the Mersenne Twister to 2**128 possible
- * initializations gives us enough initializations to give a
- * unique initialization to trillions of computers for billions
- * of years. If you really have 624 words of *real*
- * high-quality entropy you want to use, you probably don't
- * need an entropy mixer like this class at all. But if you
+ *   Likewise, the generate function has similar properties (with the entropy
+ * store as the input data). If more outputs are requested than there is
+ * entropy,
+ * some outputs cannot occur. For example, the Mersenne Twister will request 624
+ * outputs, to initialize it's 19937-bit state, which is much larger than a
+ * 128-bit or 256-bit entropy pool. But in practice, limiting the Mersenne
+ * Twister
+ * to 2**128 possible initializations gives us enough initializations to give a
+ * unique initialization to trillions of computers for billions of years. If you
+ * really have 624 words of *real* high-quality entropy you want to use, you
+ * probably don't need an entropy mixer like this class at all. But if you
  * *really* want to, nothing is stopping you from creating a
  * randutils::seed_seq_fe<624>.
  *
- * * As a consequence of the above properties, if all parts of
- * the provided seed data are kept constant except one, and the
- * remaining part is varied through K different states, K
- * different output sequences will be produced.
+ * * As a consequence of the above properties, if all parts of the provided seed
+ * data are kept constant except one, and the remaining part is varied through K
+ * different states, K different output sequences will be produced.
  *
- * * Also, because the amount of entropy stored is fixed, this
- * class never performs dynamic allocation and is free of the
- * possibility of generating an exception.
+ * * Also, because the amount of entropy stored is fixed, this class never
+ * performs dynamic allocation and is free of the possibility of generating an
+ * exception.
  *
- * Ideas used to implement this code include hashing, a simple
- * PCG generator based on an MCG base with an XorShift output
- * function and permutation functions on tuples.
+ * Ideas used to implement this code include hashing, a simple PCG generator
+ * based
+ * on an MCG base with an XorShift output function and permutation functions on
+ * tuples.
  *
  * More detail at
  * http://www.pcg-random.org/posts/developing-a-seed_seq-alternative.html
@@ -223,8 +220,7 @@ private:
     IntRep result = IntRep(1);
     IntRep multiplier = x;
     while (power != IntRep(0)) {
-      IntRep thismult =
-          power & IntRep(1) ? multiplier : IntRep(1);
+      IntRep thismult = power & IntRep(1) ? multiplier : IntRep(1);
       result *= thismult;
       power >>= 1;
       multiplier *= multiplier;
@@ -253,8 +249,7 @@ public:
 
   // generating functions
   template <typename RandomAccessIterator>
-  void generate(RandomAccessIterator first,
-                RandomAccessIterator last) const;
+  void generate(RandomAccessIterator first, RandomAccessIterator last) const;
 
   static constexpr size_t size() { return count; }
 
@@ -278,8 +273,8 @@ public:
 
 template <size_t count, typename IntRep, size_t r>
 template <typename InputIter>
-void seed_seq_fe<count, IntRep, r>::mix_entropy(
-    InputIter begin, InputIter end) {
+void seed_seq_fe<count, IntRep, r>::mix_entropy(InputIter begin,
+                                                InputIter end) {
   auto hash_const = INIT_A;
   auto hash = [&](IntRep value) {
     value ^= hash_const;
@@ -310,21 +305,17 @@ void seed_seq_fe<count, IntRep, r>::mix_entropy(
 
 template <size_t count, typename IntRep, size_t mix_rounds>
 template <typename OutputIterator>
-void seed_seq_fe<count, IntRep, mix_rounds>::param(
-    OutputIterator dest) const {
+void seed_seq_fe<count, IntRep, mix_rounds>::param(OutputIterator dest) const {
   const IntRep INV_A = fast_exp(MULT_A, IntRep(-1));
   const IntRep MIX_INV_L = fast_exp(MIX_MULT_L, IntRep(-1));
 
   auto mixer_copy = mixer_;
   for (size_t round = 0; round < mix_rounds; ++round) {
     // Advance to the final value.  We'll backtrack from that.
-    auto hash_const =
-        INIT_A * fast_exp(MULT_A, IntRep(count * count));
+    auto hash_const = INIT_A * fast_exp(MULT_A, IntRep(count * count));
 
-    for (auto src = mixer_copy.rbegin();
-         src != mixer_copy.rend(); ++src)
-      for (auto dest = mixer_copy.rbegin();
-           dest != mixer_copy.rend(); ++dest)
+    for (auto src = mixer_copy.rbegin(); src != mixer_copy.rend(); ++src)
+      for (auto dest = mixer_copy.rbegin(); dest != mixer_copy.rend(); ++dest)
         if (src != dest) {
           IntRep revhashed = *src;
           auto mult_const = hash_const;
@@ -338,8 +329,7 @@ void seed_seq_fe<count, IntRep, mix_rounds>::param(
           unmixed *= MIX_INV_L;
           *dest = unmixed;
         }
-    for (auto i = mixer_copy.rbegin(); i != mixer_copy.rend();
-         ++i) {
+    for (auto i = mixer_copy.rbegin(); i != mixer_copy.rend(); ++i) {
       IntRep unhashed = *i;
       unhashed ^= unhashed >> XSHIFT;
       unhashed *= fast_exp(hash_const, IntRep(-1));
@@ -354,8 +344,7 @@ void seed_seq_fe<count, IntRep, mix_rounds>::param(
 template <size_t count, typename IntRep, size_t mix_rounds>
 template <typename RandomAccessIterator>
 void seed_seq_fe<count, IntRep, mix_rounds>::generate(
-    RandomAccessIterator dest_begin,
-    RandomAccessIterator dest_end) const {
+    RandomAccessIterator dest_begin, RandomAccessIterator dest_end) const {
   auto src_begin = mixer_.begin();
   auto src_end = mixer_.end();
   auto src = src_begin;
@@ -383,21 +372,21 @@ using seed_seq_fe256 = seed_seq_fe<8, uint32_t>;
 /*
  * randutils::auto_seeded
  *
- * Extends a seed sequence class with a nondeterministic
- * default constructor. Uses a variety of local sources of
- * entropy to portably initialize any seed sequence to a good
- * default state.
+ * Extends a seed sequence class with a nondeterministic default constructor.
+ * Uses
+ * a variety of local sources of entropy to portably initialize any seed
+ * sequence
+ * to a good default state.
  *
- * In normal use, it's accessed via one of the following type
- * aliases, which use seed_seq_fe128 and seed_seq_fe256 above.
+ * In normal use, it's accessed via one of the following type aliases, which use
+ * seed_seq_fe128 and seed_seq_fe256 above.
  *
  *       randutils::auto_seed_128
  *       randutils::auto_seed_256
  *
  * It's discussed in detail at
- * http://www.pcg-random.org/posts/simple-portable-cpp-seed-entropy.html
- * and its motivation (why you can't just use
- * std::random_device) here
+ * http://www.pcg-random.org/posts/simple-portable-cpp-seed-entropy.html and its
+ * motivation (why you can't just use std::random_device) here
  * http://www.pcg-random.org/posts/cpps-random_device.html
  */
 
@@ -420,27 +409,23 @@ class auto_seeded : public SeedSeq {
   static uint32_t hash(T &&value) {
     return crushto32(
         std::hash<typename std::remove_reference<
-            typename std::remove_cv<T>::type>::type>{}(
-            std::forward<T>(value)));
+            typename std::remove_cv<T>::type>::type>{}(std::forward<T>(value)));
   }
 
-  static constexpr uint32_t fnv(uint32_t hash,
-                                const char *pos) {
-    return *pos == '\0' ? hash : fnv((hash * 16777619U) ^ *pos,
-                                     pos + 1);
+  static constexpr uint32_t fnv(uint32_t hash, const char *pos) {
+    return *pos == '\0' ? hash : fnv((hash * 16777619U) ^ *pos, pos + 1);
   }
 
   default_seeds local_entropy() {
-    // This is a constant that changes every time we compile
-    // the code
+    // This is a constant that changes every time we compile the code
     //
     // constexpr uint32_t compile_stamp =
     //    fnv(2166136261U, __DATE__ __TIME__ __FILE__);
 
-    // Some people think you shouldn't use the random device
-    // much because on some platforms it could be expensive to
-    // call or "use up" vital system-wide entropy, so we just
-    // call it once.
+    // Some people think you shouldn't use the random device much because on
+    // some
+    // platforms it could be expensive to call or "use up" vital system-wide
+    // entropy, so we just call it once.
     static uint32_t random_int = std::random_device{}();
 
     // The heap can vary from run to run as well.
@@ -449,54 +434,47 @@ class auto_seeded : public SeedSeq {
     auto heap = hash(malloc_addr);
     auto stack = hash(&malloc_addr);
 
-    // Every call, we increment our random int. We don't care
-    // about race conditons. The more, the merrier.
+    // Every call, we increment our random int. We don't care about race
+    // conditons. The more, the merrier.
     random_int += 0xedf19156;
 
     // Classic seed, the time. It ought to change, especially
     // since this is (hopefully) nanosecond resolution time.
-    auto hitime = std::chrono::high_resolution_clock::now()
-                      .time_since_epoch()
-                      .count();
+    auto hitime =
+        std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
-    // Address of the thing being initialized. That can mean
-    // that different seed sequences in different places in
-    // memory will be different. Even for the same object, it
-    // may vary from run to run in systems with ASLR, such as
-    // OS X, but on Linux it might not unless we compile with
-    // -fPIC -pic.
+    // Address of the thing being initialized. That can mean that different seed
+    // sequences in different places in memory will be different. Even for the
+    // same object, it may vary from run to run in systems with ASLR, such as OS
+    // X, but on Linux it might not unless we compile with -fPIC -pic.
     auto self_data = hash(this);
 
-    // The address of the time function. It should hopefully be
-    // in a system library that hopefully isn't always in the
-    // same place (might not change until system is rebooted
-    // though)
+    // The address of the time function. It should hopefully be in a system
+    // library that hopefully isn't always in the same place (might not change
+    // until system is rebooted though)
     //
-    // auto time_func =
-    // hash(&std::chrono::high_resolution_clock::now);
+    // auto time_func = hash(&std::chrono::high_resolution_clock::now);
 
-    // The address of the exit function. It should hopefully be
-    // in a system library that hopefully isn't always in the
-    // same place (might not change until system is rebooted
-    // though). Hopefully it's in a different library from
-    // time_func.
+    // The address of the exit function. It should hopefully be in a system
+    // library that hopefully isn't always in the same place (might not change
+    // until system is rebooted though). Hopefully it's in a different library
+    // from time_func.
     auto exit_func = hash(&_Exit);
 
-    // The address of a local function. That may be in a
-    // totally different part of memory. On OS X it'll vary
-    // from run to run thanks to ASLR, on Linux it might not
-    // unless we compile with -fPIC -pic. Need the cast because
-    // it's an overloaded function and we need to pick the
-    // right one.
-    auto self_func = hash(static_cast<uint32_t (*)(uint64_t)>(
-        &auto_seeded::crushto32));
+    // The address of a local function. That may be in a totally different part
+    // of
+    // memory. On OS X it'll vary from run to run thanks to ASLR, on Linux it
+    // might not unless we compile with -fPIC -pic. Need the cast because it's
+    // an
+    // overloaded function and we need to pick the right one.
+    auto self_func =
+        hash(static_cast<uint32_t (*)(uint64_t)>(&auto_seeded::crushto32));
 
-    // Hash our thread id. It seems to vary from run to run on
-    // OS X, not so much on Linux.
+    // Hash our thread id. It seems to vary from run to run on OS X, not so much
+    // on Linux.
     auto thread_id = hash(std::this_thread::get_id());
 
-// Hash of the ID of a type.  May or may not vary, depending on
-// implementation.
+// Hash of the ID of a type. May or may not vary, depending on implementation.
 #if __cpp_rtti || __GXX_RTTI
     auto type_id = crushto32(typeid(*this).hash_code());
 #else
@@ -507,9 +485,8 @@ class auto_seeded : public SeedSeq {
     auto pid = crushto32(RANDUTILS_GETPID);
     auto cpu = crushto32(RANDUTILS_CPU_ENTROPY);
 
-    return {{random_int, crushto32(hitime), stack, heap,
-             self_data, self_func, exit_func, thread_id,
-             type_id, pid, cpu}};
+    return {{random_int, crushto32(hitime), stack, heap, self_data, self_func,
+             exit_func, thread_id, type_id, pid, cpu}};
   }
 
 public:
@@ -521,8 +498,7 @@ public:
 
   base_seed_seq &base() { return *this; }
 
-  auto_seeded(default_seeds seeds)
-      : SeedSeq(seeds.begin(), seeds.end()) {
+  auto_seeded(default_seeds seeds) : SeedSeq(seeds.begin(), seeds.end()) {
     // Nothing else to do
   }
 
@@ -548,10 +524,10 @@ using auto_seed_256 = auto_seeded<seed_seq_fe256>;
  */
 
 template <typename Numeric>
-using uniform_distribution = typename std::conditional<
-    std::is_integral<Numeric>::value,
-    std::uniform_int_distribution<Numeric>,
-    std::uniform_real_distribution<Numeric>>::type;
+using uniform_distribution =
+    typename std::conditional<std::is_integral<Numeric>::value,
+                              std::uniform_int_distribution<Numeric>,
+                              std::uniform_real_distribution<Numeric>>::type;
 
 ///////////////////////////////////////////////////////
 //
@@ -587,16 +563,14 @@ public:
 private:
   engine_type engine_;
 
-  // This SFNAE evilness provides a mechanism to cast classes
-  // that aren't themselves (technically) Seed Sequences but
-  // derive from a seed sequence to be passed to functions that
-  // require actual Seed Squences. To do so, the class should
-  // provide a the type base_seed_seq and a base() member
-  // function.
+  // This SFNAE evilness provides a mechanism to cast classes that aren't
+  // themselves (technically) Seed Sequences but derive from a seed sequence to
+  // be
+  // passed to functions that require actual Seed Squences. To do so, the class
+  // should provide a the type base_seed_seq and a base() member function.
 
   template <typename T>
-  static constexpr bool has_base_seed_seq(
-      typename T::base_seed_seq *) {
+  static constexpr bool has_base_seed_seq(typename T::base_seed_seq *) {
     return true;
   }
 
@@ -608,31 +582,27 @@ private:
   template <typename SeedSeqBased>
   static auto seed_seq_cast(
       SeedSeqBased &&seq,
-      typename std::enable_if<has_base_seed_seq<SeedSeqBased>(
-          0)>::type * = 0) -> decltype(seq.base()) {
+      typename std::enable_if<has_base_seed_seq<SeedSeqBased>(0)>::type * = 0)
+      -> decltype(seq.base()) {
     return seq.base();
   }
 
   template <typename SeedSeq>
   static SeedSeq seed_seq_cast(
       SeedSeq &&seq,
-      typename std::enable_if<
-          !has_base_seed_seq<SeedSeq>(0)>::type * = 0) {
+      typename std::enable_if<!has_base_seed_seq<SeedSeq>(0)>::type * = 0) {
     return seq;
   }
 
 public:
-  template <typename Seeding = default_seed_type,
-            typename... Params>
+  template <typename Seeding = default_seed_type, typename... Params>
   random_generator(Seeding &&seeding = default_seed_type{})
-      : engine_{
-            seed_seq_cast(std::forward<Seeding>(seeding))} {
+      : engine_{seed_seq_cast(std::forward<Seeding>(seeding))} {
     // Nothing (else) to do
   }
 
-  // Work around Clang DR777 bug in Clang 3.6 and earlier by
-  // adding a redundant overload rather than mixing parameter
-  // packs and default arguments.
+  // Work around Clang DR777 bug in Clang 3.6 and earlier by adding a redundant
+  // overload rather than mixing parameter packs and default arguments.
   // https://llvm.org/bugs/show_bug.cgi?id=23029
   template <typename Seeding, typename... Params>
   random_generator(Seeding &&seeding, Params &&... params)
@@ -641,29 +611,23 @@ public:
     // Nothing (else) to do
   }
 
-  template <typename Seeding = default_seed_type,
-            typename... Params>
+  template <typename Seeding = default_seed_type, typename... Params>
   void seed(Seeding &&seeding = default_seed_type{}) {
     engine_.seed(seed_seq_cast(seeding));
   }
 
-  // Work around Clang DR777 bug in Clang 3.6 and earlier by
-  // adding a
-  // redundant overload rather than mixing parameter packs and
-  // default
-  // arguments.
-  //     https://llvm.org/bugs/show_bug.cgi?id=23029
+  // Work around Clang DR777 bug in Clang 3.6 and earlier by adding a redundant
+  // overload rather than mixing parameter packs and default arguments.
+  // https://llvm.org/bugs/show_bug.cgi?id=23029
   template <typename Seeding, typename... Params>
   void seed(Seeding &&seeding, Params &&... params) {
-    engine_.seed(seed_seq_cast(seeding),
-                 std::forward<Params>(params)...);
+    engine_.seed(seed_seq_cast(seeding), std::forward<Params>(params)...);
   }
 
   RandomEngine &engine() { return engine_; }
 
   template <typename ResultType,
-            template <typename>
-            class DistTmpl = std::normal_distribution,
+            template <typename> class DistTmpl = std::normal_distribution,
             typename... Params>
   ResultType variate(Params &&... params) {
     DistTmpl<ResultType> dist(std::forward<Params>(params)...);
@@ -675,38 +639,30 @@ public:
    */
   template <typename Numeric>
   Numeric uniform(Numeric lower, Numeric upper) {
-    return variate<Numeric, uniform_distribution>(lower,
-                                                  upper);
+    return variate<Numeric, uniform_distribution>(lower, upper);
   }
 
   /**
    * [0,1)
    */
-  double uniform() {
-    return variate<double, uniform_distribution>(0.0, 1.0);
-  }
+  double uniform() { return variate<double, uniform_distribution>(0.0, 1.0); }
 
   double normal(double mean = 0, double variance = 1) {
-    return variate<double, std::normal_distribution>(mean,
-                                                     variance);
+    return variate<double, std::normal_distribution>(mean, variance);
   }
 
-  template <template <typename>
-            class DistTmpl = uniform_distribution,
+  template <template <typename> class DistTmpl = uniform_distribution,
             typename Iter, typename... Params>
   void generate(Iter first, Iter last, Params &&... params) {
     using result_type =
-        typename std::remove_reference<decltype(
-            *(first))>::type;
+        typename std::remove_reference<decltype(*(first))>::type;
 
-    DistTmpl<result_type> dist(
-        std::forward<Params>(params)...);
+    DistTmpl<result_type> dist(std::forward<Params>(params)...);
 
     std::generate(first, last, [&] { return dist(engine_); });
   }
 
-  template <template <typename>
-            class DistTmpl = uniform_distribution,
+  template <template <typename> class DistTmpl = uniform_distribution,
             typename Range, typename... Params>
   void generate(Range &&range, Params &&... params) {
     generate<DistTmpl>(std::begin(range), std::end(range),
@@ -744,8 +700,7 @@ public:
   }
 
   template <typename T>
-  auto pick(std::initializer_list<T> range)
-      -> decltype(*range.begin()) {
+  auto pick(std::initializer_list<T> range) -> decltype(*range.begin()) {
     return *choose(range.begin(), range.end());
   }
 
@@ -754,29 +709,26 @@ public:
     auto total = std::distance(first, last);
     using value_type = decltype(*first);
 
-    return std::stable_partition(
-        first, last, [&](const value_type &) {
-          --total;
-          using distance_type = decltype(total);
-          distance_type zero{};
-          if (uniform(zero, total) < to_go) {
-            --to_go;
-            return true;
-          } else {
-            return false;
-          }
-        });
+    return std::stable_partition(first, last, [&](const value_type &) {
+      --total;
+      using distance_type = decltype(total);
+      distance_type zero{};
+      if (uniform(zero, total) < to_go) {
+        --to_go;
+        return true;
+      } else {
+        return false;
+      }
+    });
   }
 
   template <typename Size, typename Range>
-  auto sample(Size to_go, Range &&range)
-      -> decltype(std::begin(range)) {
+  auto sample(Size to_go, Range &&range) -> decltype(std::begin(range)) {
     return sample(to_go, std::begin(range), std::end(range));
   }
 };
 
-using default_rng =
-    random_generator<std::default_random_engine>;
+using default_rng = random_generator<std::default_random_engine>;
 using mt19937_rng = random_generator<std::mt19937>;
 
 ///////////////////////////////////////////////////////////
@@ -788,9 +740,8 @@ using mt19937_rng = random_generator<std::mt19937>;
  */
 template <typename RandomEngine = std::default_random_engine,
           typename DefaultSeedSeq = auto_seed_256>
-const int sample(
-    const std::vector<double> distribution,
-    random_generator<RandomEngine, DefaultSeedSeq> &rng) {
+const int sample(const std::vector<double> &distribution,
+                 random_generator<RandomEngine, DefaultSeedSeq> &rng) {
   int id = 0;
   double r = rng.uniform(), accu = distribution[0];
   while (r > accu) accu += distribution[++id];
@@ -801,20 +752,33 @@ const int sample(
  * Sample from a distribution.
  * Return: the index of the sampled element in the vector.
  * Require: sum(distribution) == 1
- * NOTE: This version does not need the weight vector is
- * normalized, but need to known the sum of weights.
+ * NOTE: This version does not need the weight vector is normalized, but need to
+ * known the sum of weights.
  */
 template <typename RandomEngine = std::default_random_engine,
           typename DefaultSeedSeq = auto_seed_256>
-const int sampleFast(
-    const std::vector<double> weights,
-    const double sum_weights,
-    random_generator<RandomEngine, DefaultSeedSeq> &rng) {
+const int sampleFast(const std::vector<double> &weights,
+                     const double sum_weights,
+                     random_generator<RandomEngine, DefaultSeedSeq> &rng) {
   int id = 0;
   double r = rng.uniform() * sum_weights, accu = weights[0];
   while (r > accu) accu += weights[++id];
   return id;
 }
+
+/**
+ * Choose an element from the population uniformly at random.
+ * Return: the element in the population
+ * Require: the population is non-empty
+ */
+template <typename Numeric, typename RandomEngine = std::default_random_engine,
+          typename DefaultSeedSeq = auto_seed_256>
+const Numeric choice(const std::vector<Numeric> &population,
+                     random_generator<RandomEngine, DefaultSeedSeq> &rng) {
+  size_t idx = rng.uniform(std::size_t{0}, population.size() - 1);
+  return population[idx];
 }
+
+}  // namespace randutils
 
 #endif  // RANDUTILS_HPP

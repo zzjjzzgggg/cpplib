@@ -1,8 +1,7 @@
 #include "osutils.h"
 namespace osutils {
 
-std::string joinPath(const std::string &parent,
-                     const std::string &child) {
+std::string join(const std::string &parent, const std::string &child) {
   if (!parent.empty()) {
     if (parent.back() == pathSeparator())
       return parent + child;
@@ -12,7 +11,11 @@ std::string joinPath(const std::string &parent,
       return new_parent + child;
     }
   } else
-    return joinPath("./", child);
+    return join("./", child);
 }
 
+std::string join(const std::string &parent, const std::string &child1,
+                 const std::string &child2) {
+  return join(join(parent, child1), child2);
+}
 }
