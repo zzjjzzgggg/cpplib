@@ -3,155 +3,67 @@
 namespace ioutils {
 
 bool isGZip(const std::string& filename) {
-  std::unordered_set<std::string> gzip_exts;
-  gzip_exts.insert(".gz");
-  gzip_exts.insert(".zip");
-  std::string base, name, ext;
-  strutils::splitFilename(filename, base, name, ext);
-  return gzip_exts.find(ext) != gzip_exts.end();
+    std::unordered_set<std::string> gzip_exts;
+    gzip_exts.insert(".gz");
+    gzip_exts.insert(".zip");
+    std::string base, name, ext;
+    strutils::splitFilename(filename, base, name, ext);
+    return gzip_exts.find(ext) != gzip_exts.end();
 }
 
 bool isLZ4(const std::string& filename) {
-  std::unordered_set<std::string> lz4_exts;
-  lz4_exts.insert(".lz");
-  lz4_exts.insert(".lz4");
-  std::string base, name, ext;
-  strutils::splitFilename(filename, base, name, ext);
-  return lz4_exts.find(ext) != lz4_exts.end();
-  return true;
+    std::unordered_set<std::string> lz4_exts;
+    lz4_exts.insert(".lz");
+    lz4_exts.insert(".lz4");
+    std::string base, name, ext;
+    strutils::splitFilename(filename, base, name, ext);
+    return lz4_exts.find(ext) != lz4_exts.end();
+    return true;
 }
 
 std::unique_ptr<IOOut> getIOOut(const std::string& filename,
                                 const bool append) {
-  if (isGZip(filename))
-    return std::make_unique<GZipOut>(filename);
-  else if (isLZ4(filename))
-    return std::make_unique<LZ4Out>(filename.c_str(), append);
-  return std::make_unique<NormOut>(filename, append);
+    if (isGZip(filename))
+        return std::make_unique<GZipOut>(filename);
+    else if (isLZ4(filename))
+        return std::make_unique<LZ4Out>(filename.c_str(), append);
+    return std::make_unique<NormOut>(filename, append);
 }
 
 std::unique_ptr<IOIn> getIOIn(const std::string& filename) {
-  if (isGZip(filename))
-    return std::make_unique<GZipIn>(filename);
-  else if (isLZ4(filename))
-    return std::make_unique<LZ4In>(filename.c_str());
-  return std::make_unique<NormIn>(filename);
+    if (isGZip(filename))
+        return std::make_unique<GZipIn>(filename);
+    else if (isLZ4(filename))
+        return std::make_unique<LZ4In>(filename.c_str());
+    return std::make_unique<NormIn>(filename);
 }
 
 bool TSVParser::next() {
-  field_vec.clear();
-  line_NO++;
-  if (in_ptr->readLine(buf, 1024) == 0) return false;
-  if (buf[0] == '#') return next();
-  strutils::split(buf, split_ch, field_vec);
-  return true;
+    field_vec.clear();
+    line_NO++;
+    if (in_ptr->readLine(buf, 1024) == 0) return false;
+    if (buf[0] == '#') return next();
+    strutils::split(buf, split_ch, field_vec);
+    return true;
 }
 
-int TSVParser::getInt(const int& id) const {
-  int val = 0;
-  try {
-    val = std::stoi(field_vec[id]);
-  } catch (const std::invalid_argument& err) {
-    fprintf(stderr, "Field %d in line %lu is not integer\n", id, line_NO);
-  }
-  return val;
+template <>
+auto TSVParser::get<int>(const int& id) const -> int {
+    return std::stoi(field_vec[id]);
 }
 
-double TSVParser::getFlt(const int& id) const {
-  double val = 0.0;
-  try {
-    val = std::stod(field_vec[id]);
-  } catch (const std::invalid_argument& err) {
-    fprintf(stderr, "Field %d in line %lu is not double\n", id, line_NO);
-  }
-  return val;
+template <>
+auto TSVParser::get<float>(const int& id) const -> float {
+    return std::stof(field_vec[id]);
 }
 
-////////////////////////////////////////////////////////////
-// vector saver
-void saveIntVec(const std::vector<int>& vec, const std::string& filename,
-                const std::string& ano) {
-  saveVec(vec, filename, "{}\n", ano);
+template <>
+auto TSVParser::get<double>(const int& id) const -> double {
+    return std::stod(field_vec[id]);
 }
 
-void saveFltVec(const std::vector<double>& vec, const std::string& filename,
-                const std::string& ano) {
-  saveVec(vec, filename, "{:.6e}\n", ano);
-}
-
-void saveIntPrVec(const std::vector<std::pair<int, int>>& vec,
-                  const std::string& filename, const std::string& ano) {
-  savePrVec(vec, filename, "{}\t{}\n", ano);
-}
-
-void saveFltPrVec(const std::vector<std::pair<double, double>>& vec,
-                  const std::string& filename, const std::string& ano) {
-  savePrVec(vec, filename, "{:.6e}\t{:.6e}\n", ano);
-}
-
-void saveIntFltPrVec(const std::vector<std::pair<int, double>>& vec,
-                     const std::string& filename, const std::string& ano) {
-  savePrVec(vec, filename, "{}\t{:.6e}\n", ano);
-}
-////////////////////////////////////////////////////////////
-// vector loader
-void loadIntVec(const std::string& filename, std::vector<int>& vec,
-                const int col) {
-  TSVParser ss(filename);
-  while (ss.next()) vec.push_back(ss.getInt(col));
-}
-
-void loadFltVec(const std::string& filename, std::vector<double>& vec,
-                const int col) {
-  TSVParser ss(filename);
-  while (ss.next()) vec.push_back(ss.getFlt(col));
-}
-
-void loadIntPrVec(const std::string& filename,
-                  std::vector<std::pair<int, int>>& vec, const int c0,
-                  const int c1) {
-  TSVParser ss(filename);
-  while (ss.next()) vec.emplace_back(ss.getInt(c0), ss.getInt(c1));
-}
-
-void loadFltPrVec(const std::string& filename,
-                  std::vector<std::pair<double, double>>& vec, const int c0,
-                  const int c1) {
-  TSVParser ss(filename);
-  while (ss.next()) vec.emplace_back(ss.getFlt(c0), ss.getFlt(c1));
-}
-
-void loadIntFltPrVec(const std::string& filename,
-                     std::vector<std::pair<int, double>>& vec, const int c0,
-                     const int c1) {
-  TSVParser ss(filename);
-  while (ss.next()) vec.emplace_back(ss.getInt(c0), ss.getFlt(c1));
-}
-
-////////////////////////////////////////////////////////////
-// map saver
-void saveIntMap(const std::unordered_map<int, int>& mp,
-                const std::string& filename, const std::string& ano) {
-  saveMap(mp, filename, "{}\t{}\n", ano);
-}
-
-void saveIntFltMap(const std::unordered_map<int, double>& mp,
-                   const std::string& filename, const std::string& ano) {
-  saveMap(mp, filename, "{}\t{:.6e}\n", ano);
-}
-
-////////////////////////////////////////////////////////////
-// map loader
-void loadIntMap(const std::string& filename, std::unordered_map<int, int>& mp,
-                const int kc, const int vc) {
-  TSVParser ss(filename);
-  while (ss.next()) mp[ss.getInt(kc)] = ss.getInt(vc);
-}
-
-void loadIntFltMap(const std::string& filename,
-                   std::unordered_map<int, double>& mp, const int kc,
-                   const int vc) {
-  TSVParser ss(filename);
-  while (ss.next()) mp[ss.getInt(kc)] = ss.getFlt(vc);
+template <>
+auto TSVParser::get<std::string>(const int& id) const -> std::string {
+    return field_vec[id];
 }
 }

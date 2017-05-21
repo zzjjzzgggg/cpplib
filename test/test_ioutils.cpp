@@ -10,10 +10,17 @@
 
 using namespace ioutils;
 
-int main(int argc, char *argv[]) {
-  LZ4Out lzo("/home/jzzhao/workspace/test/lz4/oneblock.lz4");
-  const char* data = "this is a test aaa";
-  printf("%lu, %lu\n", std::strlen(data), strlen(data));
-  lzo.write(data, std::strlen(data));
-  return 0;
+int main(int argc, char* argv[]) {
+    TSVParser parser("test.dat");
+    if (parser.next()) {
+        int x = parser.get<int>(0);
+        int y = parser.get<int>(1);
+        printf("%d\t%d\n", x, y);
+    }
+    if (parser.next()) {
+        double x = parser.get<double>(0);
+        double y = parser.get<double>(1);
+        printf("%.2e\t%.2e\n", x, y);
+    }
+    return 0;
 }
