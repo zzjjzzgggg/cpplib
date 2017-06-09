@@ -16,3 +16,6 @@ add_executable(test_argsparser test_argsparser.cpp)
 target_link_libraries(test_argsparser argsparser)
 
 add_executable(test_randutils test_randutils.cpp)
+
+add_executable(test_graph test_graph.cpp)
+target_link_libraries(test_graph graph)

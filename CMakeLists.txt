@@ -29,9 +29,11 @@ add_library(ppk_assert SHARED Assert/src/ppk_assert.cpp)
 include_directories(str)
 include_directories(os)
 include_directories(io)
+include_directories(graph)
 
 add_subdirectory(str)
 add_subdirectory(os)
 add_subdirectory(io)
+add_subdirectory(graph)
 
 add_subdirectory(test)
