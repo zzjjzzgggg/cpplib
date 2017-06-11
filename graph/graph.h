@@ -51,9 +51,9 @@ public:
         /**
          * Make sure the node has neighbors before calling this method
          */
-        int sampleNbr() {
-            auto iter = rng_.choose<std::vector<int>::iterator>(nbrs_.begin(),
-                                                                nbrs_.end());
+        int sampleNbr(randutils::random_generator<>& rng) {
+            auto iter = rng.choose<std::vector<int>::iterator>(nbrs_.begin(),
+                                                               nbrs_.end());
             return *iter;
         }
 
@@ -62,11 +62,15 @@ public:
         }
 
         void addNbr(const int nbr) { nbrs_.push_back(nbr); }
-        void sort() { std::sort(nbrs_.begin(), nbrs_.end()); }
+        void defrag() {
+            std::sort(nbrs_.begin(), nbrs_.end());
+            auto last = std::unique(nbrs_.begin(), nbrs_.end());
+            nbrs_.erase(last, nbrs_.end());
+        }
     };
 
 private:
-    static randutils::default_rng rng_;
+    randutils::default_rng rng_;
     std::unordered_map<int, Node> nodes_;  // maps a node id to its node object
 
 public:
@@ -110,6 +114,8 @@ public:
         return iter->first;
     }
 
+    int sampleNbr(int id) { return getNode(id).sampleNbr(rng_); }
+
     void addNode(int id) {
         if (!isNode(id)) nodes_[id] = Node{id};
     }
@@ -129,7 +135,7 @@ public:
      * Including: sort neighbors of each node increasingly.
      */
     void optimize() {
-        for (auto& p : nodes_) p.second.sort();
+        for (auto& p : nodes_) p.second.defrag();
     }
 };
 
@@ -179,8 +185,8 @@ public:
         /**
          * Make sure the node has out-neighbors before calling this method
          */
-        int sampleOutNbr() {
-            auto iter = rng_.choose<std::vector<int>::iterator>(
+        int sampleOutNbr(randutils::random_generator<>& rng) {
+            auto iter = rng.choose<std::vector<int>::iterator>(
                 out_nbrs_.begin(), out_nbrs_.end());
             return *iter;
         }
@@ -188,9 +194,9 @@ public:
         /**
          * Make sure the node has in-neighbors before calling this method
          */
-        int sampleInNbr() {
-            auto iter = rng_.choose<std::vector<int>::iterator>(
-                in_nbrs_.begin(), in_nbrs_.end());
+        int sampleInNbr(randutils::random_generator<>& rng) {
+            auto iter = rng.choose<std::vector<int>::iterator>(in_nbrs_.begin(),
+                                                               in_nbrs_.end());
             return *iter;
         }
 
@@ -201,14 +207,18 @@ public:
         void addInNbr(const int nbr) { in_nbrs_.push_back(nbr); }
         void addOutNbr(const int nbr) { out_nbrs_.push_back(nbr); }
 
-        void sort() {
+        void defrag() {
             std::sort(in_nbrs_.begin(), in_nbrs_.end());
             std::sort(out_nbrs_.begin(), out_nbrs_.end());
+            auto last_i = std::unique(in_nbrs_.begin(), in_nbrs_.end());
+            in_nbrs_.erase(last_i, in_nbrs_.end());
+            auto last_o = std::unique(out_nbrs_.begin(), out_nbrs_.end());
+            out_nbrs_.erase(last_o, out_nbrs_.end());
         }
     };
 
 private:
-    static randutils::default_rng rng_;
+    randutils::default_rng rng_;
     std::unordered_map<int, Node> nodes_;  // maps a node id to its node object
 
 public:
@@ -255,6 +265,9 @@ public:
         return iter->first;
     }
 
+    int sampleInNbr(int id) { return getNode(id).sampleInNbr(rng_); }
+    int sampleOutNbr(int id) { return getNode(id).sampleOutNbr(rng_); }
+
     void addNode(int id) {
         if (!isNode(id)) nodes_[id] = Node{id};
     }
@@ -274,12 +287,12 @@ public:
      * Including: sort neighbors of each node increasingly.
      */
     void optimize() {
-        for (auto& p : nodes_) p.second.sort();
+        for (auto& p : nodes_) p.second.defrag();
     }
 };
 
 template <typename Graph>
-Graph loadEdgelist(const std::string& edges_fnm) {
+Graph loadEdgeList(const std::string& edges_fnm) {
     Graph G;
     ioutils::TSVParser ss{edges_fnm};
     while (ss.next()) {
@@ -293,7 +306,7 @@ Graph loadEdgelist(const std::string& edges_fnm) {
 }
 
 template <typename Graph>
-Graph loadBinEdgelist(const std::string& edges_fnm) {
+Graph loadBinEdgeList(const std::string& edges_fnm) {
     Graph G;
     int src, dst;
     auto pin = ioutils::getIOIn(edges_fnm);
@@ -304,6 +317,13 @@ Graph loadBinEdgelist(const std::string& edges_fnm) {
         G.addNode(dst);
         G.addEdge(src, dst);
     }
+    G.optimize();
+    return G;
+}
+
+template <typename Graph>
+Graph loadBinary(const std::string& edges_fnm) {
+    Graph G;
     G.optimize();
     return G;
 }

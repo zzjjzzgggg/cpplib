@@ -14,7 +14,6 @@ int main(int argc, char* argv[]) {
     printf("d: %d\n", G.getNode(1).getInDeg());
     printf("%d\n", G.sampleNode());
 
-    auto& node = G.getNode(1);
-    printf("%d\n", node.sampleOutNbr());
+    printf("%d\n", G.sampleOutNbr(1));
     return 0;
 }

@@ -9,18 +9,17 @@
 #include "ioutils.h"
 
 using namespace ioutils;
+using namespace std;
 
 int main(int argc, char* argv[]) {
-    TSVParser parser("test.dat");
-    if (parser.next()) {
-        int x = parser.get<int>(0);
-        int y = parser.get<int>(1);
-        printf("%d\t%d\n", x, y);
-    }
-    if (parser.next()) {
-        double x = parser.get<double>(0);
-        double y = parser.get<double>(1);
-        printf("%.2e\t%.2e\n", x, y);
+    int n = 0;
+    TSVParser parser("~/workspace/discoverability/enron/graph.gz");
+    while (parser.next()) {
+        n++;
+        string x = parser.get<string>(0);
+        string y = parser.get<string>(1);
+        printf("%s\t%s\n", x.c_str(), y.c_str());
+        if (n > 10) break;
     }
     return 0;
 }

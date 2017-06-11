@@ -64,6 +64,6 @@ auto TSVParser::get<double>(const int& id) const -> double {
 
 template <>
 auto TSVParser::get<std::string>(const int& id) const -> std::string {
-    return field_vec[id];
+    return strutils::trim(field_vec[id]);
 }
 }

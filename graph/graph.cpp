@@ -5,7 +5,4 @@
 
 #include "graph.h"
 
-namespace graph {
-randutils::default_rng UGraph::rng_;
-randutils::default_rng DGraph::rng_;
-}
+namespace graph {}

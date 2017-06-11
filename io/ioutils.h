@@ -52,20 +52,20 @@ public:
 // vector saver
 template <class TVal>
 void saveVec(const std::vector<TVal>& vec, const std::string& filename,
-             const std::string& ano = "") {
+             const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
-    if (!ano.empty()) out_ptr->save(ano);
     for (auto val : vec) out_ptr->save(fmt::format("{}\n", val));
+    if (echo) printf("vector is saved to %s\n", filename.c_str());
 }
 
 template <class T1, class T2>
 void savePrVec(const std::vector<std::pair<T1, T2>>& vec,
-               const std::string& filename, const std::string& ano = "") {
+               const std::string& filename, const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
-    if (!ano.empty()) out_ptr->save(ano);
     for (auto& pr : vec)
         out_ptr->save(fmt::format("{}\t{}\n", pr.first, pr.second));
     out_ptr->close();
+    if (echo) printf("pair vector is saved to %s\n", filename.c_str());
 }
 
 // vector loader
@@ -85,20 +85,29 @@ void loadPrVec(const std::string& filename, std::vector<std::pair<T1, T2>>& vec,
 
 // map saver
 template <class TKey, class TVal>
-void saveMap(const std::unordered_map<TKey, TVal>& mp,
-             const std::string& filename, const std::string& ano = "") {
+void saveMap(const std::unordered_map<TKey, TVal>& map,
+             const std::string& filename, const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
-    if (!ano.empty()) out_ptr->save(ano);
-    for (auto& pr : mp)
+    for (auto& pr : map)
         out_ptr->save(fmt::format("{}\t{}\n", pr.first, pr.second));
+    if (echo) printf("map is saved to %s\n", filename.c_str());
+}
+
+// set saver
+template <class T>
+void saveSet(const std::unordered_set<T>& set, const std::string& filename,
+             const bool echo = true) {
+    std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
+    for (auto val : set) out_ptr->save(fmt::format("{}\n", val));
+    if (echo) printf("set is saved to %s\n", filename.c_str());
 }
 
 // map loader
 template <class TKey, class TVal>
-void loadMap(const std::string& filename, std::unordered_map<TKey, TVal>& mp,
+void loadMap(const std::string& filename, std::unordered_map<TKey, TVal>& map,
              const int kc = 0, const int vc = 1) {
     TSVParser ss(filename);
-    while (ss.next()) mp[ss.get<TKey>(kc)] = ss.get<TVal>(vc);
+    while (ss.next()) map[ss.get<TKey>(kc)] = ss.get<TVal>(vc);
 }
 
 } /* namespace ioutils */
