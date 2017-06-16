@@ -69,6 +69,7 @@
  * http://www.pcg-random.org/posts/ease-of-use-without-loss-of-power.html
  */
 
+#include <cassert>
 #include <algorithm>
 #include <array>
 #include <chrono>
@@ -774,6 +775,7 @@ template <typename RandomEngine = std::default_random_engine,
           typename DefaultSeedSeq = auto_seed_256>
 const int sample(const std::vector<double> &weights, const double sum_weights,
                  random_generator<RandomEngine, DefaultSeedSeq> &rng) {
+    assert(sum_weights > 0 && !weights.empty());
     int id = 0;
     double r = rng.uniform() * sum_weights, accu = weights[0];
     while (r > accu) accu += weights[++id];
@@ -789,6 +791,7 @@ template <typename Numeric, typename RandomEngine = std::default_random_engine,
           typename DefaultSeedSeq = auto_seed_256>
 const Numeric choice(const std::vector<Numeric> &population,
                      random_generator<RandomEngine, DefaultSeedSeq> &rng) {
+    assert(!population.empty());
     size_t idx = rng.uniform(std::size_t{0}, population.size() - 1);
     return population[idx];
 }
