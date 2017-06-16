@@ -34,17 +34,18 @@ public:
         Node& operator=(const Node&) = delete;
 
         // move constructor/assignment
-        Node(Node&& other) : id_(other.id_), nbrs_(std::move(other.nbrs_)) {
-            other.nbrs_.clear();
-        }
+        Node(Node&& other) : id_(other.id_), nbrs_(std::move(other.nbrs_)) {}
 
         Node& operator=(Node&& other) {
             id_ = other.id_;
             nbrs_ = std::move(other.nbrs_);
-            other.nbrs_.clear();
             return *this;
         }
 
+        void save(std::unique_ptr<ioutils::IOOut>& po);
+        void load(std::unique_ptr<ioutils::IOIn>& pi);
+
+        int getID() const { return id_; }
         int getDeg() const { return nbrs_.size(); }
         int getNbr(const int d) const { return nbrs_[d]; }
 
@@ -91,6 +92,9 @@ public:
         other.nodes_.clear();
         return *this;
     }
+
+    void save(const std::string& filename);
+    void load(const std::string& filename);
 
     bool isNode(const int id) const { return nodes_.find(id) != nodes_.end(); }
     bool isEdge(const int src, const int dst) const {
@@ -160,20 +164,19 @@ public:
         // move constructor/assignment
         Node(Node&& other)
             : id_(other.id_), in_nbrs_(std::move(other.in_nbrs_)),
-              out_nbrs_(std::move(other.out_nbrs_)) {
-            other.in_nbrs_.clear();
-            other.out_nbrs_.clear();
-        }
+              out_nbrs_(std::move(other.out_nbrs_)) {}
 
         Node& operator=(Node&& other) {
             id_ = other.id_;
             in_nbrs_ = std::move(other.in_nbrs_);
             out_nbrs_ = std::move(other.out_nbrs_);
-            other.in_nbrs_.clear();
-            other.out_nbrs_.clear();
             return *this;
         }
 
+        void save(std::unique_ptr<ioutils::IOOut>& po);
+        void load(std::unique_ptr<ioutils::IOIn>& pi);
+
+        int getID() const { return id_; }
         int getInDeg() const { return in_nbrs_.size(); }
         int getOutDeg() const { return out_nbrs_.size(); }
         int getInNbr(const int d) const { return in_nbrs_[d]; }
@@ -239,6 +242,9 @@ public:
         other.nodes_.clear();
         return *this;
     }
+
+    void save(const std::string& filename);
+    void load(const std::string& filename);
 
     bool isNode(const int id) const { return nodes_.find(id) != nodes_.end(); }
     bool isEdge(const int src, const int dst) const {
@@ -322,11 +328,12 @@ Graph loadBinEdgeList(const std::string& edges_fnm) {
 }
 
 template <typename Graph>
-Graph loadBinary(const std::string& edges_fnm) {
+Graph loadBinary(const std::string& filename) {
     Graph G;
-    G.optimize();
+    G.load(filename);
     return G;
 }
-}
+
+}  // end namespace graph
 
 #endif /* __GRAPH_H__ */

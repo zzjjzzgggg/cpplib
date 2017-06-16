@@ -1,19 +1,20 @@
 #include <cstdio>
 
+#include "osutils.h"
 #include "graph.h"
 
 int main(int argc, char* argv[]) {
-    graph::DGraph G;
-    G.addNode(1);
-    G.addNode(2);
-    G.addNode(3);
-    G.addEdge(1, 1);
-    G.addEdge(1, 2);
-    G.addEdge(1, 3);
-    printf("n: %d, e: %d\n", G.getNodes(), G.getEdges());
-    printf("d: %d\n", G.getNode(1).getInDeg());
-    printf("%d\n", G.sampleNode());
+    osutils::Timer tm;
+    graph::DGraph G = graph::loadEdgeList<graph::DGraph>(
+        "~/workspace/datasets/cit-HepTh_digraph.gz");
+    printf("n: %d, e: %d, %s\n", G.getNodes(), G.getEdges(),
+           tm.getStr().c_str());
+    // G.save("test.lz");
 
-    printf("%d\n", G.sampleOutNbr(1));
+    tm.tick();
+    graph::DGraph H = graph::loadBinary<graph::DGraph>("test.lz");
+    printf("n: %d, e: %d, %s\n", H.getNodes(), H.getEdges(),
+           tm.getStr().c_str());
+
     return 0;
 }
