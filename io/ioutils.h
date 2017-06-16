@@ -55,7 +55,7 @@ void saveVec(const std::vector<TVal>& vec, const std::string& filename,
              const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     for (auto val : vec) out_ptr->save(fmt::format("{}\n", val));
-    if (echo) printf("vector is saved to %s\n", filename.c_str());
+    if (echo) printf("saved to %s\n", filename.c_str());
 }
 
 template <class T1, class T2>
@@ -65,7 +65,7 @@ void savePrVec(const std::vector<std::pair<T1, T2>>& vec,
     for (auto& pr : vec)
         out_ptr->save(fmt::format("{}\t{}\n", pr.first, pr.second));
     out_ptr->close();
-    if (echo) printf("pair vector is saved to %s\n", filename.c_str());
+    if (echo) printf("saved to %s\n", filename.c_str());
 }
 
 // vector loader
@@ -90,7 +90,7 @@ void saveMap(const std::unordered_map<TKey, TVal>& map,
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     for (auto& pr : map)
         out_ptr->save(fmt::format("{}\t{}\n", pr.first, pr.second));
-    if (echo) printf("map is saved to %s\n", filename.c_str());
+    if (echo) printf("saved to %s\n", filename.c_str());
 }
 
 // set saver
@@ -99,7 +99,7 @@ void saveSet(const std::unordered_set<T>& set, const std::string& filename,
              const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     for (auto val : set) out_ptr->save(fmt::format("{}\n", val));
-    if (echo) printf("set is saved to %s\n", filename.c_str());
+    if (echo) printf("saved to %s\n", filename.c_str());
 }
 
 // map loader
