@@ -52,9 +52,8 @@ public:
         /**
          * Make sure the node has neighbors before calling this method
          */
-        int sampleNbr(randutils::random_generator<>& rng) {
-            auto iter = rng.choose<std::vector<int>::iterator>(nbrs_.begin(),
-                                                               nbrs_.end());
+        int sampleNbr(randutils::random_generator<>& rng) const {
+            auto iter = rng.choose(nbrs_.begin(), nbrs_.end());
             return *iter;
         }
 
@@ -71,7 +70,7 @@ public:
     };
 
 private:
-    randutils::default_rng rng_;
+    mutable randutils::default_rng rng_;   // we don't care rng_
     std::unordered_map<int, Node> nodes_;  // maps a node id to its node object
 
 public:
@@ -112,13 +111,12 @@ public:
     Node& getNode(const int id) { return nodes_[id]; }
     const Node& getNode(const int id) const { return nodes_.at(id); }
 
-    int sampleNode() {
-        auto iter = rng_.choose<std::unordered_map<int, Node>::iterator>(
-            nodes_.begin(), nodes_.end());
+    int sampleNode() const {
+        auto iter = rng_.choose(nodes_.begin(), nodes_.end());
         return iter->first;
     }
 
-    int sampleNbr(int id) { return getNode(id).sampleNbr(rng_); }
+    int sampleNbr(int id) const { return getNode(id).sampleNbr(rng_); }
 
     void addNode(int id) {
         if (!isNode(id)) nodes_[id] = Node{id};
@@ -188,18 +186,16 @@ public:
         /**
          * Make sure the node has out-neighbors before calling this method
          */
-        int sampleOutNbr(randutils::random_generator<>& rng) {
-            auto iter = rng.choose<std::vector<int>::iterator>(
-                out_nbrs_.begin(), out_nbrs_.end());
+        int sampleOutNbr(randutils::random_generator<>& rng) const {
+            auto iter = rng.choose(out_nbrs_.begin(), out_nbrs_.end());
             return *iter;
         }
 
         /**
          * Make sure the node has in-neighbors before calling this method
          */
-        int sampleInNbr(randutils::random_generator<>& rng) {
-            auto iter = rng.choose<std::vector<int>::iterator>(in_nbrs_.begin(),
-                                                               in_nbrs_.end());
+        int sampleInNbr(randutils::random_generator<>& rng) const {
+            auto iter = rng.choose(in_nbrs_.begin(), in_nbrs_.end());
             return *iter;
         }
 
@@ -221,7 +217,7 @@ public:
     };
 
 private:
-    randutils::default_rng rng_;
+    mutable randutils::default_rng rng_;
     std::unordered_map<int, Node> nodes_;  // maps a node id to its node object
 
 public:
@@ -265,14 +261,13 @@ public:
     /**
      * Make sure the graph has nodes before calling this method
      */
-    int sampleNode() {
-        auto iter = rng_.choose<std::unordered_map<int, Node>::iterator>(
-            nodes_.begin(), nodes_.end());
+    int sampleNode() const {
+        auto iter = rng_.choose(nodes_.begin(), nodes_.end());
         return iter->first;
     }
 
-    int sampleInNbr(int id) { return getNode(id).sampleInNbr(rng_); }
-    int sampleOutNbr(int id) { return getNode(id).sampleOutNbr(rng_); }
+    int sampleInNbr(int id) const { return getNode(id).sampleInNbr(rng_); }
+    int sampleOutNbr(int id) const { return getNode(id).sampleOutNbr(rng_); }
 
     void addNode(int id) {
         if (!isNode(id)) nodes_[id] = Node{id};
