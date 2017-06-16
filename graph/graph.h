@@ -42,7 +42,7 @@ public:
             return *this;
         }
 
-        void save(std::unique_ptr<ioutils::IOOut>& po);
+        void save(std::unique_ptr<ioutils::IOOut>& po) const;
         void load(std::unique_ptr<ioutils::IOIn>& pi);
 
         int getID() const { return id_; }
@@ -93,7 +93,7 @@ public:
         return *this;
     }
 
-    void save(const std::string& filename);
+    void save(const std::string& filename) const;
     void load(const std::string& filename);
 
     bool isNode(const int id) const { return nodes_.find(id) != nodes_.end(); }
@@ -173,7 +173,7 @@ public:
             return *this;
         }
 
-        void save(std::unique_ptr<ioutils::IOOut>& po);
+        void save(std::unique_ptr<ioutils::IOOut>& po) const;
         void load(std::unique_ptr<ioutils::IOIn>& pi);
 
         int getID() const { return id_; }
@@ -243,7 +243,7 @@ public:
         return *this;
     }
 
-    void save(const std::string& filename);
+    void save(const std::string& filename) const;
     void load(const std::string& filename);
 
     bool isNode(const int id) const { return nodes_.find(id) != nodes_.end(); }

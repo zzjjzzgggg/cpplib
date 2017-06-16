@@ -18,10 +18,13 @@ void splitFilename(const std::string &fullname, std::string &base,
                    std::string &fnm_wo_ext, std::string &ext);
 
 /**
- * Insert a short string into the middle of a filename.
+ * Insert a short string into the middle of a filename, also replace extension
+ * if ext is non-empty.
  * E.g., "./syn/event.dat", "test" --> "./syn/event_test.dat"
+ *       "./syn/event.dat", "test", "gz" --> "./syn/event_test.gz"
  */
-std::string insertMiddle(const std::string &filename, const std::string &sufix);
+std::string insertMiddle(const std::string &filename, const std::string &sufix,
+                         const std::string &ext = "");
 
 /**
  * return the base path of fullname, with '/' at the tail

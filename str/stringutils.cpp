@@ -19,19 +19,17 @@ void splitFilename(const std::string &filename, std::string &base,
     if (ext_idx != std::string::npos) ext = filename_w_ext.substr(ext_idx);
 }
 
-/**
- * ../syn/events2_U100_I10_T100.dat -->
- * ../syn/events2_U100_I10_T100_test.dat
- */
-std::string insertMiddle(const std::string &filename,
-                         const std::string &sufix) {
+std::string insertMiddle(const std::string &filename, const std::string &sufix,
+                         const std::string &ext) {
     auto idx = filename.rfind('.');
     if (idx != std::string::npos) {
-        std::string extension = filename.substr(idx + 1);
+        std::string extension = ext.empty() ? filename.substr(idx + 1) : ext;
         std::string base = filename.substr(0, idx);
         return base + "_" + sufix + "." + extension;
-    } else
-        return filename + "_" + sufix;
+    } else {
+        return ext.empty() ? filename + "_" + sufix
+                           : filename + "_" + sufix + "." + ext;
+    }
 }
 
 std::string getBasePath(const std::string &filename) {
