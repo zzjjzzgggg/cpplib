@@ -110,6 +110,14 @@ void loadMap(const std::string& filename, std::unordered_map<TKey, TVal>& map,
     while (ss.next()) map[ss.get<TKey>(kc)] = ss.get<TVal>(vc);
 }
 
+// set loader
+template <class TKey>
+void loadSet(const std::string& filename, std::unordered_set<TKey>& set,
+             const int c = 0) {
+    TSVParser ss(filename);
+    while (ss.next()) set.insert(ss.get<TKey>(c));
+}
+
 } /* namespace ioutils */
 
 #endif /* __IOUTILS_H__ */

@@ -69,7 +69,7 @@
  * http://www.pcg-random.org/posts/ease-of-use-without-loss-of-power.html
  */
 
-#include <cassert>
+// #include <cassert>
 #include <algorithm>
 #include <array>
 #include <chrono>
