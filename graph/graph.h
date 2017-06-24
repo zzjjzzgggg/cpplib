@@ -49,6 +49,9 @@ public:
         int getDeg() const { return nbrs_.size(); }
         int getNbr(const int d) const { return nbrs_[d]; }
 
+        std::vector<int>::iterator beginNbr() { return nbrs_.begin(); }
+        std::vector<int>::iterator endNbr() { return nbrs_.end(); }
+
         /**
          * Make sure the node has neighbors before calling this method
          */
@@ -182,6 +185,12 @@ public:
         bool isInNbr(const int nbr) const {
             return std::binary_search(in_nbrs_.begin(), in_nbrs_.end(), nbr);
         }
+
+        std::vector<int>::iterator beginInNbr() { return in_nbrs_.begin(); }
+        std::vector<int>::iterator endInNbr() { return in_nbrs_.end(); }
+
+        std::vector<int>::iterator beginOutNbr() { return out_nbrs_.begin(); }
+        std::vector<int>::iterator endOutNbr() { return out_nbrs_.end(); }
 
         /**
          * Make sure the node has out-neighbors before calling this method
