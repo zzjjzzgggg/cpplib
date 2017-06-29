@@ -30,10 +30,12 @@ include_directories(str)
 include_directories(os)
 include_directories(io)
 include_directories(graph)
+include_directories(math)
 
 add_subdirectory(str)
 add_subdirectory(os)
 add_subdirectory(io)
 add_subdirectory(graph)
+add_subdirectory(math)
 
 add_subdirectory(test)

@@ -19,3 +19,6 @@ add_executable(test_randutils test_randutils.cpp)
 
 add_executable(test_graph test_graph.cpp)
 target_link_libraries(test_graph graph)
+
+add_executable(test_mathutils test_mathutils.cpp)
+target_link_libraries(test_mathutils mathutils)
