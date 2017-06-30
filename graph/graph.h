@@ -9,5 +9,6 @@
 #include "ugraph.h"
 #include "dgraph.h"
 #include "gio.h"
+#include "triad.h"
 
 #endif /* __GRAPH_H__ */

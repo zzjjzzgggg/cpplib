@@ -73,6 +73,7 @@ public:
         }
     };
 
+    typedef std::unordered_map<int, Node>::const_iterator NodeIter;
     /**
      *   cur_edge_
      *      |
@@ -82,16 +83,13 @@ public:
      * ...               <- end_
      */
     class EdgeIter {
-    public:
-        typedef std::unordered_map<int, Node>::const_iterator HashIter;
-
     private:
-        HashIter cur_, end_;
+        NodeIter cur_, end_;
         int cur_edge_;
 
     public:
         EdgeIter() : cur_edge_(0) {}
-        EdgeIter(const HashIter& start_nd_iter, const HashIter& end_nd_iter)
+        EdgeIter(const NodeIter& start_nd_iter, const NodeIter& end_nd_iter)
             : cur_(start_nd_iter), end_(end_nd_iter), cur_edge_(0) {}
 
         // copy assignment
@@ -211,6 +209,10 @@ public:
     }
 
     // iterators
+
+    NodeIter beginNI() const { return nodes_.begin(); }
+    NodeIter endNI() const { return nodes_.end(); }
+
     /**
      * find the first node that degree is nonzero, and first neighbor <= node
      */
@@ -222,6 +224,8 @@ public:
         return EdgeIter(ni, nodes_.end());
     }
     EdgeIter endEI() const { return EdgeIter(nodes_.end(), nodes_.end()); }
+
+    bool isDirected() const { return false; }
 };
 
 }  // end namespace graph

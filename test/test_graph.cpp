@@ -15,5 +15,10 @@ int main(int argc, char* argv[]) {
         printf("%d\t%d\n", ei.getSrcID(), ei.getDstID());
     }
 
+    printf("%d\n", countNodeDirTriads(G, 3));
+
+    auto triads_hist = statDirTriads(G);
+    for (auto& pr : triads_hist) printf("%d  %d\n", pr.first, pr.second);
+
     return 0;
 }
