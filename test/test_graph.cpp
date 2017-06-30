@@ -3,18 +3,17 @@
 #include "osutils.h"
 #include "graph.h"
 
+using namespace graph;
+
 int main(int argc, char* argv[]) {
     osutils::Timer tm;
-    graph::DGraph G = graph::loadEdgeList<graph::DGraph>(
-        "~/workspace/datasets/cit-HepTh_digraph.gz");
+    DGraph G = loadEdgeList<DGraph>("test_graph.dat", true);
     printf("n: %d, e: %d, %s\n", G.getNodes(), G.getEdges(),
            tm.getStr().c_str());
-    // G.save("test.lz");
 
-    tm.tick();
-    graph::DGraph H = graph::loadBinary<graph::DGraph>("test.lz");
-    printf("n: %d, e: %d, %s\n", H.getNodes(), H.getEdges(),
-           tm.getStr().c_str());
+    for (auto&& ei = G.beginEI(); ei != G.endEI(); ei++) {
+        printf("%d\t%d\n", ei.getSrcID(), ei.getDstID());
+    }
 
     return 0;
 }
