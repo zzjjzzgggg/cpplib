@@ -14,8 +14,9 @@
  **/
 double SpecFunc::BetaBinomial(const int k, const int n, const double alpha,
                               const double beta) {
-    return exp(lgamma(n + 1.0) - lgamma(k + 1.0) - lgamma(n - k + 1.0) +
-               lgamma(k + alpha) + lgamma(n - k + beta) -
-               lgamma(n + alpha + beta) + lgamma(alpha + beta) - lgamma(alpha) -
-               lgamma(beta));
+    return std::exp(std::lgamma(n + 1.0) - std::lgamma(k + 1.0) -
+                    std::lgamma(n - k + 1.0) + std::lgamma(k + alpha) +
+                    std::lgamma(n - k + beta) - std::lgamma(n + alpha + beta) +
+                    std::lgamma(alpha + beta) - std::lgamma(alpha) -
+                    std::lgamma(beta));
 }

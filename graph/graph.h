@@ -14,7 +14,6 @@
 #include "../adv/randutils.h"
 
 namespace graph {
-
 /**
  * undirected graph.
  */
@@ -65,19 +64,22 @@ public:
         }
 
         void addNbr(const int nbr) { nbrs_.push_back(nbr); }
-        void defrag() {
-            std::sort(nbrs_.begin(), nbrs_.end());
+
+        void sort() { std::sort(nbrs_.begin(), nbrs_.end()); }
+
+        void uniq() {
             auto last = std::unique(nbrs_.begin(), nbrs_.end());
             nbrs_.erase(last, nbrs_.end());
         }
     };
 
 private:
+    bool is_multi_;
     mutable randutils::default_rng rng_;   // we don't care rng_
     std::unordered_map<int, Node> nodes_;  // maps a node id to its node object
 
 public:
-    UGraph() {}
+    UGraph(const bool is_multi = false) : is_multi_(is_multi) {}
     virtual ~UGraph() {}
 
     // disable copy constructor/assignment
@@ -85,13 +87,12 @@ public:
     UGraph& operator=(const UGraph&) = delete;
 
     // move constructor/assignment
-    UGraph(UGraph&& other) : nodes_(std::move(other.nodes_)) {
-        other.nodes_.clear();
-    }
+    UGraph(UGraph&& other)
+        : is_multi_(other.is_multi_), nodes_(std::move(other.nodes_)) {}
 
     UGraph& operator=(UGraph&& other) {
+        is_multi_ = other.is_multi_;
         nodes_ = std::move(other.nodes_);
-        other.nodes_.clear();
         return *this;
     }
 
@@ -127,7 +128,8 @@ public:
 
     /**
      * Add edge (src, dst) to the graph. For the purpose of fast adding,
-     * this function does not check whether or not the edge has existed. Callers
+     * this function does not check whether or not the edge has existed.
+     * Callers
      * are responsible to avoid duplidate edges.
      */
     void addEdge(const int src, const int dst) {
@@ -140,7 +142,9 @@ public:
      * Including: sort neighbors of each node increasingly.
      */
     void optimize() {
-        for (auto& p : nodes_) p.second.defrag();
+        for (auto& p : nodes_) p.second.sort();
+        if (!is_multi_)
+            for (auto& p : nodes_) p.second.uniq();
     }
 };
 
@@ -215,9 +219,12 @@ public:
         void addInNbr(const int nbr) { in_nbrs_.push_back(nbr); }
         void addOutNbr(const int nbr) { out_nbrs_.push_back(nbr); }
 
-        void defrag() {
+        void sort() {
             std::sort(in_nbrs_.begin(), in_nbrs_.end());
             std::sort(out_nbrs_.begin(), out_nbrs_.end());
+        }
+
+        void uniq() {
             auto last_i = std::unique(in_nbrs_.begin(), in_nbrs_.end());
             in_nbrs_.erase(last_i, in_nbrs_.end());
             auto last_o = std::unique(out_nbrs_.begin(), out_nbrs_.end());
@@ -226,11 +233,12 @@ public:
     };
 
 private:
+    bool is_multi_;
     mutable randutils::default_rng rng_;
     std::unordered_map<int, Node> nodes_;  // maps a node id to its node object
 
 public:
-    DGraph() {}
+    DGraph(const bool is_multi = false) : is_multi_(is_multi) {}
     virtual ~DGraph() {}
 
     // disable copy constructor/assignment
@@ -238,13 +246,12 @@ public:
     DGraph& operator=(const DGraph&) = delete;
 
     // move constructor/assignment
-    DGraph(DGraph&& other) : nodes_(std::move(other.nodes_)) {
-        other.nodes_.clear();
-    }
+    DGraph(DGraph&& other)
+        : is_multi_(other.is_multi_), nodes_(std::move(other.nodes_)) {}
 
     DGraph& operator=(DGraph&& other) {
+        is_multi_ = other.is_multi_;
         nodes_ = std::move(other.nodes_);
-        other.nodes_.clear();
         return *this;
     }
 
@@ -284,7 +291,8 @@ public:
 
     /**
      * Add edge (src, dst) to the graph. For efficiency consideration, this
-     * function does not check whether or not the edge has existed. Callers are
+     * function does not check whether or not the edge has existed. Callers
+     * are
      * responsible to avoid duplidate edges.
      */
     void addEdge(const int src, const int dst) {
@@ -297,13 +305,15 @@ public:
      * Including: sort neighbors of each node increasingly.
      */
     void optimize() {
-        for (auto& p : nodes_) p.second.defrag();
+        for (auto& p : nodes_) p.second.sort();
+        if (!is_multi_)
+            for (auto& p : nodes_) p.second.uniq();
     }
 };
 
 template <typename Graph>
-Graph loadEdgeList(const std::string& edges_fnm) {
-    Graph G;
+Graph loadEdgeList(const std::string& edges_fnm, const bool is_multi = false) {
+    Graph G(is_multi);
     ioutils::TSVParser ss{edges_fnm};
     while (ss.next()) {
         int src = ss.get<int>(0), dst = ss.get<int>(1);
@@ -316,8 +326,9 @@ Graph loadEdgeList(const std::string& edges_fnm) {
 }
 
 template <typename Graph>
-Graph loadBinEdgeList(const std::string& edges_fnm) {
-    Graph G;
+Graph loadBinEdgeList(const std::string& edges_fnm,
+                      const bool is_multi = false) {
+    Graph G(is_multi);
     int src, dst;
     auto pin = ioutils::getIOIn(edges_fnm);
     while (!pin->eof()) {
