@@ -52,18 +52,19 @@ public:
 // vector saver
 template <class TVal>
 void saveVec(const std::vector<TVal>& vec, const std::string& filename,
-             const bool echo = true) {
+             const bool echo = true, const std::string& format = "{}\n") {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
-    for (auto val : vec) out_ptr->save(fmt::format("{}\n", val));
+    for (auto val : vec) out_ptr->save(fmt::format(format, val));
     if (echo) printf("saved to %s\n", filename.c_str());
 }
 
 template <class T1, class T2>
 void savePrVec(const std::vector<std::pair<T1, T2>>& vec,
-               const std::string& filename, const bool echo = true) {
+               const std::string& filename, const bool echo = true,
+               const std::string& format = "{}\t{}\n") {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     for (auto& pr : vec)
-        out_ptr->save(fmt::format("{}\t{}\n", pr.first, pr.second));
+        out_ptr->save(fmt::format(format, pr.first, pr.second));
     out_ptr->close();
     if (echo) printf("saved to %s\n", filename.c_str());
 }
@@ -86,19 +87,20 @@ void loadPrVec(const std::string& filename, std::vector<std::pair<T1, T2>>& vec,
 // map saver
 template <class TKey, class TVal>
 void saveMap(const std::unordered_map<TKey, TVal>& map,
-             const std::string& filename, const bool echo = true) {
+             const std::string& filename, const bool echo = true,
+             const std::string& format = "{}\t{}\n") {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     for (auto& pr : map)
-        out_ptr->save(fmt::format("{}\t{}\n", pr.first, pr.second));
+        out_ptr->save(fmt::format(format, pr.first, pr.second));
     if (echo) printf("saved to %s\n", filename.c_str());
 }
 
 // set saver
 template <class T>
 void saveSet(const std::unordered_set<T>& set, const std::string& filename,
-             const bool echo = true) {
+             const bool echo = true, const std::string& format = "{}\n") {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
-    for (auto val : set) out_ptr->save(fmt::format("{}\n", val));
+    for (auto val : set) out_ptr->save(fmt::format(format, val));
     if (echo) printf("saved to %s\n", filename.c_str());
 }
 
