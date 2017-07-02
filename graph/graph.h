@@ -6,6 +6,7 @@
 #ifndef __GRAPH_H__
 #define __GRAPH_H__
 
+#include "comm.h"
 #include "ugraph.h"
 #include "dgraph.h"
 #include "gio.h"

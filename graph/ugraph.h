@@ -6,12 +6,7 @@
 #ifndef __UGRAPH_H__
 #define __UGRAPH_H__
 
-#include <vector>
-#include <unordered_map>
-#include <algorithm>
-
-#include "../io/ioutils.h"
-#include "../adv/randutils.h"
+#include "comm.h"
 
 namespace graph {
 /**
@@ -135,12 +130,12 @@ public:
     };
 
 private:
-    bool is_multi_;
+    GraphType gtype_;
     mutable randutils::default_rng rng_;   // we don't care rng_
     std::unordered_map<int, Node> nodes_;  // maps a node id to its node object
 
 public:
-    UGraph(const bool is_multi = false) : is_multi_(is_multi) {}
+    UGraph(const GraphType gtype = GraphType::SIMPLE) : gtype_(gtype) {}
     virtual ~UGraph() {}
 
     // disable copy constructor/assignment
@@ -149,10 +144,10 @@ public:
 
     // move constructor/assignment
     UGraph(UGraph&& other)
-        : is_multi_(other.is_multi_), nodes_(std::move(other.nodes_)) {}
+        : gtype_(other.gtype_), nodes_(std::move(other.nodes_)) {}
 
     UGraph& operator=(UGraph&& other) {
-        is_multi_ = other.is_multi_;
+        gtype_ = other.gtype_;
         nodes_ = std::move(other.nodes_);
         return *this;
     }
@@ -204,7 +199,7 @@ public:
      */
     void optimize() {
         for (auto& p : nodes_) p.second.sort();
-        if (!is_multi_)
+        if (gtype_ == GraphType::SIMPLE)
             for (auto& p : nodes_) p.second.uniq();
     }
 
@@ -224,8 +219,6 @@ public:
         return EdgeIter(ni, nodes_.end());
     }
     EdgeIter endEI() const { return EdgeIter(nodes_.end(), nodes_.end()); }
-
-    bool isDirected() const { return false; }
 };
 
 }  // end namespace graph

@@ -7,7 +7,7 @@ using namespace graph;
 
 int main(int argc, char* argv[]) {
     osutils::Timer tm;
-    DGraph G = loadEdgeList<DGraph>("test_graph.dat", true);
+    DGraph G = loadEdgeList<DGraph>("test_graph.dat", GraphType::MULTI);
     printf("n: %d, e: %d, %s\n", G.getNodes(), G.getEdges(),
            tm.getStr().c_str());
 
