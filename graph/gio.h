@@ -49,6 +49,14 @@ Graph loadBinary(const std::string& filename) {
     return G;
 }
 
+template <class Graph>
+void saveEdgelist(const Graph& G, const std::string& filename) {
+    auto po = ioutils::getIOOut(filename);
+    for (auto&& ei = G.beginEI(); ei != G.endEI(); ei++)
+        po->save(fmt::format("{}\t{}\n", ei.getSrcID(), ei.getDstID()));
+    printf("edgelist saved to %s\n", filename.c_str());
+}
+
 }  // end namespace graph
 
 #endif /* __GIO_H__ */
