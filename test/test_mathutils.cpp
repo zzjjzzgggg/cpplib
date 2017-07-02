@@ -7,9 +7,10 @@
 #include "../math/mathutils.h"
 
 int main(int argc, char *argv[]) {
+    int n = 0;
     double s = 0;
-    for (int i = 0; i <= 3; i++) {
-        double val = SpecFunc::BetaBinomial(i, 3, .5, .5);
+    for (int i = 0; i <= n; i++) {
+        double val = SpecFunc::BetaBinomial(i, n, .5, .5);
         s += val;
         printf("%.3f\n", val);
     }
