@@ -15,12 +15,7 @@ Graph loadEdgeList(const std::string& edges_fnm,
                    const GraphType gtype = GraphType::SIMPLE) {
     Graph G(gtype);
     ioutils::TSVParser ss{edges_fnm};
-    while (ss.next()) {
-        int src = ss.get<int>(0), dst = ss.get<int>(1);
-        G.addNode(src);
-        G.addNode(dst);
-        G.addEdge(src, dst);
-    }
+    while (ss.next()) G.addEdge(ss.get<int>(0), ss.get<int>(1));
     G.optimize();
     return G;
 }
@@ -28,14 +23,12 @@ Graph loadEdgeList(const std::string& edges_fnm,
 template <class Graph>
 Graph loadBinEdgeList(const std::string& edges_fnm,
                       const GraphType gtype = GraphType::SIMPLE) {
-    Graph G(gtype);
     int src, dst;
+    Graph G(gtype);
     auto pin = ioutils::getIOIn(edges_fnm);
     while (!pin->eof()) {
         pin->load(src);
         pin->load(dst);
-        G.addNode(src);
-        G.addNode(dst);
         G.addEdge(src, dst);
     }
     G.optimize();

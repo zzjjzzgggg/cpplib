@@ -189,8 +189,12 @@ public:
      * NOTE: Callers are responsible to avoid duplidate edges.
      */
     void addEdge(const int src, const int dst) {
+        addNode(src);
         nodes_[src].addNbr(dst);
-        if (dst != src) nodes_[dst].addNbr(src);
+        if (dst != src) {
+            addNode(dst);
+            nodes_[dst].addNbr(src);
+        }
     }
 
     /**

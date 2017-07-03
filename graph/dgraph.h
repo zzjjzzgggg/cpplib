@@ -220,6 +220,8 @@ public:
      * responsible to avoid duplidate edges.
      */
     void addEdge(const int src, const int dst) {
+        addNode(src);
+        addNode(dst);
         nodes_[src].addOutNbr(dst);
         nodes_[dst].addInNbr(src);
     }
