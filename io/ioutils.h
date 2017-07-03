@@ -50,7 +50,7 @@ public:
 };
 
 // vector
-template <class TVal>
+template <typename TVal>
 void saveVec(const std::vector<TVal>& vec, const std::string& filename,
              const bool echo = true, const std::string& format = "{}\n") {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
@@ -58,14 +58,14 @@ void saveVec(const std::vector<TVal>& vec, const std::string& filename,
     if (echo) printf("saved to %s\n", filename.c_str());
 }
 
-template <class T>
+template <typename T>
 void loadVec(const std::string& filename, std::vector<T>& vec,
              const int col = 0) {
     TSVParser ss(filename);
     while (ss.next()) vec.push_back(ss.get<T>(col));
 }
 
-template <class T>
+template <typename T>
 std::vector<T> loadVec(const std::string& filename, const int col = 0) {
     std::vector<T> vec;
     loadVec(filename, vec, col);
@@ -73,7 +73,7 @@ std::vector<T> loadVec(const std::string& filename, const int col = 0) {
 }
 
 // vector pair
-template <class T1, class T2>
+template <typename T1, typename T2>
 void savePrVec(const std::vector<std::pair<T1, T2>>& vec,
                const std::string& filename, const bool echo = true,
                const std::string& format = "{}\t{}\n") {
@@ -84,14 +84,14 @@ void savePrVec(const std::vector<std::pair<T1, T2>>& vec,
     if (echo) printf("saved to %s\n", filename.c_str());
 }
 
-template <class T1, class T2>
+template <typename T1, typename T2>
 void loadPrVec(const std::string& filename, std::vector<std::pair<T1, T2>>& vec,
                const int c0 = 0, const int c1 = 1) {
     TSVParser ss(filename);
     while (ss.next()) vec.emplace_back(ss.get<T1>(c0), ss.get<T2>(c1));
 }
 
-template <class T1, class T2>
+template <typename T1, typename T2>
 std::vector<std::pair<T1, T2>> loadPrVec(const std::string& filename,
                                          const int c0 = 0, const int c1 = 1) {
     std::vector<std::pair<T1, T2>> vec;
@@ -99,8 +99,40 @@ std::vector<std::pair<T1, T2>> loadPrVec(const std::string& filename,
     return vec;
 }
 
+// tuple vector
+template <typename T1, typename T2, typename T3>
+void saveTupleVec(const std::vector<std::tuple<T1, T2, T3>>& vec,
+                  const std::string& filename, const bool echo = true,
+                  const std::string& format = "{}\t{}\t{}\n") {
+    std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
+    for (auto&& e : vec)
+        out_ptr->save(fmt::format(format, std::get<0>(e), std::get<1>(e),
+                                  std::get<2>(e)));
+    out_ptr->close();
+    if (echo) printf("saved to %s\n", filename.c_str());
+}
+
+template <typename T1, typename T2, typename T3>
+void loadTupleVec(const std::string& filename,
+                  std::vector<std::tuple<T1, T2, T3>>& vec, const int c0 = 0,
+                  const int c1 = 1, const int c2 = 2) {
+    TSVParser ss(filename);
+    while (ss.next())
+        vec.emplace_back(ss.get<T1>(c0), ss.get<T2>(c1), ss.get<T3>(c2));
+}
+
+template <typename T1, typename T2, typename T3>
+std::vector<std::tuple<T1, T2, T3>> loadTupleVec(const std::string& filename,
+                                                 const int c0 = 0,
+                                                 const int c1 = 1,
+                                                 const int c2 = 2) {
+    std::vector<std::tuple<T1, T2, T3>> vec;
+    loadTupleVec(filename, vec, c0, c1, c2);
+    return vec;
+}
+
 // map
-template <class TKey, class TVal>
+template <typename TKey, typename TVal>
 void saveMap(const std::unordered_map<TKey, TVal>& map,
              const std::string& filename, const bool echo = true,
              const std::string& format = "{}\t{}\n") {
@@ -110,14 +142,14 @@ void saveMap(const std::unordered_map<TKey, TVal>& map,
     if (echo) printf("saved to %s\n", filename.c_str());
 }
 
-template <class TKey, class TVal>
+template <typename TKey, typename TVal>
 void loadMap(const std::string& filename, std::unordered_map<TKey, TVal>& map,
              const int kc = 0, const int vc = 1) {
     TSVParser ss(filename);
     while (ss.next()) map[ss.get<TKey>(kc)] = ss.get<TVal>(vc);
 }
 
-template <class TKey, class TVal>
+template <typename TKey, typename TVal>
 std::unordered_map<TKey, TVal> loadMap(const std::string& filename,
                                        const int kc = 0, const int vc = 1) {
     std::unordered_map<TKey, TVal> map;
@@ -126,7 +158,7 @@ std::unordered_map<TKey, TVal> loadMap(const std::string& filename,
 }
 
 // set
-template <class T>
+template <typename T>
 void saveSet(const std::unordered_set<T>& set, const std::string& filename,
              const bool echo = true, const std::string& format = "{}\n") {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
@@ -134,14 +166,14 @@ void saveSet(const std::unordered_set<T>& set, const std::string& filename,
     if (echo) printf("saved to %s\n", filename.c_str());
 }
 
-template <class TKey>
+template <typename TKey>
 void loadSet(const std::string& filename, std::unordered_set<TKey>& set,
              const int c = 0) {
     TSVParser ss(filename);
     while (ss.next()) set.insert(ss.get<TKey>(c));
 }
 
-template <class TKey>
+template <typename TKey>
 std::unordered_set<TKey> loadSet(const std::string& filename, const int c = 0) {
     std::unordered_set<TKey> set;
     loadSet(filename, set, c);
