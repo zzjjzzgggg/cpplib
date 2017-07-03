@@ -17,7 +17,7 @@ namespace graph {
 template <class Graph>
 int countNodeDirTriads(const Graph& G, const int& node) {
     if (G.getNode(node).getDeg() < 2) return 0;
-    int closed_triads = 0;
+    int triads = 0;
     // get unique neighbors
     std::unordered_map<int, int> nbr_cnt;
     auto& nd_obj = G.getNode(node);
@@ -37,10 +37,10 @@ int countNodeDirTriads(const Graph& G, const int& node) {
             src_nbr_cnt[src_obj.getNbr(d)]++;
         for (int j = i + 1; j < nbr_vec.size(); j++) {
             int dst = nbr_vec[j];
-            closed_triads += src_nbr_cnt[dst] * nbr_cnt[src] * nbr_cnt[dst];
+            triads += src_nbr_cnt[dst] * nbr_cnt[src] * nbr_cnt[dst];
         }
     }
-    return closed_triads;
+    return triads;
 }
 
 /**
