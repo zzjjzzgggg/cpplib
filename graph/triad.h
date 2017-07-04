@@ -15,7 +15,7 @@ namespace graph {
  * Count the number of directed triads the node belonging to
  */
 template <class Graph>
-int countNodeDirTriads(const Graph& G, const int& node) {
+int countNodeDirTriads(const int& node, const Graph& G) {
     if (G.getNode(node).getDeg() < 2) return 0;
     int triads = 0;
     // get unique neighbors
@@ -29,15 +29,15 @@ int countNodeDirTriads(const Graph& G, const int& node) {
     nbr_vec.reserve(nbr_cnt.size());
     for (auto& it : nbr_cnt) nbr_vec.push_back(it.first);
     // count connected neighbors
-    for (int i = 0; i < nbr_vec.size(); i++) {
-        int src = nbr_vec[i];
-        auto& src_obj = G.getNode(src);
+    for (auto src_it = nbr_vec.begin(); src_it != nbr_vec.end(); src_it++) {
+        auto& src_obj = G.getNode(*src_it);
         std::unordered_map<int, int> src_nbr_cnt;
         for (int d = 0; d < src_obj.getDeg(); d++)
             src_nbr_cnt[src_obj.getNbr(d)]++;
-        for (int j = i + 1; j < nbr_vec.size(); j++) {
-            int dst = nbr_vec[j];
-            triads += src_nbr_cnt[dst] * nbr_cnt[src] * nbr_cnt[dst];
+        for (auto dst_it = src_it + 1; dst_it != nbr_vec.end(); dst_it++) {
+            if (src_nbr_cnt.find(*dst_it) != src_nbr_cnt.end())
+                triads +=
+                    src_nbr_cnt[*dst_it] * nbr_cnt[*src_it] * nbr_cnt[*dst_it];
         }
     }
     return triads;
@@ -52,7 +52,7 @@ std::vector<std::pair<int, int>> statDirTriads(const Graph& G) {
     std::vector<std::pair<int, int>> triads_hist;
     std::unordered_map<int, int> triads_map;
     for (auto&& ni = G.beginNI(); ni != G.endNI(); ni++)
-        triads_map[countNodeDirTriads(G, ni->first)]++;
+        triads_map[countNodeDirTriads(ni->first, G)]++;
     for (auto& it : triads_map) triads_hist.emplace_back(it.first, it.second);
     std::sort(triads_hist.begin(), triads_hist.end());
     return triads_hist;
