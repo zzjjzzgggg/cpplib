@@ -197,6 +197,8 @@ public:
 
     Node& getNode(const int id) { return nodes_[id]; }
     const Node& getNode(const int id) const { return nodes_.at(id); }
+    Node& operator[](int id) { return nodes_[id]; };
+    const Node& operator[](int id) const { return nodes_.at(id); };
 
     /**
      * Make sure the graph has nodes before calling this method

@@ -170,6 +170,8 @@ public:
 
     Node& getNode(const int id) { return nodes_[id]; }
     const Node& getNode(const int id) const { return nodes_.at(id); }
+    Node& operator[](int id) { return nodes_[id]; };
+    const Node& operator[](int id) const { return nodes_.at(id); };
 
     int sampleNode() const {
         auto iter = rng_.choose(nodes_.begin(), nodes_.end());
