@@ -16,11 +16,11 @@ namespace graph {
  */
 template <class Graph>
 int countNodeDirTriads(const int& node, const Graph& G) {
-    if (G.getNode(node).getDeg() < 2) return 0;
+    if (G[node].getDeg() < 2) return 0;
     int triads = 0;
     // get unique neighbors
     std::unordered_map<int, int> nbr_cnt;
-    auto& nd_obj = G.getNode(node);
+    auto& nd_obj = G[node];
     for (int d = 0; d < nd_obj.getDeg(); d++) {
         int nbr = nd_obj.getNbr(d);
         if (nbr != node) nbr_cnt[nbr]++;
@@ -30,7 +30,7 @@ int countNodeDirTriads(const int& node, const Graph& G) {
     for (auto& it : nbr_cnt) nbr_vec.push_back(it.first);
     // count connected neighbors
     for (auto src_it = nbr_vec.begin(); src_it != nbr_vec.end(); src_it++) {
-        auto& src_obj = G.getNode(*src_it);
+        auto& src_obj = G[*src_it];
         std::unordered_map<int, int> src_nbr_cnt;
         for (int d = 0; d < src_obj.getDeg(); d++)
             src_nbr_cnt[src_obj.getNbr(d)]++;
