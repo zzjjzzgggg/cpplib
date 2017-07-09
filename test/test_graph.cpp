@@ -17,8 +17,5 @@ int main(int argc, char* argv[]) {
 
     printf("%d\n", countNodeDirTriads(3, G));
 
-    auto triads_hist = statDirTriads(G);
-    for (auto& pr : triads_hist) printf("%d  %d\n", pr.first, pr.second);
-
     return 0;
 }
