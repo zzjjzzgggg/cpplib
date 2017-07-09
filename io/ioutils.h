@@ -20,30 +20,29 @@ std::unique_ptr<IOIn> getIOIn(const std::string& filename);
 
 class TSVParser {
 private:
-    size_t line_NO;
-    char split_ch;
-    char buf[1024];  // assume each line has a
-                     // maximum length of 1024 bytes.
-    std::vector<std::string> field_vec;
-    std::unique_ptr<IOIn> in_ptr;
+    size_t line_NO_;
+    char split_ch_;
+    char buf_[1024];  // assume each line has a maximum length of 1024 bytes.
+    std::vector<std::string> field_vec_;
+    std::unique_ptr<IOIn> in_ptr_;
 
 public:
-    TSVParser(const std::string& filename) : line_NO(0), split_ch('\t') {
-        in_ptr = getIOIn(filename);
+    TSVParser(const std::string& filename) : line_NO_(0), split_ch_('\t') {
+        in_ptr_ = getIOIn(filename);
     }
 
     TSVParser(const std::string& filename, const char sep)
-        : line_NO(0), split_ch(sep) {
-        in_ptr = getIOIn(filename);
+        : line_NO_(0), split_ch_(sep) {
+        in_ptr_ = getIOIn(filename);
     }
 
     bool next();
 
-    int getNumFields() const { return (int)(field_vec.size()); }
+    int getNumFields() const { return (int)(field_vec_.size()); }
 
-    size_t getLineNO() const { return line_NO; }
+    size_t getLineNO() const { return line_NO_; }
 
-    const std::string getLine() const { return std::string(buf); }
+    const std::string getLine() const { return std::string(buf_); }
 
     template <typename T>
     auto get(const int& id) const -> T;

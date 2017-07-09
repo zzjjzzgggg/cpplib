@@ -11,7 +11,6 @@
 //   -- compression: .gz, .7z, .rar, .zip, .cab, .arj. bzip2
 
 #include <cstdio>
-#include <cassert>
 #include <cstring>
 
 #include <string>
@@ -19,47 +18,40 @@
 
 #include "iobase.h"
 #include "../str/stringutils.h"
-#include "../Assert/src/ppk_assert.h"
-#define assert_msg PPK_ASSERT
 
 namespace ioutils {
 
 class GZipOut : public IOOut {
 private:
-    static const size_t MxBfL;
-    FILE *ZipStdinRd, *ZipStdinWr;
-    char* Bf;
-    size_t BfL;
+    static const size_t MAX_BUF_SIZE;
+    size_t buf_size_;
+    char* buf_;
+    FILE* zip_wr_;
 
 private:
-    void FlushBf();
-    void CreateZipProcess(const std::string& cmd, const std::string& filename);
+    void flush();
 
 public:
     GZipOut(const std::string& filename);
     ~GZipOut();
 
-    int putChar(const char& ch);
+    void write(const void* dat, const size_t len) override;
 
-    void write(const void* data, const size_t length) override;
     void close() override;
-
-    void Flush();
 
     std::string getCmd(const std::string& filename);
 };
 
 class GZipIn : public IOIn {
 private:
-    static const int MxBfL;
-    FILE *ZipStdoutRd, *ZipStdoutWr;
-    size_t CurFPos;
-    char* Bf;
-    int BfC, BfL;
+    static const size_t MAX_BUF_SIZE;
+
+    size_t cur_pos_, buf_size_;
+    char* buf_;
+    FILE* zip_rd_;
 
 private:
-    void FillBf();
-    void CreateZipProcess(const std::string& cmd, const std::string& zip_fnm);
+    void fill();
 
 public:
     GZipIn(const std::string& filename);
@@ -67,13 +59,14 @@ public:
 
     void close() override{};
 
-    bool eof() override { return BfL < MxBfL && BfC == BfL; }
-    char getChar() {
-        if (BfC == BfL) FillBf();
-        return Bf[BfC++];
-    }
+    bool eof() override { return buf_size_ == 0; }
 
-    size_t read(const void* LBf, const size_t LBfL) override;
+    /**
+     * Read `len` data into target buffer `dat`. The method does not allocate
+     * space for target buffer `dat`. It assumes the target buffer `dat` has at
+     * least `len` space.
+     */
+    size_t read(const void* dat, const size_t len) override;
 
     /**
      * Read characters until a newline ('\n') is encountered. If a newline
@@ -83,10 +76,10 @@ public:
      * first (n - 1) bytes. The function return value is the number of bytes
      * placed in buffer (which includes the newline character if encountered,
      * but excludes the terminating null byte).
-     **/
+     */
     size_t readLine(const void* data, const size_t len) override;
 
-    std::string getCmd(const std::string& zip_fnm);
+    std::string getCmd(const std::string& zip_fnm) const;
 };
 }
 #endif /* __GZIPIO_H__ */

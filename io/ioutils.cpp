@@ -39,31 +39,31 @@ std::unique_ptr<IOIn> getIOIn(const std::string& filename) {
 }
 
 bool TSVParser::next() {
-    field_vec.clear();
-    line_NO++;
-    if (in_ptr->readLine(buf, 1024) == 0) return false;
-    if (buf[0] == '#') return next();
-    strutils::split(buf, split_ch, field_vec);
+    field_vec_.clear();
+    line_NO_++;
+    if (in_ptr_->readLine(buf_, 1024) == 0) return false;
+    if (buf_[0] == '#') return next();
+    strutils::split(buf_, split_ch_, field_vec_);
     return true;
 }
 
 template <>
 auto TSVParser::get<int>(const int& id) const -> int {
-    return std::stoi(field_vec[id]);
+    return std::stoi(field_vec_[id]);
 }
 
 template <>
 auto TSVParser::get<float>(const int& id) const -> float {
-    return std::stof(field_vec[id]);
+    return std::stof(field_vec_[id]);
 }
 
 template <>
 auto TSVParser::get<double>(const int& id) const -> double {
-    return std::stod(field_vec[id]);
+    return std::stod(field_vec_[id]);
 }
 
 template <>
 auto TSVParser::get<std::string>(const int& id) const -> std::string {
-    return strutils::trim(field_vec[id]);
+    return strutils::trim(field_vec_[id]);
 }
 }
