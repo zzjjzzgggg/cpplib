@@ -43,21 +43,6 @@ int countNodeDirTriads(const int& node, const Graph& G) {
     return triads;
 }
 
-/**
- * state the triads frequency, i.e., how many nodes have a particular number of
- * triads.
- */
-template <class Graph>
-std::vector<std::pair<int, int>> statDirTriads(const Graph& G) {
-    std::vector<std::pair<int, int>> triads_hist;
-    std::unordered_map<int, int> triads_map;
-    for (auto&& ni = G.beginNI(); ni != G.endNI(); ni++)
-        triads_map[countNodeDirTriads(ni->first, G)]++;
-    for (auto& it : triads_map) triads_hist.emplace_back(it.first, it.second);
-    std::sort(triads_hist.begin(), triads_hist.end());
-    return triads_hist;
-}
-
 } /* end of namespace graph */
 
 #endif /* __TRIAD_H__ */
