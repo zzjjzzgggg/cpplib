@@ -58,37 +58,42 @@ GZipIn::~GZipIn() {
     if (buf_ != NULL) delete[] buf_;
 }
 
-void GZipIn::fill() {
+bool GZipIn::eof() {
+    if (num_read_ < buf_size_) return false;
+    return !fill();
+}
+
+bool GZipIn::fill() {
     buf_size_ = fread(buf_, 1, MAX_BUF_SIZE, zip_rd_);
-    cur_pos_ = 0;
+    num_read_ = 0;
+    return buf_size_ > 0;
 }
 
 size_t GZipIn::read(const void* dat, const size_t len) {
-    char* sink = (char*)dat;
-    size_t num_read = 0;
-    for (size_t i = 0; i < len; i++) {
-        if (cur_pos_ == buf_size_) {
-            fill();
-            if (eof()) break;  // no more data to read
-        }
-        sink[i] = buf_[cur_pos_++];
-        num_read++;
+    if (len <= 0 || dat == nullptr) return 0;
+    size_t num_read = 0, num_to_read = 0;
+    while (!eof() && num_read < len) {
+        num_to_read = std::min(len - num_read, buf_size_ - num_read_);
+        std::memcpy((char*)dat + num_read, buf_ + num_read_, num_to_read);
+        num_read += num_to_read;
+        num_read_ += num_to_read;
     }
     return num_read;
 }
 
 size_t GZipIn::readLine(const void* dat, const size_t len) {
-    char* sink = (char*)dat;
-    size_t num_read = 0;
-    while (num_read < len - 1) {
-        if (cur_pos_ == buf_size_) {
-            fill();
-            if (eof()) break;
+    size_t num_read = 0, num_to_read;
+    while (!eof() && num_read < len - 1) {
+        num_to_read = std::min(len - num_read, buf_size_ - num_read_);
+        char* src_ptr = buf_ + num_read_;
+        char* dst_ptr = (char*)dat + num_read;
+        for (size_t i = 0; i < num_to_read; i++) {
+            *dst_ptr++ = *src_ptr++;
+            num_read++;
+            num_read_++;
+            if (*(dst_ptr - 1) == '\n') break;
         }
-        *sink = buf_[cur_pos_++];
-        num_read++;
-        if (*sink == '\n') break;
-        sink++;
+        if (*(dst_ptr - 1) == '\n') break;
     }
     *((char*)dat + num_read) = '\0';
     return num_read;

@@ -46,12 +46,12 @@ class GZipIn : public IOIn {
 private:
     static const size_t MAX_BUF_SIZE;
 
-    size_t cur_pos_, buf_size_;
+    size_t num_read_, buf_size_;
     char* buf_;
     FILE* zip_rd_;
 
 private:
-    void fill();
+    bool fill();
 
 public:
     GZipIn(const std::string& filename);
@@ -59,7 +59,7 @@ public:
 
     void close() override{};
 
-    bool eof() override { return buf_size_ == 0; }
+    bool eof() override;
 
     /**
      * Read `len` data into target buffer `dat`. The method does not allocate
