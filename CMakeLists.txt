@@ -8,7 +8,7 @@ check_cxx_compiler_flag("-std=c++17" COMPILER_SUPPORTS_CXX_17)
 
 if (COMPILER_SUPPORTS_CXX_1z)
   message(STATUS "Compiling with C++1z")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++1z")
 elseif (COMPILER_SUPPORTS_CXX_14)
   message(STATUS "Compiling with C++14")
   set(CMAKE_CXX_STANDARD 14)
