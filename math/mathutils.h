@@ -36,15 +36,12 @@ public:
     /**
      * Beta-Binomial distribution.
      *
-     * f(k | n, alpha, beta) =
+     * f(k | n, alpha, beta) = B(k, n) x
      *
-     *    Gamma(alpha + beta)                 Gamma(n + 1)
-     *   ------------------------ x ------------------------------ x
-     *   Gamma(alpha)Gamma(beta)     Gamma(k + 1)Gamma(n - k + 1)
+     *    Gamma(alpha + beta)        Gamma(k + alpah)Gamma(n - k + beta)
+     *   ------------------------ x -------------------------------------
+     *   Gamma(alpha)Gamma(beta)           Gamma(n + alpha + beta)
      *
-     *    Gamma(k + alpah)Gamma(n - k + beta)
-     *   -------------------------------------
-     *         Gamma(n + alpha + beta)
      */
     static double BetaBinomial(const int k, const int n, const double alpha,
                                const double beta);
