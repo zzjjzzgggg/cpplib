@@ -14,6 +14,14 @@ double SpecFun::BinCoeff(const int k, const int n) {
     return std::exp(LogBinCoeff(k, n));
 }
 
+double SpecFun::LogBetaCoeff(const double alpha, const double beta) {
+    return std::lgamma(alpha) + std::lgamma(beta) - std::lgamma(alpha + beta);
+}
+
+double SpecFun::BetaCoeff(const double alpha, const double beta) {
+    return std::exp(LogBetaCoeff(alpha, beta));
+}
+
 double SpecFun::Binomial(const int k, const int n, const double p) {
     return std::exp(LogBinCoeff(k, n) + k * std::log(p) +
                     (n - k) * std::log(1 - p));
@@ -21,8 +29,12 @@ double SpecFun::Binomial(const int k, const int n, const double p) {
 
 double SpecFun::BetaBinomial(const int k, const int n, const double alpha,
                              const double beta) {
-    return std::exp(LogBinCoeff(k, n) + std::lgamma(k + alpha) +
-                    std::lgamma(n - k + beta) - std::lgamma(n + alpha + beta) +
-                    std::lgamma(alpha + beta) - std::lgamma(alpha) -
-                    std::lgamma(beta));
+    return std::exp(LogBinCoeff(k, n) + LogBetaCoeff(alpha + k, beta + n - k) -
+                    LogBetaCoeff(alpha, beta));
+}
+
+double SpecFun::BetaGeometric(const int k, const double alpha,
+                              const double beta) {
+    return std::exp(LogBetaCoeff(alpha + 1, beta + k - 1) -
+                    LogBetaCoeff(alpha, beta));
 }

@@ -18,33 +18,59 @@ public:
     /**
      * Binomial coefficient, i.e., n choose k.
      *
-     * B(k, n) =
-     *            Gamma(n + 1)
-     *   ------------------------------
-     *    Gamma(k + 1)Gamma(n - k + 1)
+     *                        Gamma(n + 1)
+     * BinCoef(k, n) = ------------------------------
+     *                  Gamma(k + 1)Gamma(n - k + 1)
      */
     static double BinCoeff(const int k, const int n);
 
     /**
-     * Binomial distribution.
-     *
-     * Bin(k | n, p) = B(k, n) p^k (1-p)^{n-k}
-     *
+     * log of Beta distribution coefficient
      */
+    inline static double LogBetaCoeff(const double alpha, const double beta);
+
+    /**
+     * Beta distribution coefficient.
+     *
+     *                          Gamma(alpha)Gamma(beta)
+     * BetaCoef(alpha, beta) = -------------------------
+     *                            Gamma(alpha + beta)
+     */
+    static double BetaCoeff(const double alpha, const double beta);
+
+    /**
+      * Binomial distribution.
+      *
+      * Bin(k | n, p) = BinCoef(k, n) p^k (1-p)^{n-k}
+      *
+      */
     static double Binomial(const int k, const int n, const double p);
 
     /**
-     * Beta-Binomial distribution.
+     * Beta-Binomial distribution. BetaBin(k; n, alpha, beta), k \in [0,n]
      *
-     * f(k | n, alpha, beta) = B(k, n) x
+     * f(k | n, alpha, beta) = BinCoef(k, n) x
      *
-     *    Gamma(alpha + beta)        Gamma(k + alpah)Gamma(n - k + beta)
-     *   ------------------------ x -------------------------------------
-     *   Gamma(alpha)Gamma(beta)           Gamma(n + alpha + beta)
+     *    BetaCoef(alpha + k, beta + n - k)
+     *   -----------------------------------
+     *          BetaCoef(alpha, beta)
      *
      */
     static double BetaBinomial(const int k, const int n, const double alpha,
                                const double beta);
+
+    /**
+     * Beta-Geometric distribution. BetaGeo(k; alpha, beta), k \in [1,\infty)
+     *
+     *                       BetaCoef(alpha + 1, beta + k - 1)
+     * f(k | alpha, beta) = -------------------------------
+     *                           BetaCoef(alpha, beta)
+     *    alpha x Gamma(alpha + beta) x Gamma(k + beta)
+     *   -----------------------------------------------
+     *      Gamma(beta) x Gamma(alpha + beta + k + 1)
+     */
+    static double BetaGeometric(const int k, const double alpha,
+                                const double beta);
 };
 
 #endif /* __MATHUTILS_H__ */
