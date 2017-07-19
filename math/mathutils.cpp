@@ -6,16 +6,8 @@
 #include "mathutils.h"
 #include <cmath>
 
-double SpecFun::LogBinCoeff(const int k, const int n) {
-    return std::lgamma(n + 1) - std::lgamma(k + 1) - std::lgamma(n - k + 1);
-}
-
 double SpecFun::BinCoeff(const int k, const int n) {
     return std::exp(LogBinCoeff(k, n));
-}
-
-double SpecFun::LogBetaCoeff(const double alpha, const double beta) {
-    return std::lgamma(alpha) + std::lgamma(beta) - std::lgamma(alpha + beta);
 }
 
 double SpecFun::BetaCoeff(const double alpha, const double beta) {

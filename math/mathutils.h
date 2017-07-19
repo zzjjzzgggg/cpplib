@@ -13,7 +13,9 @@ public:
     /**
      * log of Binomial coefficient.
      */
-    inline static double LogBinCoeff(const int k, const int n);
+    inline static double LogBinCoeff(const int k, const int n) {
+        return std::lgamma(n + 1) - std::lgamma(k + 1) - std::lgamma(n - k + 1);
+    }
 
     /**
      * Binomial coefficient, i.e., n choose k.
@@ -27,7 +29,10 @@ public:
     /**
      * log of Beta distribution coefficient
      */
-    inline static double LogBetaCoeff(const double alpha, const double beta);
+    inline static double LogBetaCoeff(const double alpha, const double beta) {
+        return std::lgamma(alpha) + std::lgamma(beta) -
+               std::lgamma(alpha + beta);
+    }
 
     /**
      * Beta distribution coefficient.
