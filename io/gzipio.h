@@ -24,7 +24,7 @@ namespace ioutils {
 class GZipOut : public IOOut {
 private:
     static const size_t MAX_BUF_SIZE;
-    size_t buf_size_;
+    size_t buf_sz_;
     char* buf_;
     FILE* zip_wr_;
 
@@ -35,6 +35,10 @@ public:
     GZipOut(const std::string& filename);
     ~GZipOut();
 
+    /**
+     * Write `len` data from source `dat` to buffer. If the buffer is full, data
+     * will be flushed to disk.
+     */
     void write(const void* dat, const size_t len) override;
 
     void close() override;
@@ -46,7 +50,7 @@ class GZipIn : public IOIn {
 private:
     static const size_t MAX_BUF_SIZE;
 
-    size_t num_read_, buf_size_;
+    size_t num_read_, buf_sz_;
     char* buf_;
     FILE* zip_rd_;
 

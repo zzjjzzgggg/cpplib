@@ -4,7 +4,7 @@ namespace ioutils {
 
 const size_t GZipOut::MAX_BUF_SIZE = 4 * 1024;
 
-GZipOut::GZipOut(const std::string& filename) : buf_size_(0) {
+GZipOut::GZipOut(const std::string& filename) : buf_sz_(0) {
     zip_wr_ = popen(getCmd(filename).c_str(), "w");
     buf_ = new char[MAX_BUF_SIZE];
 }
@@ -15,12 +15,12 @@ GZipOut::~GZipOut() {
 }
 
 void GZipOut::flush() {
-    fwrite(buf_, 1, buf_size_, zip_wr_);
-    buf_size_ = 0;
+    fwrite(buf_, 1, buf_sz_, zip_wr_);
+    buf_sz_ = 0;
 }
 
 void GZipOut::close() {
-    if (buf_size_ != 0) flush();
+    if (buf_sz_ != 0) flush();
     if (zip_wr_ != NULL) {
         pclose(zip_wr_);
         zip_wr_ = NULL;
@@ -28,12 +28,14 @@ void GZipOut::close() {
 }
 
 void GZipOut::write(const void* dat, const size_t len) {
-    char* src = (char*)dat;
-    for (size_t i = 0; i < len; i++) {
-        if (buf_size_ < MAX_BUF_SIZE)
-            buf_[buf_size_++] = src[i];
-        else
-            flush();
+    size_t num_write = 0;
+    while (len - num_write > 0) {
+        size_t num_available = MAX_BUF_SIZE - buf_sz_;
+        if (num_available == 0) flush();
+        size_t num_to_write = std::min(len - num_write, num_available);
+        std::memcpy(buf_ + buf_sz_, (char*)dat + num_write, num_to_write);
+        buf_sz_ += num_to_write;
+        num_write += num_to_write;
     }
 }
 
@@ -59,21 +61,21 @@ GZipIn::~GZipIn() {
 }
 
 bool GZipIn::eof() {
-    if (num_read_ < buf_size_) return false;
+    if (num_read_ < buf_sz_) return false;
     return !fill();
 }
 
 bool GZipIn::fill() {
-    buf_size_ = fread(buf_, 1, MAX_BUF_SIZE, zip_rd_);
+    buf_sz_ = fread(buf_, 1, MAX_BUF_SIZE, zip_rd_);
     num_read_ = 0;
-    return buf_size_ > 0;
+    return buf_sz_ > 0;
 }
 
 size_t GZipIn::read(const void* dat, const size_t len) {
     if (len <= 0 || dat == nullptr) return 0;
     size_t num_read = 0, num_to_read = 0;
     while (!eof() && num_read < len) {
-        num_to_read = std::min(len - num_read, buf_size_ - num_read_);
+        num_to_read = std::min(len - num_read, buf_sz_ - num_read_);
         std::memcpy((char*)dat + num_read, buf_ + num_read_, num_to_read);
         num_read += num_to_read;
         num_read_ += num_to_read;
@@ -84,7 +86,7 @@ size_t GZipIn::read(const void* dat, const size_t len) {
 size_t GZipIn::readLine(const void* dat, const size_t len) {
     size_t num_read = 0, num_to_read;
     while (!eof() && num_read < len - 1) {
-        num_to_read = std::min(len - num_read, buf_size_ - num_read_);
+        num_to_read = std::min(len - num_read, buf_sz_ - num_read_);
         char* src_ptr = buf_ + num_read_;
         char* dst_ptr = (char*)dat + num_read;
         for (size_t i = 0; i < num_to_read; i++) {

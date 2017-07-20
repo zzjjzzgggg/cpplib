@@ -14,7 +14,7 @@ template <class Graph>
 Graph loadEdgeList(const std::string& edges_fnm,
                    const GraphType gtype = GraphType::SIMPLE) {
     Graph G(gtype);
-    ioutils::TSVParser ss{edges_fnm};
+    ioutils::TSVParser ss(edges_fnm);
     while (ss.next()) G.addEdge(ss.get<int>(0), ss.get<int>(1));
     G.optimize();
     return G;

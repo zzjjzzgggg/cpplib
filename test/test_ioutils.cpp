@@ -7,33 +7,38 @@
 
 #include <cstdio>
 #include "ioutils.h"
+#include "osutils.h"
 
 using namespace ioutils;
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    string filename = "test.lz";
-    auto po = getIOOut(filename);
+    string src_file = "~/workspace/discoverability/hepth/graph.gz";
+    string dst_file = "test.lz";
+    auto po = getIOOut(dst_file);
 
     printf("writing ... \n");
-    int n = 0;
-    TSVParser parser("~/workspace/discoverability/enron/graph.gz");
+    TSVParser parser(src_file);
     while (parser.next()) {
-        n++;
-        string x = parser.get<string>(0);
-        string y = parser.get<string>(1);
-        printf("%s\t%s\n", x.c_str(), y.c_str());
-        po->save(fmt::format("{}\t{}\n", x.c_str(), y.c_str()));
-        if (n > 10) break;
+        int x = parser.get<int>(0);
+        int y = parser.get<int>(1);
+        po->save(fmt::format("{}\t{}\n", x, y));
     }
     po->close();
 
+    auto edges = loadPrVec<int, int>(src_file);
+
     printf("reading ... \n");
-    TSVParser ss(filename);
+    int i = 0;
+    TSVParser ss(dst_file);
     while (ss.next()) {
-        string x = ss.get<string>(0);
-        string y = ss.get<string>(1);
-        printf("%s\t%s\n", x.c_str(), y.c_str());
+        int x = ss.get<int>(0);
+        int y = ss.get<int>(1);
+        if (x != edges[i].first || y != edges[i].second) {
+            printf("err\n");
+            break;
+        }
+        i++;
     }
 
     return 0;
