@@ -31,11 +31,13 @@ include_directories(os)
 include_directories(io)
 include_directories(graph)
 include_directories(math)
+include_directories(adv)
 
 add_subdirectory(str)
 add_subdirectory(os)
 add_subdirectory(io)
 add_subdirectory(graph)
 add_subdirectory(math)
+add_subdirectory(adv)
 
 add_subdirectory(test)
