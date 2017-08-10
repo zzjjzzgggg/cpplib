@@ -32,6 +32,12 @@ std::string insertMiddle(const std::string &filename, const std::string &sufix,
 std::string getBasePath(const std::string &fullname);
 
 /**
+ * replace the filename in fullname with given filename.
+ */
+std::string replaceFilename(const std::string &fullname,
+                            const std::string &filename);
+
+/**
  * Return a string representation of a number.
  * E.g., 1000 -> 1K; 10000 -> 10K
  */
