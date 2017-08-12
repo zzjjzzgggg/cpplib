@@ -66,4 +66,5 @@ template <>
 auto TSVParser::get<std::string>(const int& id) const -> std::string {
     return strutils::trim(field_vec_[id]);
 }
-}
+
+}  // end namespace ioutils
