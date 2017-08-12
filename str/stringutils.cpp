@@ -41,8 +41,8 @@ std::string getBasePath(const std::string &filename) {
     }
 }
 
-std::string replaceFilename(const std::string &fullname,
-                            const std::string &filename) {
+std::string subFilename(const std::string &fullname,
+                        const std::string &filename) {
     return getBasePath(fullname) + filename;
 }
 

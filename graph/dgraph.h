@@ -232,7 +232,7 @@ public:
      * Optimize the graph data structure for the purpose of fast access.
      * Including: sort neighbors of each node increasingly.
      */
-    void optimize() {
+    void defrag() {
         for (auto& p : nodes_) p.second.sort();
         if (gtype_ == GraphType::SIMPLE)
             for (auto& p : nodes_) p.second.uniq();

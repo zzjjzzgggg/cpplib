@@ -16,7 +16,7 @@ Graph loadEdgeList(const std::string& edges_fnm,
     Graph G(gtype);
     ioutils::TSVParser ss(edges_fnm);
     while (ss.next()) G.addEdge(ss.get<int>(0), ss.get<int>(1));
-    G.optimize();
+    G.defrag();
     return G;
 }
 
@@ -31,7 +31,7 @@ Graph loadBinEdgeList(const std::string& edges_fnm,
         pin->load(dst);
         G.addEdge(src, dst);
     }
-    G.optimize();
+    G.defrag();
     return G;
 }
 
