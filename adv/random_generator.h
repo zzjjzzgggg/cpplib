@@ -4,14 +4,14 @@
  * retaining all the power.
  */
 
-#ifndef RANDUTILS_HPP
-#define RANDUTILS_HPP 1
+#ifndef __RNGUTILS_HPP__
+#define __RNGUTILS_HPP__
 
 /*
  * This header includes three class templates that can help make C++11 random
  * number generation easier to use.
  *
- * randutils::seed_seq_fe
+ * rngutils::seed_seq_fe
  *
  * Fixed-Entropy Seed sequence
  *
@@ -21,8 +21,8 @@
  *
  * In normal use, it's accessed via one of the following type aliases
  *
- *       randutils::seed_seq_fe128
- *       randutils::seed_seq_fe256
+ *       rngutils::seed_seq_fe128
+ *       rngutils::seed_seq_fe256
  *
  * It's discussed in detail at
  * http://www.pcg-random.org/posts/developing-a-seed_seq-alternative.html and
@@ -31,7 +31,7 @@
  * http://www.pcg-random.org/posts/cpp-seeding-surprises.html
  *
  *
- * randutils::auto_seeded
+ * rngutils::auto_seeded
  *
  * Extends a seed sequence class with a nondeterministic default constructor.
  * Uses
@@ -42,8 +42,8 @@
  * In normal use, it's accessed via one of the following type aliases, which use
  * seed_seq_fe128 and seed_seq_fe256 above.
  *
- *       randutils::auto_seed_128
- *       randutils::auto_seed_256
+ *       rngutils::auto_seed_128
+ *       rngutils::auto_seed_256
  *
  * It's discussed in detail at
  * http://www.pcg-random.org/posts/simple-portable-cpp-seed-entropy.html and its
@@ -51,7 +51,7 @@
  * http://www.pcg-random.org/posts/cpps-random_device.html
  *
  *
- * randutils::random_generator
+ * rngutils::random_generator
  *
  * An Easy-to-Use Random API
  *
@@ -62,8 +62,8 @@
  * also
  * use auto_seed_256 by default
  *
- *       randutils::default_rng
- *       randutils::mt19937_rng
+ *       rngutils::default_rng
+ *       rngutils::mt19937_rng
  *
  * It's discussed in detail at
  * http://www.pcg-random.org/posts/ease-of-use-without-loss-of-power.html
@@ -85,44 +85,44 @@
 
 // Ugly platform-specific code for auto_seeded
 
-#if !defined(RANDUTILS_CPU_ENTROPY) && defined(__has_builtin)
+#if !defined(RNGUTILS_CPU_ENTROPY) && defined(__has_builtin)
 #if __has_builtin(__builtin_readcyclecounter)
-#define RANDUTILS_CPU_ENTROPY __builtin_readcyclecounter()
+#define RNGUTILS_CPU_ENTROPY __builtin_readcyclecounter()
 #endif
 #endif
-#if !defined(RANDUTILS_CPU_ENTROPY)
+#if !defined(RNGUTILS_CPU_ENTROPY)
 #if __i386__
 #if __GNUC__
-#define RANDUTILS_CPU_ENTROPY __builtin_ia32_rdtsc()
+#define RNGUTILS_CPU_ENTROPY __builtin_ia32_rdtsc()
 #else
 #include <immintrin.h>
-#define RANDUTILS_CPU_ENTROPY __rdtsc()
+#define RNGUTILS_CPU_ENTROPY __rdtsc()
 #endif
 #else
-#define RANDUTILS_CPU_ENTROPY 0
+#define RNGUTILS_CPU_ENTROPY 0
 #endif
 #endif
 
-#if defined(RANDUTILS_GETPID)
+#if defined(RNGUTILS_GETPID)
 // Already defined externally
 #elif defined(_WIN64) || defined(_WIN32)
 #include <process.h>
-#define RANDUTILS_GETPID _getpid()
+#define RNGUTILS_GETPID _getpid()
 #elif defined(__unix__) || defined(__unix) || \
     (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>
-#define RANDUTILS_GETPID getpid()
+#define RNGUTILS_GETPID getpid()
 #else
-#define RANDUTILS_GETPID 0
+#define RNGUTILS_GETPID 0
 #endif
 
 #if __cpp_constexpr >= 201304L
-#define RANDUTILS_GENERALIZED_CONSTEXPR constexpr
+#define RNGUTILS_GENERALIZED_CONSTEXPR constexpr
 #else
-#define RANDUTILS_GENERALIZED_CONSTEXPR
+#define RNGUTILS_GENERALIZED_CONSTEXPR
 #endif
 
-namespace randutils {
+namespace rngutils {
 
 ///////////////////////////////////////////////////
 //
@@ -139,11 +139,9 @@ namespace randutils {
  * integers.
  *
  * seed_seq_fe128 and seed_seq_fe256 are provided as convenience typedefs for
- * 128-
- * and 256-bit entropy stores respectively. These variants outperform
+ * 128- and 256-bit entropy stores respectively. These variants outperform
  * std::seed_seq, while being better mixing the bits it is provided as entropy.
- * In
- * almost all common use cases, they serve as better drop-in replacements for
+ * In almost all common use cases, they serve as better drop-in replacements for
  * seed_seq.
  *
  * Technical details
@@ -159,26 +157,23 @@ namespace randutils {
  *
  * * Bias freedom/Bijection: If M == N, the state of the entropy store is a
  * bijection from the M inputs (i.e., no states occur twice, none are omitted).
- * If
- * M > N the number of times each state can occur is the same (each state occurs
- * 2**(32*(M-N)) times, where ** is the power function). If M < N, some states
- * cannot occur (bias) but no state occurs more than once (it's impossible to
- * avoid bias if M < N; ideally N should not be chosen so that it is more than
- * M).
+ * If M > N the number of times each state can occur is the same (each state
+ * occurs 2**(32*(M-N)) times, where ** is the power function). If M < N, some
+ * states cannot occur (bias) but no state occurs more than once (it's
+ * impossible to avoid bias if M < N; ideally N should not be chosen so that it
+ * is more than M).
  *
- *   Likewise, the generate function has similar properties (with the entropy
+ * Likewise, the generate function has similar properties (with the entropy
  * store as the input data). If more outputs are requested than there is
- * entropy,
- * some outputs cannot occur. For example, the Mersenne Twister will request 624
- * outputs, to initialize it's 19937-bit state, which is much larger than a
- * 128-bit or 256-bit entropy pool. But in practice, limiting the Mersenne
- * Twister
- * to 2**128 possible initializations gives us enough initializations to give a
- * unique initialization to trillions of computers for billions of years. If you
- * really have 624 words of *real* high-quality entropy you want to use, you
- * probably don't need an entropy mixer like this class at all. But if you
- * *really* want to, nothing is stopping you from creating a
- * randutils::seed_seq_fe<624>.
+ * entropy, some outputs cannot occur. For example, the Mersenne Twister will
+ * request 624 outputs, to initialize it's 19937-bit state, which is much larger
+ * than a 128-bit or 256-bit entropy pool. But in practice, limiting the
+ * Mersenne Twister to 2**128 possible initializations gives us enough
+ * initializations to give a unique initialization to trillions of computers for
+ * billions of years. If you really have 624 words of *real* high-quality
+ * entropy you want to use, you probably don't need an entropy mixer like this
+ * class at all. But if you *really* want to, nothing is stopping you from
+ * creating a rngutils::seed_seq_fe<624>.
  *
  * * As a consequence of the above properties, if all parts of the provided seed
  * data are kept constant except one, and the remaining part is varied through K
@@ -189,9 +184,8 @@ namespace randutils {
  * exception.
  *
  * Ideas used to implement this code include hashing, a simple PCG generator
- * based
- * on an MCG base with an XorShift output function and permutation functions on
- * tuples.
+ * based on an MCG base with an XorShift output function and permutation
+ * functions on tuples.
  *
  * More detail at
  * http://www.pcg-random.org/posts/developing-a-seed_seq-alternative.html
@@ -215,7 +209,7 @@ private:
     static constexpr uint32_t MIX_MULT_R = 0x4973f715;
     static constexpr uint32_t XSHIFT = sizeof(IntRep) * 8 / 2;
 
-    RANDUTILS_GENERALIZED_CONSTEXPR
+    RNGUTILS_GENERALIZED_CONSTEXPR
     static IntRep fast_exp(IntRep x, IntRep power) {
         IntRep result = IntRep(1);
         IntRep multiplier = x;
@@ -371,7 +365,7 @@ using seed_seq_fe256 = seed_seq_fe<8, uint32_t>;
 ///////////////////////////////////////////////////////
 
 /*
- * randutils::auto_seeded
+ * rngutils::auto_seeded
  *
  * Extends a seed sequence class with a nondeterministic default constructor.
  * Uses
@@ -382,8 +376,8 @@ using seed_seq_fe256 = seed_seq_fe<8, uint32_t>;
  * In normal use, it's accessed via one of the following type aliases, which use
  * seed_seq_fe128 and seed_seq_fe256 above.
  *
- *       randutils::auto_seed_128
- *       randutils::auto_seed_256
+ *       rngutils::auto_seed_128
+ *       rngutils::auto_seed_256
  *
  * It's discussed in detail at
  * http://www.pcg-random.org/posts/simple-portable-cpp-seed-entropy.html and its
@@ -494,8 +488,8 @@ class auto_seeded : public SeedSeq {
 #endif
 
         // Platform-specific entropy
-        auto pid = crushto32(RANDUTILS_GETPID);
-        auto cpu = crushto32(RANDUTILS_CPU_ENTROPY);
+        auto pid = crushto32(RNGUTILS_GETPID);
+        auto cpu = crushto32(RNGUTILS_CPU_ENTROPY);
 
         return {{random_int, crushto32(hitime), stack, heap, self_data,
                  self_func, exit_func, thread_id, type_id, pid, cpu}};
@@ -548,7 +542,7 @@ using uniform_distribution =
 ///////////////////////////////////////////////////////
 
 /*
- * randutils::random_generator
+ * rngutils::random_generator
  *
  *   An Easy-to-Use Random API
  *
@@ -558,8 +552,8 @@ using uniform_distribution =
  * In normal use, it's accessed via one of the following type
  * aliases, which also use auto_seed_256 by default
  *
- *       randutils::default_rng
- *       randutils::mt19937_rng
+ *       rngutils::default_rng
+ *       rngutils::mt19937_rng
  *
  * It's discussed in detail at
  * http://www.pcg-random.org/posts/ease-of-use-without-loss-of-power.html
@@ -749,6 +743,6 @@ using default_rng = random_generator<std::default_random_engine>;
 using mt19937_rng = random_generator<std::mt19937>;
 
 /********************************* END **************************************/
-}  // namespace randutils
+}  // namespace rngutils
 
-#endif  // RANDUTILS_HPP
+#endif  // __RNGUTILS_HPP__

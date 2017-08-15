@@ -3,14 +3,14 @@
  * Distributed under terms of the MIT license.
  */
 
-#include "randutils.h"
+#include "rngutils.h"
 
-namespace randutils {
+namespace rngutils {
 
 void initUniform(std::vector<double> &dist, const size_t &start) {
     if (start > 0) std::fill(dist.begin(), dist.begin() + start, 0);
     double sum = 0;
-    randutils::default_rng rng;
+    rngutils::default_rng rng;
     for (size_t i = start; i < dist.size(); i++) {
         dist[i] = rng.uniform();
         sum += dist[i];
@@ -18,4 +18,4 @@ void initUniform(std::vector<double> &dist, const size_t &start) {
     for (size_t i = start; i < dist.size(); i++) dist[i] /= sum;
 }
 
-}  // namespace randutils
+}  // namespace rngutils

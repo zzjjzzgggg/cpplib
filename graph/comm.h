@@ -11,7 +11,7 @@
 #include <algorithm>
 
 #include "../io/ioutils.h"
-#include "../adv/randutils.h"
+#include "../adv/rngutils.h"
 
 namespace graph {
 

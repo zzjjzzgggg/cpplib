@@ -49,7 +49,7 @@ public:
         /**
          * Make sure the node has neighbors before calling this method
          */
-        int sampleNbr(randutils::random_generator<>& rng) const {
+        int sampleNbr(rngutils::random_generator<>& rng) const {
             auto iter = rng.choose(nbrs_.begin(), nbrs_.end());
             return *iter;
         }
@@ -131,7 +131,7 @@ public:
 
 private:
     GraphType gtype_;
-    mutable randutils::default_rng rng_;   // we don't care rng_
+    mutable rngutils::default_rng rng_;    // we don't care rng_
     std::unordered_map<int, Node> nodes_;  // maps a node id to its node object
 
 public:

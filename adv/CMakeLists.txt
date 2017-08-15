@@ -1,1 +1,1 @@
-add_library(randutils SHARED randutils.cpp)
+add_library(rngutils SHARED rngutils.cpp)

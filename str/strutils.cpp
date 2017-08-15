@@ -1,4 +1,4 @@
-#include "stringutils.h"
+#include "strutils.h"
 
 namespace strutils {
 

@@ -1,5 +1,5 @@
-#ifndef __STRINGUTILS_H__
-#define __STRINGUTILS_H__
+#ifndef __STRUTILS_H__
+#define __STRUTILS_H__
 
 #include <string>
 #include <sstream>
@@ -61,4 +61,4 @@ std::string trim_left(const std::string &str);
 std::string trim_right(const std::string &str);
 std::string trim(const std::string &str);
 }
-#endif /* __STRINGUTILS_H__ */
+#endif /* __STRUTILS_H__ */

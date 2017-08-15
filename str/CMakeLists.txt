@@ -1,1 +1,1 @@
-add_library(stringutils SHARED stringutils.cpp)
+add_library(strutils SHARED strutils.cpp)

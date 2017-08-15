@@ -3,12 +3,12 @@
  * Distributed under terms of the MIT license.
  */
 
-#ifndef __RANDUTILS_H__
-#define __RANDUTILS_H__
+#ifndef __RNGUTILS_H__
+#define __RNGUTILS_H__
 
 #include "random_generator.h"
 
-namespace randutils {
+namespace rngutils {
 
 /**
  * Sample from a distribution.
@@ -60,6 +60,6 @@ const Numeric choice(const std::vector<Numeric> &population,
  */
 void initUniform(std::vector<double> &dist, const size_t &start = 0);
 
-}  // namespace randutils
+}  // namespace rngutils
 
-#endif /* __RANDUTILS_H__ */
+#endif /* __RNGUTILS_H__ */
