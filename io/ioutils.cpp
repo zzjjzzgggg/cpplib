@@ -23,6 +23,7 @@ bool isLZ4(const std::string& filename) {
 
 std::unique_ptr<IOOut> getIOOut(const std::string& filename,
                                 const bool append) {
+    osutils::rmfile(filename);
     if (isGZip(filename))
         return std::make_unique<GZipOut>(filename);
     else if (isLZ4(filename))

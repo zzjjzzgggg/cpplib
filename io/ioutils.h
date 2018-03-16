@@ -6,6 +6,7 @@
 #include "iobase.h"
 #include "lz4io.h"
 #include "gzipio.h"
+#include "../os/osutils.h"
 
 namespace ioutils {
 
