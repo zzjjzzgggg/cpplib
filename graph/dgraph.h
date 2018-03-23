@@ -100,14 +100,14 @@ public:
             out_nbrs_.erase(last_o, out_nbrs_.end());
         }
     };
-
     typedef std::unordered_map<int, Node>::const_iterator NodeIter;
+
     /**
      * Iterate over out-neighbors
      *
      *   cur_edge_
      *      |
-     *      V
+     *      v
      * v1: {0 1 ... d1}  <- cur_
      * v2: {0 2 ... d2}
      * ...               <- end_
@@ -217,8 +217,7 @@ public:
 
     /**
      * Add edge (src, dst) to the graph. For efficiency consideration, this
-     * function does not check whether or not the edge has existed. Callers
-     * are
+     * function does not check whether or not the edge has existed. Callers are
      * responsible to avoid duplidate edges.
      */
     void addEdge(const int src, const int dst) {
@@ -241,8 +240,9 @@ public:
     // iterators
     NodeIter beginNI() const { return nodes_.begin(); }
     NodeIter endNI() const { return nodes_.end(); }
+
     /**
-     * find the first node that out degree is nonzero
+     * Find the first node that out degree is nonzero
      */
     EdgeIter beginEI() const {
         auto ni = nodes_.begin();
