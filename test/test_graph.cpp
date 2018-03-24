@@ -7,15 +7,17 @@ using namespace graph;
 
 int main(int argc, char* argv[]) {
     osutils::Timer tm;
-    DGraph G = loadEdgeList<DGraph>("test_graph.dat", GraphType::MULTI);
-    printf("n: %d, e: %d, %s\n", G.getNodes(), G.getEdges(),
-           tm.getStr().c_str());
 
-    for (auto&& ei = G.beginEI(); ei != G.endEI(); ei++) {
-        printf("%d\t%d\n", ei.getSrcID(), ei.getDstID());
+    DatNet<int, int, std::greater<std::pair<int, int>>> net;
+    net.addEdge(1, 2, 1);
+    net.addEdge(2, 3, 1);
+    net.addEdge(2, 4, 2);
+    net.addEdge(4, 5, 1);
+    printf("%d, %d\n", net.getNodes(), net.getEdges());
+
+    for (auto&& ei=net.beginEI(); ei!=net.endEI(); ei++) {
+        printf("%d, %d, %d\n", ei.getSrcID(), ei.getDstID(), ei.getDat());
     }
-
-    printf("%d\n", countNodeDirTriads(3, G));
 
     return 0;
 }

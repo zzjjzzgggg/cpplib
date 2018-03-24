@@ -14,6 +14,8 @@ namespace graph {
  */
 class UGraph {
 public:
+    typedef typename std::vector<int>::const_iterator NbrIter;
+
     class Node {
     private:
         int id_;                 // node
@@ -43,8 +45,8 @@ public:
         int getDeg() const { return nbrs_.size(); }
         int getNbr(const int d) const { return nbrs_[d]; }
 
-        std::vector<int>::iterator begine() { return nbrs_.begin(); }
-        std::vector<int>::iterator ende() { return nbrs_.end(); }
+        NbrIter beginNbr() const { return nbrs_.begin(); }
+        NbrIter endNbr() const { return nbrs_.end(); }
 
         /**
          * Make sure the node has neighbors before calling this method
@@ -73,25 +75,27 @@ public:
      *   cur_edge_
      *      |
      *      V
-     * v1: {0 1 ... d1}  <- cur_
+     * v1: {0 1 ... d1}  <- cur_nd_
      * v2: {0 2 ... d2}
-     * ...               <- end_
+     * ...               <- end_nd_
      */
     class EdgeIter {
     private:
-        NodeIter cur_, end_;
-        int cur_edge_;
+        NodeIter cur_nd_, end_nd_;
+        NbrIter cur_edge_;
 
     public:
-        EdgeIter() : cur_edge_(0) {}
+        EdgeIter() {}
         EdgeIter(const NodeIter& start_nd_iter, const NodeIter& end_nd_iter)
-            : cur_(start_nd_iter), end_(end_nd_iter), cur_edge_(0) {}
+            : cur_nd_(start_nd_iter), end_nd_(end_nd_iter) {
+            if (cur_nd_ != end_nd_) cur_edge_ = cur_nd_->second.beginNbr();
+        }
 
         // copy assignment
         EdgeIter& operator=(const EdgeIter& edge_iter) {
             if (this != &edge_iter) {
-                cur_ = edge_iter.cur_;
-                end_ = edge_iter.end_;
+                cur_nd_ = edge_iter.cur_nd_;
+                end_nd_ = edge_iter.end_nd_;
                 cur_edge_ = edge_iter.cur_edge_;
             }
             return *this;
@@ -104,29 +108,31 @@ public:
          * move to next valid edge; if not exists, move to end
          */
         EdgeIter& operator++(int) {
-            while (cur_ != end_) {
-                cur_edge_++;
-                while (cur_ != end_ && (cur_edge_ >= cur_->second.getDeg() ||
-                                        getDstID() > getSrcID())) {
-                    cur_edge_ = 0;
-                    cur_++;
-                }
-                if (cur_ == end_ || getSrcID() >= getDstID()) break;
+            cur_edge_++;
+            while (cur_edge_ == cur_nd_->second.endNbr()) {
+                cur_nd_++;
+                if (cur_nd_ == end_nd_) break;
+                cur_edge_ = cur_nd_->second.beginNbr();
             }
             return *this;
         }
 
         bool operator!=(const EdgeIter& ei) const {
-            return cur_ != ei.cur_ ||
-                   (cur_ == ei.cur_ && cur_edge_ < ei.cur_edge_);
+            return cur_nd_ != ei.cur_nd_ || end_nd_ != ei.end_nd_ ||
+                (cur_nd_ != end_nd_ && cur_edge_ != ei.cur_edge_);
         }
 
+        /**
+         * If both two node iterators point to end, return true;
+         * Otherwise, compare the two attribute by attribute.
+         */
         bool operator==(const EdgeIter& ei) const {
-            return cur_ == ei.cur_ && cur_edge_ == ei.cur_edge_;
+            return cur_nd_ == ei.cur_nd_ && end_nd_ == ei.end_nd_ &&
+                (cur_nd_ == end_nd_ || cur_edge_ == ei.cur_edge_);
         }
 
-        int getSrcID() const { return cur_->second.getID(); }
-        int getDstID() const { return cur_->second.getNbr(cur_edge_); }
+        int getSrcID() const { return cur_nd_->second.getID(); }
+        int getDstID() const { return *cur_edge_; }
     };
 
 private:
@@ -219,9 +225,7 @@ public:
      */
     EdgeIter beginEI() const {
         auto ni = nodes_.begin();
-        while (ni != nodes_.end() &&
-               (ni->second.getDeg() == 0 || ni->second.getNbr(0) > ni->first))
-            ni++;
+        while (ni != nodes_.end() && ni->second.getDeg() == 0) ni++;
         return EdgeIter(ni, nodes_.end());
     }
     EdgeIter endEI() const { return EdgeIter(nodes_.end(), nodes_.end()); }

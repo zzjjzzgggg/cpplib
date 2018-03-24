@@ -11,5 +11,6 @@
 #include "dgraph.h"
 #include "gio.h"
 #include "triad.h"
+#include "network.h"
 
 #endif /* __GRAPH_H__ */

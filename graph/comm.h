@@ -7,7 +7,7 @@
 #define __COMM_H__
 
 #include <vector>
-#include <forward_list>
+#include <set>
 #include <unordered_map>
 #include <algorithm>
 
