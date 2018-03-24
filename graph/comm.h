@@ -8,8 +8,10 @@
 
 #include <vector>
 #include <set>
+#include <queue>
 #include <unordered_map>
 #include <algorithm>
+#include <climits>
 
 #include "../io/ioutils.h"
 #include "../adv/rngutils.h"

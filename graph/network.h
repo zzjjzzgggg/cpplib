@@ -11,17 +11,19 @@
 namespace graph {
 
 /**
- * Directed network allowing node and edge to store data. Use an adjacency
- * list
+ * Directed network allowing node and edge to store data. Use an adjacency list
  * data structure. For each node, only its out neighbors are stored and sorted
- * by function Cmp.
+ * by function Cmp. For example, Cmp could be std::less<int>
  */
 template <class NDat, class EDat, class Cmp>
 class DatNet {
 public:
+    class Node;
     typedef
         typename std::set<std::pair<int, EDat>, Cmp>::const_iterator NbrIter;
+    typedef typename std::unordered_map<int, Node>::const_iterator NodeIter;
 
+public:
     /**
      * A node object stores its ID, data, and out-neighbors
      */
@@ -29,7 +31,7 @@ public:
     private:
         int id_;
         NDat dat_;
-        std::set<std::pair<int, EDat>, Cmp> nbrs_;
+        std::set<std::pair<int, EDat>, Cmp> out_nbrs_;
 
     public:
         Node() : id_(-1) {}
@@ -41,46 +43,45 @@ public:
         Node& operator=(const Node&) = delete;
 
         // move constructor/assignment
-        Node(Node&& other) : id_(other.id_), nbrs_(std::move(other.nbrs_)) {}
+        Node(Node&& other)
+            : id_(other.id_), out_nbrs_(std::move(other.out_nbrs_)) {}
 
         Node& operator=(Node&& other) {
             id_ = other.id_;
-            nbrs_ = std::move(other.nbrs_);
+            out_nbrs_ = std::move(other.out_nbrs_);
             return *this;
         }
 
         // only structure is saved
         void save(std::unique_ptr<ioutils::IOOut>& po) const {
-            po->save(id_);                        // id
-            po->save((int)nbrs_.size());          // out-deg
-            for (int nbr : nbrs_) po->save(nbr);  // out-neighbors
+            po->save(id_);                            // id
+            po->save((int)out_nbrs_.size());          // out-deg
+            for (int nbr : out_nbrs_) po->save(nbr);  // out-neighbors
         }
-
         void load(std::unique_ptr<ioutils::IOIn>& pi) {
             int deg, nbr;
-            pi->load(id_);       // id
-            pi->load(deg);       // out-deg
-            nbrs_.reserve(deg);  // out-neighbors
+            pi->load(id_);           // id
+            pi->load(deg);           // out-deg
+            out_nbrs_.reserve(deg);  // out-neighbors
             for (int d = 0; d < deg; d++) {
                 pi->load(nbr);
-                nbrs_.push_back(nbr);
+                out_nbrs_.push_back(nbr);
             }
         }
 
         int getID() const { return id_; }
+        int getOutDeg() const { return out_nbrs_.size(); }
 
-        int getDeg() const { return nbrs_.size(); }
+        // std::pair<int, EDat>& getNbr(const int d) const { return
+        // out_nbrs_[d]; }
 
-        // std::pair<int, EDat>& getNbr(const int d) const { return nbrs_[d]; }
+        NbrIter beginOutNbr() const { return out_nbrs_.begin(); }
+        NbrIter endOutNbr() const { return out_nbrs_.end(); }
 
-        NbrIter beginNbr() const { return nbrs_.begin(); }
-        NbrIter endNbr() const { return nbrs_.end(); }
-
-        void addNbr(const int nbr, const EDat& dat) {
-            nbrs_.emplace(nbr, dat);
+        void addOutNbr(const int nbr, const EDat& dat) {
+            out_nbrs_.emplace(nbr, dat);
         }
     };
-    typedef typename std::unordered_map<int, Node>::const_iterator NodeIter;
 
     /**
      * Iterate over out-neighbors
@@ -101,7 +102,7 @@ public:
         EdgeIter() {}
         EdgeIter(const NodeIter& start_nd_iter, const NodeIter& end_nd_iter)
             : cur_nd_(start_nd_iter), end_nd_(end_nd_iter) {
-            if (cur_nd_ != end_nd_) cur_edge_ = cur_nd_->second.beginNbr();
+            if (cur_nd_ != end_nd_) cur_edge_ = cur_nd_->second.beginOutNbr();
         }
 
         // copy assignment
@@ -118,10 +119,10 @@ public:
         // move to next valid edge; if not exists, move to end
         EdgeIter& operator++(int) {
             cur_edge_++;
-            while (cur_edge_ == cur_nd_->second.endNbr()) {
+            while (cur_edge_ == cur_nd_->second.endOutNbr()) {
                 cur_nd_++;
                 if (cur_nd_ == end_nd_) break;
-                cur_edge_ = cur_nd_->second.beginNbr();
+                cur_edge_ = cur_nd_->second.beginOutNbr();
             }
             return *this;
         }
@@ -170,7 +171,6 @@ public:
         po->save((int)nodes_.size());                // total number of nodes
         for (auto& pr : nodes_) pr.second.save(po);  // each node
     }
-
     void load(const std::string& filename) {
         auto pi = ioutils::getIOIn(filename);
         int num_nodes;
@@ -188,7 +188,7 @@ public:
     const int getNodes() const { return nodes_.size(); }
     const int getEdges() const {
         int edges = 0;
-        for (const auto& p : nodes_) edges += p.second.getDeg();
+        for (const auto& p : nodes_) edges += p.second.getOutDeg();
         return edges;
     }
 
@@ -211,23 +211,18 @@ public:
     void addEdge(const int src, const int dst, const EDat& dat) {
         addNode(src);
         addNode(dst);
-        nodes_[src].addNbr(dst, dat);
+        nodes_[src].addOutNbr(dst, dat);
     }
 
     // iterators
     NodeIter beginNI() const { return nodes_.begin(); }
-
     NodeIter endNI() const { return nodes_.end(); }
-
-    /**
-     * Find the first node such that its out degree is nonzero
-     */
     EdgeIter beginEI() const {
+        // Find the first node such that its out degree is nonzero
         auto ni = nodes_.begin();
-        while (ni != nodes_.end() && ni->second.getDeg() == 0) ni++;
+        while (ni != nodes_.end() && ni->second.getOutDeg() == 0) ni++;
         return EdgeIter(ni, nodes_.end());
     }
-
     EdgeIter endEI() const { return EdgeIter(nodes_.end(), nodes_.end()); }
 
 }; /* DatNet */

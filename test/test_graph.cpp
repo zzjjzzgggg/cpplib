@@ -19,5 +19,8 @@ int main(int argc, char* argv[]) {
         printf("%d, %d, %d\n", ei.getSrcID(), ei.getDstID(), ei.getDat());
     }
 
+    for (auto&& ni=net.beginNI(); ni!=net.endNI(); ni++) {
+        printf("%d, %d\n", ni->first, ni->second.getOutDeg());
+    }
     return 0;
 }
