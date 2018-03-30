@@ -19,33 +19,30 @@
  * performs better in empirical statistical tests, and executes faster in
  * normal-sized use cases.
  *
- * In normal use, it's accessed via one of the following type aliases
+ * In normal use, it is accessed via one of the following type aliases
  *
  *       rngutils::seed_seq_fe128
  *       rngutils::seed_seq_fe256
  *
- * It's discussed in detail at
+ * It is discussed in detail at
  * http://www.pcg-random.org/posts/developing-a-seed_seq-alternative.html and
- * the
- * motivation for its creation (what's wrong with std::seed_seq) here
+ * the motivation for its creation (what is wrong with std::seed_seq) here
  * http://www.pcg-random.org/posts/cpp-seeding-surprises.html
  *
  *
  * rngutils::auto_seeded
  *
  * Extends a seed sequence class with a nondeterministic default constructor.
- * Uses
- * a variety of local sources of entropy to portably initialize any seed
- * sequence
- * to a good default state.
+ * Uses a variety of local sources of entropy to portably initialize any seed
+ * sequence to a good default state.
  *
- * In normal use, it's accessed via one of the following type aliases, which use
- * seed_seq_fe128 and seed_seq_fe256 above.
+ * In normal use, it is accessed via one of the following type aliases, which
+ * use seed_seq_fe128 and seed_seq_fe256 above.
  *
  *       rngutils::auto_seed_128
  *       rngutils::auto_seed_256
  *
- * It's discussed in detail at
+ * It is discussed in detail at
  * http://www.pcg-random.org/posts/simple-portable-cpp-seed-entropy.html and its
  * motivation (why you can't just use std::random_device) here
  * http://www.pcg-random.org/posts/cpps-random_device.html
@@ -55,17 +52,16 @@
  *
  * An Easy-to-Use Random API
  *
- * Provides all the power of C++11's random number facility in an easy-to use
+ * Provides all the power of C++11 is random number facility in an easy-to use
  * wrapper.
  *
- * In normal use, it's accessed via one of the following type aliases, which
- * also
- * use auto_seed_256 by default
+ * In normal use, it is accessed via one of the following type aliases, which
+ * also use auto_seed_256 by default
  *
  *       rngutils::default_rng
  *       rngutils::mt19937_rng
  *
- * It's discussed in detail at
+ * It is discussed in detail at
  * http://www.pcg-random.org/posts/ease-of-use-without-loss-of-power.html
  */
 
@@ -166,8 +162,8 @@ namespace rngutils {
  * Likewise, the generate function has similar properties (with the entropy
  * store as the input data). If more outputs are requested than there is
  * entropy, some outputs cannot occur. For example, the Mersenne Twister will
- * request 624 outputs, to initialize it's 19937-bit state, which is much larger
- * than a 128-bit or 256-bit entropy pool. But in practice, limiting the
+ * request 624 outputs, to initialize it is 19937-bit state, which is much
+ * larger than a 128-bit or 256-bit entropy pool. But in practice, limiting the
  * Mersenne Twister to 2**128 possible initializations gives us enough
  * initializations to give a unique initialization to trillions of computers for
  * billions of years. If you really have 624 words of *real* high-quality
@@ -368,18 +364,16 @@ using seed_seq_fe256 = seed_seq_fe<8, uint32_t>;
  * rngutils::auto_seeded
  *
  * Extends a seed sequence class with a nondeterministic default constructor.
- * Uses
- * a variety of local sources of entropy to portably initialize any seed
- * sequence
- * to a good default state.
+ * Uses a variety of local sources of entropy to portably initialize any seed
+ * sequence to a good default state.
  *
- * In normal use, it's accessed via one of the following type aliases, which use
- * seed_seq_fe128 and seed_seq_fe256 above.
+ * In normal use, it is accessed via one of the following type aliases, which
+ * use seed_seq_fe128 and seed_seq_fe256 above.
  *
  *       rngutils::auto_seed_128
  *       rngutils::auto_seed_256
  *
- * It's discussed in detail at
+ * It is discussed in detail at
  * http://www.pcg-random.org/posts/simple-portable-cpp-seed-entropy.html and its
  * motivation (why you can't just use std::random_device) here
  * http://www.pcg-random.org/posts/cpps-random_device.html
@@ -418,9 +412,8 @@ class auto_seeded : public SeedSeq {
         //    fnv(2166136261U, __DATE__ __TIME__ __FILE__);
 
         // Some people think you shouldn't use the random device much because on
-        // some
-        // platforms it could be expensive to call or "use up" vital system-wide
-        // entropy, so we just call it once.
+        // some platforms it could be expensive to call or "use up" vital
+        // system-wide entropy, so we just call it once.
         static uint32_t random_int = std::random_device{}();
 
         // The heap can vary from run to run as well.
@@ -433,51 +426,41 @@ class auto_seeded : public SeedSeq {
         // conditons. The more, the merrier.
         random_int += 0xedf19156;
 
-        // Classic seed, the time. It ought to change, especially
-        // since this is (hopefully) nanosecond resolution time.
+        // Classic seed, the time. It ought to change, especially since this is
+        // (hopefully) nanosecond resolution time.
         auto hitime = std::chrono::high_resolution_clock::now()
                           .time_since_epoch()
                           .count();
 
         // Address of the thing being initialized. That can mean that different
-        // seed
-        // sequences in different places in memory will be different. Even for
-        // the
-        // same object, it may vary from run to run in systems with ASLR, such
-        // as OS
-        // X, but on Linux it might not unless we compile with -fPIC -pic.
+        // seed sequences in different places in memory will be different. Even
+        // for the same object, it may vary from run to run in systems with
+        // ASLR, such as OS X, but on Linux it might not unless we compile with
+        // -fPIC -pic.
         auto self_data = hash(this);
 
         // The address of the time function. It should hopefully be in a system
         // library that hopefully isn't always in the same place (might not
-        // change
-        // until system is rebooted though)
+        // change until system is rebooted though)
         //
         // auto time_func = hash(&std::chrono::high_resolution_clock::now);
 
         // The address of the exit function. It should hopefully be in a system
         // library that hopefully isn't always in the same place (might not
-        // change
-        // until system is rebooted though). Hopefully it's in a different
-        // library
-        // from time_func.
+        // change until system is rebooted though). Hopefully it is in a
+        // different library from time_func.
         auto exit_func = hash(&_Exit);
 
         // The address of a local function. That may be in a totally different
-        // part
-        // of
-        // memory. On OS X it'll vary from run to run thanks to ASLR, on Linux
-        // it
-        // might not unless we compile with -fPIC -pic. Need the cast because
-        // it's
-        // an
-        // overloaded function and we need to pick the right one.
+        // part of memory. On OS X it'll vary from run to run thanks to ASLR, on
+        // Linux it might not unless we compile with -fPIC -pic. Need the cast
+        // because it's an overloaded function and we need to pick the right
+        // one.
         auto self_func =
             hash(static_cast<uint32_t (*)(uint64_t)>(&auto_seeded::crushto32));
 
         // Hash our thread id. It seems to vary from run to run on OS X, not so
-        // much
-        // on Linux.
+        // much on Linux.
         auto thread_id = hash(std::this_thread::get_id());
 
 // Hash of the ID of a type. May or may not vary, depending on implementation.
@@ -546,16 +529,16 @@ using uniform_distribution =
  *
  *   An Easy-to-Use Random API
  *
- * Provides all the power of C++11's random number facility in
- * an easy-to use wrapper.
+ * Provides all the power of C++11 is random number facility in an easy-to use
+ * wrapper.
  *
- * In normal use, it's accessed via one of the following type
- * aliases, which also use auto_seed_256 by default
+ * In normal use, it is accessed via one of the following type aliases, which
+ * also use auto_seed_256 by default
  *
  *       rngutils::default_rng
  *       rngutils::mt19937_rng
  *
- * It's discussed in detail at
+ * It is discussed in detail at
  * http://www.pcg-random.org/posts/ease-of-use-without-loss-of-power.html
  */
 
@@ -571,11 +554,9 @@ private:
 
     // This SFNAE evilness provides a mechanism to cast classes that aren't
     // themselves (technically) Seed Sequences but derive from a seed sequence
-    // to
-    // be
-    // passed to functions that require actual Seed Squences. To do so, the
-    // class
-    // should provide a the type base_seed_seq and a base() member function.
+    // to be passed to functions that require actual Seed Squences. To do so,
+    // the class should provide a the type base_seed_seq and a base() member
+    // function.
 
     template <typename T>
     static constexpr bool has_base_seed_seq(typename T::base_seed_seq *) {
@@ -610,9 +591,8 @@ public:
     }
 
     // Work around Clang DR777 bug in Clang 3.6 and earlier by adding a
-    // redundant
-    // overload rather than mixing parameter packs and default arguments.
-    // https://llvm.org/bugs/show_bug.cgi?id=23029
+    // redundant overload rather than mixing parameter packs and default
+    // arguments. https://llvm.org/bugs/show_bug.cgi?id=23029
     template <typename Seeding, typename... Params>
     random_generator(Seeding &&seeding, Params &&... params)
         : engine_{seed_seq_cast(std::forward<Seeding>(seeding)),
@@ -626,9 +606,8 @@ public:
     }
 
     // Work around Clang DR777 bug in Clang 3.6 and earlier by adding a
-    // redundant
-    // overload rather than mixing parameter packs and default arguments.
-    // https://llvm.org/bugs/show_bug.cgi?id=23029
+    // redundant overload rather than mixing parameter packs and default
+    // arguments. https://llvm.org/bugs/show_bug.cgi?id=23029
     template <typename Seeding, typename... Params>
     void seed(Seeding &&seeding, Params &&... params) {
         engine_.seed(seed_seq_cast(seeding), std::forward<Params>(params)...);
