@@ -6,7 +6,8 @@
 #ifndef __NETWORK_H__
 #define __NETWORK_H__
 
-#include "comm.h"
+#include "node_interface.h"
+#include "edge_iter_interface.h"
 
 namespace graph {
 
@@ -18,25 +19,23 @@ namespace graph {
 template <class NDat, class EDat, class Cmp>
 class DatNet {
 public:
-    class Node;
+    // each edge is a pair <dest_id, dat>
     typedef
         typename std::set<std::pair<int, EDat>, Cmp>::const_iterator NbrIter;
-    typedef typename std::unordered_map<int, Node>::const_iterator NodeIter;
 
 public:
     /**
      * A node object stores its ID, data, and out-neighbors
      */
-    class Node {
+    class Node : public INode<NbrIter> {
     private:
-        int id_;
         NDat dat_;
         std::set<std::pair<int, EDat>, Cmp> out_nbrs_;
 
     public:
-        Node() : id_(-1) {}
-        Node(const int id) : id_(id) {}
-        Node(const int id, const NDat& dat) : id_(id), dat_(dat) {}
+        Node() : INode<NbrIter>(-1) {}
+        Node(const int id) : INode<NbrIter>(id) {}
+        Node(const int id, const NDat& dat) : INode<NbrIter>(id), dat_(dat) {}
 
         // disable copy constructor/assignment
         Node(const Node&) = delete;
@@ -44,45 +43,47 @@ public:
 
         // move constructor/assignment
         Node(Node&& other)
-            : id_(other.id_), out_nbrs_(std::move(other.out_nbrs_)) {}
-
+            : INode<NbrIter>(other.id_),
+              out_nbrs_(std::move(other.out_nbrs_)) {}
         Node& operator=(Node&& other) {
-            id_ = other.id_;
+            this->id_ = other.id_;
             out_nbrs_ = std::move(other.out_nbrs_);
             return *this;
         }
 
         // only structure is saved
-        void save(std::unique_ptr<ioutils::IOOut>& po) const {
-            po->save(id_);                            // id
-            po->save((int)out_nbrs_.size());          // out-deg
-            for (int nbr : out_nbrs_) po->save(nbr);  // out-neighbors
-        }
-        void load(std::unique_ptr<ioutils::IOIn>& pi) {
-            int deg, nbr;
-            pi->load(id_);           // id
-            pi->load(deg);           // out-deg
-            out_nbrs_.reserve(deg);  // out-neighbors
-            for (int d = 0; d < deg; d++) {
-                pi->load(nbr);
-                out_nbrs_.push_back(nbr);
-            }
+        void save(std::unique_ptr<ioutils::IOOut>& po) const override {
         }
 
-        int getID() const { return id_; }
-        int getOutDeg() const { return out_nbrs_.size(); }
+        void load(std::unique_ptr<ioutils::IOIn>& pi) override {
+        }
+
+        int getDeg() const override { return out_nbrs_.size(); }
+        int getInDeg() const override { return out_nbrs_.size(); }
+        int getOutDeg() const override { return out_nbrs_.size(); }
 
         // std::pair<int, EDat>& getNbr(const int d) const { return
         // out_nbrs_[d]; }
 
-        NbrIter beginOutNbr() const { return out_nbrs_.begin(); }
-        NbrIter endOutNbr() const { return out_nbrs_.end(); }
+        NbrIter beginOutNbr() const override { return out_nbrs_.begin(); }
+        NbrIter endOutNbr() const override { return out_nbrs_.end(); }
+
+        NbrIter beginInNbr() const override { return out_nbrs_.begin(); }
+        NbrIter endInNbr() const override { return out_nbrs_.end(); }
+
+        NbrIter beginNbr() const override { return out_nbrs_.begin(); }
+        NbrIter endNbr() const override { return out_nbrs_.end(); }
+
+        bool isNbr(const int nbr) const override { return true; }
+
+        int getNbr(const int d) const override { return -1; }
 
         void addOutNbr(const int nbr, const EDat& dat) {
             out_nbrs_.emplace(nbr, dat);
         }
     };
 
+    typedef typename std::unordered_map<int, Node>::const_iterator NodeIter;
     /**
      * Iterate over out-neighbors
      *
@@ -93,57 +94,21 @@ public:
      * v2: {0 2 ... d2}
      * ...               <- end_nd_
      */
-    class EdgeIter {
-    private:
-        NodeIter cur_nd_, end_nd_;
-        NbrIter cur_edge_;
-
+    class EdgeIter : public IEdgeIter<EdgeIter, NodeIter, NbrIter> {
     public:
         EdgeIter() {}
         EdgeIter(const NodeIter& start_nd_iter, const NodeIter& end_nd_iter)
-            : cur_nd_(start_nd_iter), end_nd_(end_nd_iter) {
-            if (cur_nd_ != end_nd_) cur_edge_ = cur_nd_->second.beginOutNbr();
-        }
+            : IEdgeIter<EdgeIter, NodeIter, NbrIter>(start_nd_iter,
+                                                     end_nd_iter) {}
 
         // copy assignment
         EdgeIter& operator=(const EdgeIter& ei) {
-            if (this != &ei) {
-                cur_nd_ = ei.cur_nd_;
-                end_nd_ = ei.end_nd_;
-                cur_edge_ = ei.cur_edge_;
-            }
-            return *this;
+            return IEdgeIter<EdgeIter, NodeIter, NbrIter>::operator=(ei);
         }
 
-        // postfix increment: i++
-        // move to next valid edge; if not exists, move to end
-        EdgeIter& operator++(int) {
-            cur_edge_++;
-            while (cur_edge_ == cur_nd_->second.endOutNbr()) {
-                cur_nd_++;
-                if (cur_nd_ == end_nd_) break;
-                cur_edge_ = cur_nd_->second.beginOutNbr();
-            }
-            return *this;
-        }
-
-        bool operator!=(const EdgeIter& ei) const {
-            return cur_nd_ != ei.cur_nd_ || end_nd_ != ei.end_nd_ ||
-                   (cur_nd_ != end_nd_ && cur_edge_ != ei.cur_edge_);
-        }
-
-        /**
-         * If both two node iterators point to end, return true;
-         * Otherwise, compare the two attribute by attribute.
-         */
-        bool operator==(const EdgeIter& ei) const {
-            return cur_nd_ == ei.cur_nd_ && end_nd_ == ei.end_nd_ &&
-                   (cur_nd_ == end_nd_ || cur_edge_ == ei.cur_edge_);
-        }
-
-        int getSrcID() const { return cur_nd_->second.getID(); }
-        int getDstID() const { return cur_edge_->first; }
-        const EDat& getDat() const { return cur_edge_->second; }
+        int getSrcID() const override { return this->cur_nd_->second.getID(); }
+        int getDstID() const override { return this->cur_edge_->first; }
+        const EDat& getDat() const { return this->cur_edge_->second; }
     };
 
 private:

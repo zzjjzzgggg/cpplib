@@ -6,7 +6,8 @@
 #ifndef __DGRAPH_H__
 #define __DGRAPH_H__
 
-#include "comm.h"
+#include "node_interface.h"
+#include "edge_iter_interface.h"
 
 namespace graph {
 
@@ -17,14 +18,13 @@ class DGraph {
 public:
     typedef typename std::vector<int>::const_iterator NbrIter;
 
-    class Node {
+    class Node : public INode<NbrIter> {
     private:
-        int id_;
         std::vector<int> in_nbrs_, out_nbrs_;
 
     public:
-        Node() : id_(-1) {}
-        Node(const int id) : id_(id) {}
+        Node() : INode(-1) {}
+        Node(const int id) : INode(id) {}
 
         // disable copy constructor/assignment
         Node(const Node&) = delete;
@@ -32,7 +32,7 @@ public:
 
         // move constructor/assignment
         Node(Node&& other)
-            : id_(other.id_), in_nbrs_(std::move(other.in_nbrs_)),
+            : INode(other.id_), in_nbrs_(std::move(other.in_nbrs_)),
               out_nbrs_(std::move(other.out_nbrs_)) {}
 
         Node& operator=(Node&& other) {
@@ -42,30 +42,37 @@ public:
             return *this;
         }
 
-        void save(std::unique_ptr<ioutils::IOOut>& po) const;
-        void load(std::unique_ptr<ioutils::IOIn>& pi);
+        void save(std::unique_ptr<ioutils::IOOut>& po) const override;
+        void load(std::unique_ptr<ioutils::IOIn>& pi) override;
 
-        int getID() const { return id_; }
+        int getDeg() const override { return getInDeg() + getOutDeg(); }
+        int getInDeg() const override { return in_nbrs_.size(); }
+        int getOutDeg() const override { return out_nbrs_.size(); }
 
-        int getInDeg() const { return in_nbrs_.size(); }
-        int getOutDeg() const { return out_nbrs_.size(); }
-        int getDeg() const { return getInDeg() + getOutDeg(); }
-
-        int getInNbr(const int d) const { return in_nbrs_[d]; }
-        int getOutNbr(const int d) const { return out_nbrs_[d]; }
-        int getNbr(const int d) const {
+        int getInNbr(const int d) const override { return in_nbrs_[d]; }
+        int getOutNbr(const int d) const override { return out_nbrs_[d]; }
+        int getNbr(const int d) const override {
             return d < getOutDeg() ? getOutNbr(d) : getInNbr(d - getOutDeg());
         }
 
-        bool isInNbr(const int nbr) const {
+        bool isInNbr(const int nbr) const override {
             return std::binary_search(in_nbrs_.begin(), in_nbrs_.end(), nbr);
         }
 
-        NbrIter beginInNbr() const { return in_nbrs_.begin(); }
-        NbrIter endInNbr() const { return in_nbrs_.end(); }
+        bool isOutNbr(const int nbr) const override {
+            return std::binary_search(out_nbrs_.begin(), out_nbrs_.end(), nbr);
+        }
 
-        NbrIter beginOutNbr() const { return out_nbrs_.begin(); }
-        NbrIter endOutNbr() const { return out_nbrs_.end(); }
+        bool isNbr(const int nbr) const override { return isOutNbr(nbr); }
+
+        NbrIter beginNbr() const override { return out_nbrs_.begin(); }
+        NbrIter endNbr() const override { return out_nbrs_.end(); }
+
+        NbrIter beginInNbr() const override { return in_nbrs_.begin(); }
+        NbrIter endInNbr() const override { return in_nbrs_.end(); }
+
+        NbrIter beginOutNbr() const override { return out_nbrs_.begin(); }
+        NbrIter endOutNbr() const override { return out_nbrs_.end(); }
 
         /**
          * Make sure the node has out-neighbors before calling this method
@@ -81,10 +88,6 @@ public:
         int sampleInNbr(rngutils::random_generator<>& rng) const {
             auto iter = rng.choose(in_nbrs_.begin(), in_nbrs_.end());
             return *iter;
-        }
-
-        bool isOutNbr(const int nbr) const {
-            return std::binary_search(out_nbrs_.begin(), out_nbrs_.end(), nbr);
         }
 
         void addInNbr(const int nbr) { in_nbrs_.push_back(nbr); }
@@ -114,56 +117,19 @@ public:
      * v2: {0 2 ... d2}
      * ...               <- end_nd_
      */
-    class EdgeIter {
-    private:
-        NodeIter cur_nd_, end_nd_;
-        NbrIter cur_edge_;
-
+    class EdgeIter : public IEdgeIter<EdgeIter, NodeIter, NbrIter> {
     public:
         EdgeIter() {}
         EdgeIter(const NodeIter& start_nd_iter, const NodeIter& end_nd_iter)
-            : cur_nd_(start_nd_iter), end_nd_(end_nd_iter) {
-            if (cur_nd_ != end_nd_) cur_edge_ = cur_nd_->second.beginOutNbr();
-        }
+            : IEdgeIter(start_nd_iter, end_nd_iter) {}
 
         // copy assignment
-        EdgeIter& operator=(const EdgeIter& edge_iter) {
-            if (this != &edge_iter) {
-                cur_nd_ = edge_iter.cur_nd_;
-                end_nd_ = edge_iter.end_nd_;
-                cur_edge_ = edge_iter.cur_edge_;
-            }
-            return *this;
+        EdgeIter& operator=(const EdgeIter& ei) {
+            return IEdgeIter<EdgeIter, NodeIter, NbrIter>::operator=(ei);
         }
 
-        // postfix increment: i++
-        // move to next valid edge; if not exists, move to end
-        EdgeIter& operator++(int) {
-            cur_edge_++;
-            while (cur_edge_ == cur_nd_->second.endOutNbr()) {
-                cur_nd_++;
-                if (cur_nd_ == end_nd_) break;
-                cur_edge_ = cur_nd_->second.beginOutNbr();
-            }
-            return *this;
-        }
-
-        bool operator!=(const EdgeIter& ei) const {
-            return cur_nd_ != ei.cur_nd_ || end_nd_ != ei.end_nd_ ||
-                (cur_nd_ != end_nd_ && cur_edge_ != ei.cur_edge_);
-        }
-
-        /**
-         * If both two node iterators point to end, return true;
-         * Otherwise, compare the two attribute by attribute.
-         */
-        bool operator==(const EdgeIter& ei) const {
-            return cur_nd_ == ei.cur_nd_ && end_nd_ == ei.end_nd_ &&
-                (cur_nd_ == end_nd_ || cur_edge_ == ei.cur_edge_);
-        }
-
-        int getSrcID() const { return cur_nd_->second.getID(); }
-        int getDstID() const { return *cur_edge_; }
+        int getSrcID() const override { return cur_nd_->second.getID(); }
+        int getDstID() const override { return *cur_edge_; }
     };
 
 private:

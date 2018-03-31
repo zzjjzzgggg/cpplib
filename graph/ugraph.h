@@ -6,7 +6,8 @@
 #ifndef __UGRAPH_H__
 #define __UGRAPH_H__
 
-#include "comm.h"
+#include "node_interface.h"
+#include "edge_iter_interface.h"
 
 namespace graph {
 /**
@@ -16,37 +17,34 @@ class UGraph {
 public:
     typedef typename std::vector<int>::const_iterator NbrIter;
 
-    class Node {
+    class Node : public INode<NbrIter> {
     private:
-        int id_;                 // node
         std::vector<int> nbrs_;  // neighbors
 
     public:
-        Node() : id_(-1) {}
-        Node(const int id) : id_(id) {}
+        Node() : INode(-1) {}
+        Node(const int id) : INode(id) {}
 
         // disable copy constructor/assignment
         Node(const Node&) = delete;
         Node& operator=(const Node&) = delete;
 
         // move constructor/assignment
-        Node(Node&& other) : id_(other.id_), nbrs_(std::move(other.nbrs_)) {}
-
+        Node(Node&& other) : INode(other.id_), nbrs_(std::move(other.nbrs_)) {}
         Node& operator=(Node&& other) {
             id_ = other.id_;
             nbrs_ = std::move(other.nbrs_);
             return *this;
         }
 
-        void save(std::unique_ptr<ioutils::IOOut>& po) const;
-        void load(std::unique_ptr<ioutils::IOIn>& pi);
+        void save(std::unique_ptr<ioutils::IOOut>& po) const override;
+        void load(std::unique_ptr<ioutils::IOIn>& pi) override;
 
-        int getID() const { return id_; }
-        int getDeg() const { return nbrs_.size(); }
-        int getNbr(const int d) const { return nbrs_[d]; }
+        int getDeg() const override { return nbrs_.size(); }
+        int getNbr(const int d) const override { return nbrs_[d]; }
 
-        NbrIter beginNbr() const { return nbrs_.begin(); }
-        NbrIter endNbr() const { return nbrs_.end(); }
+        NbrIter beginNbr() const override { return nbrs_.begin(); }
+        NbrIter endNbr() const override { return nbrs_.end(); }
 
         /**
          * Make sure the node has neighbors before calling this method
@@ -56,7 +54,7 @@ public:
             return *iter;
         }
 
-        bool isNbr(const int nbr) const {
+        bool isNbr(const int nbr) const override {
             return std::binary_search(nbrs_.begin(), nbrs_.end(), nbr);
         }
 
@@ -79,60 +77,19 @@ public:
      * v2: {0 2 ... d2}
      * ...               <- end_nd_
      */
-    class EdgeIter {
-    private:
-        NodeIter cur_nd_, end_nd_;
-        NbrIter cur_edge_;
-
+    class EdgeIter : public IEdgeIter<EdgeIter, NodeIter, NbrIter> {
     public:
         EdgeIter() {}
         EdgeIter(const NodeIter& start_nd_iter, const NodeIter& end_nd_iter)
-            : cur_nd_(start_nd_iter), end_nd_(end_nd_iter) {
-            if (cur_nd_ != end_nd_) cur_edge_ = cur_nd_->second.beginNbr();
-        }
+            : IEdgeIter(start_nd_iter, end_nd_iter) {}
 
         // copy assignment
-        EdgeIter& operator=(const EdgeIter& edge_iter) {
-            if (this != &edge_iter) {
-                cur_nd_ = edge_iter.cur_nd_;
-                end_nd_ = edge_iter.end_nd_;
-                cur_edge_ = edge_iter.cur_edge_;
-            }
-            return *this;
+        EdgeIter& operator=(const EdgeIter& ei) {
+            return IEdgeIter<EdgeIter, NodeIter, NbrIter>::operator=(ei);
         }
 
-        /**
-         * Iterate over edges that source ID >= destination ID, for the purpose
-         * of performance consideration.
-         * postfix increment: i++
-         * move to next valid edge; if not exists, move to end
-         */
-        EdgeIter& operator++(int) {
-            cur_edge_++;
-            while (cur_edge_ == cur_nd_->second.endNbr()) {
-                cur_nd_++;
-                if (cur_nd_ == end_nd_) break;
-                cur_edge_ = cur_nd_->second.beginNbr();
-            }
-            return *this;
-        }
-
-        bool operator!=(const EdgeIter& ei) const {
-            return cur_nd_ != ei.cur_nd_ || end_nd_ != ei.end_nd_ ||
-                (cur_nd_ != end_nd_ && cur_edge_ != ei.cur_edge_);
-        }
-
-        /**
-         * If both two node iterators point to end, return true;
-         * Otherwise, compare the two attribute by attribute.
-         */
-        bool operator==(const EdgeIter& ei) const {
-            return cur_nd_ == ei.cur_nd_ && end_nd_ == ei.end_nd_ &&
-                (cur_nd_ == end_nd_ || cur_edge_ == ei.cur_edge_);
-        }
-
-        int getSrcID() const { return cur_nd_->second.getID(); }
-        int getDstID() const { return *cur_edge_; }
+        int getSrcID() const override { return cur_nd_->second.getID(); }
+        int getDstID() const override { return *cur_edge_; }
     };
 
 private:
