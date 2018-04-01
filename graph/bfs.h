@@ -9,7 +9,7 @@
 #include "comm.h"
 
 /**
- * BFS over directed graphs.
+ * BFS over directed graphs, i.e., only search from out-neighbors of each node.
  */
 template <class Graph>
 class DirBFS {

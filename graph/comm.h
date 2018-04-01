@@ -9,6 +9,7 @@
 #include <vector>
 #include <set>
 #include <queue>
+#include <stack>
 #include <unordered_map>
 #include <algorithm>
 #include <climits>

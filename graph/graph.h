@@ -13,4 +13,6 @@
 #include "triad.h"
 #include "network.h"
 
+#include "cncom.h"
+
 #endif /* __GRAPH_H__ */
