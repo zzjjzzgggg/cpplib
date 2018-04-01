@@ -632,6 +632,15 @@ public:
     }
 
     /**
+     *
+     */
+    template <typename Numeric>
+    Numeric randint(Numeric lower = 0,
+                    Numeric upper = std::numeric_limits<Numeric>::max()) {
+        return variate<Numeric, uniform_distribution>(lower, upper);
+    }
+
+    /**
      * [0,1)
      */
     double uniform() { return variate<double, uniform_distribution>(0.0, 1.0); }
