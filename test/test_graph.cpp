@@ -36,8 +36,8 @@ void test_scc() {
     visitor.performDFS();
     auto& nd_cc_vec = visitor.nd_cc_vec_;
     int cc = -1;
-    for (auto it = nd_cc_vec.begin(); it!=nd_cc_vec.end(); it++) {
-        int v = it->first, c = it->second;
+    for (auto& pr : nd_cc_vec) {
+        int v = pr.first, c = pr.second;
         if (c != cc) {
             cc = c;
             printf("\nSCC[%d]: ", c);
@@ -46,11 +46,16 @@ void test_scc() {
     }
     printf("\n");
 
-    std::vector<std::pair<int, int>> cc_edge_vec;
-    visitor.getConnections(cc_edge_vec);
-    for (auto it = cc_edge_vec.begin(); it!=cc_edge_vec.end(); it++) {
-        printf("%d --> %d\n", it->first, it->second);
+    auto cc_edge_vec = visitor.getCCEdges();
+    for (auto& pr : cc_edge_vec) {
+        printf("%d --> %d\n", pr.first, pr.second);
     }
+
+    auto cc_vec = visitor.getCCSorted();
+    for (int cc: cc_vec)
+        printf("%d ", cc);
+    printf("\n");
+
 }
 
 void test_net() {

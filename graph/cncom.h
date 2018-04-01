@@ -33,7 +33,7 @@ private:
     std::stack<int> stack_;
 
 public:
-    std::vector<std::pair<int, int>> nd_cc_vec_;    // node-component pairs
+    std::vector<std::pair<int, int>> nd_cc_vec_;  // node-component pairs
 
 public:
     SCCVisitor(const Graph& graph) : graph_(graph), rank_(0) {
@@ -108,14 +108,16 @@ public:
     }
 
     /**
-     * Print out one representative edge between two SCCs.
+     * Get connected component connections. Keep one representative connection
+     * between two SCCs.
      */
-    void getConnections(std::vector<std::pair<int, int>>& cc_edge_vec) {
+    std::vector<std::pair<int, int>> getCCEdges() {
         int cur_cc = -1;
+        std::vector<std::pair<int, int>> cc_edge_vec;
         std::unordered_set<int> discovered_ccs;
-        for (auto&& it = nd_cc_vec_.begin(); it != nd_cc_vec_.end(); it++) {
-            int v = it->first;
-            int cc_from = it->second;
+        for (auto& pr : nd_cc_vec_) {
+            int v = pr.first;
+            int cc_from = pr.second;
             if (cc_from != cur_cc) {
                 cur_cc = cc_from;
                 discovered_ccs.clear();
@@ -129,6 +131,22 @@ public:
                 }
             }
         }
+        return cc_edge_vec;
+    }
+
+    /**
+     * Return topologically sorted CCs
+     */
+    std::vector<int> getCCSorted() {
+        std::vector<int> vec;
+        int cc = -1;
+        for (auto& pr: nd_cc_vec_) {
+            if (pr.second != cc) {
+                cc = pr.second;
+                vec.push_back(cc);
+            }
+        }
+        return vec;
     }
 };
 
