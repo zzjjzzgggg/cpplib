@@ -31,9 +31,7 @@ private:
     int rank_;
     std::unordered_map<int, Element> record_;
     std::stack<int> stack_;
-
-public:
-    std::vector<std::pair<int, int>> nd_cc_vec_;  // node-component pairs
+    std::vector<std::pair<int, int>> cc_nd_vec_;  // node-component pairs
 
 private:
     /**
@@ -55,7 +53,7 @@ private:
 
 public:
     SCCVisitor(const Graph& graph) : graph_(graph), rank_(0) {
-        nd_cc_vec_.reserve(graph_.getNodes());
+        cc_nd_vec_.reserve(graph_.getNodes());
     }
 
     /**
@@ -68,6 +66,13 @@ public:
      * between two SCCs.
      */
     std::vector<std::pair<int, int>> getCCEdges() const;
+
+    /**
+     * Get CC-node inclusion relationships in CC topological order
+     */
+    const std::vector<std::pair<int, int>>& getCNEdges() const {
+        return cc_nd_vec_;
+    }
 
     /**
      * Return topologically sorted CCs
@@ -115,7 +120,7 @@ void SCCVisitor<Graph>::finish(const int v) {
     while (true) {
         int t = stack_.top();
         stack_.pop();
-        nd_cc_vec_.emplace_back(t, v);
+        cc_nd_vec_.emplace_back(v, t);  // CC-node inclusion relationship
         record_[t].rank = INT_MAX;
         record_[t].parent = v;
         if (t == v) break;
@@ -132,17 +137,16 @@ void SCCVisitor<Graph>::performDFS() {
         }
     }
     // topology sort
-    std::reverse(nd_cc_vec_.begin(), nd_cc_vec_.end());
+    std::reverse(cc_nd_vec_.begin(), cc_nd_vec_.end());
 }
 
 template <class Graph>
 std::vector<std::pair<int, int>> SCCVisitor<Graph>::getCCEdges() const {
-    int cur_cc = -1;
     std::vector<std::pair<int, int>> cc_edge_vec;
     std::unordered_set<int> discovered_ccs;
-    for (auto& pr : nd_cc_vec_) {
-        int v = pr.first;
-        int cc_from = pr.second;
+    int cur_cc = -1;
+    for (auto& pr : cc_nd_vec_) {
+        int cc_from = pr.first, v = pr.second;
         if (cc_from != cur_cc) {
             cur_cc = cc_from;
             discovered_ccs.clear();
@@ -163,9 +167,9 @@ template <class Graph>
 std::vector<int> SCCVisitor<Graph>::getCCSorted() const {
     std::vector<int> vec;
     int cc = -1;
-    for (auto& pr : nd_cc_vec_) {
-        if (pr.second != cc) {
-            cc = pr.second;
+    for (auto& pr : cc_nd_vec_) {
+        if (pr.first != cc) {
+            cc = pr.first;
             vec.push_back(cc);
         }
     }

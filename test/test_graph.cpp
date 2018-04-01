@@ -34,10 +34,9 @@ void test_scc() {
     g.addEdge(12, 9);
     SCCVisitor visitor(g);
     visitor.performDFS();
-    auto& nd_cc_vec = visitor.nd_cc_vec_;
     int cc = -1;
-    for (auto& pr : nd_cc_vec) {
-        int v = pr.first, c = pr.second;
+    for (auto& pr : visitor.getCNEdges()) {
+        int c = pr.first, v = pr.second;
         if (c != cc) {
             cc = c;
             printf("\nSCC[%d]: ", c);
@@ -46,13 +45,11 @@ void test_scc() {
     }
     printf("\n");
 
-    auto cc_edge_vec = visitor.getCCEdges();
-    for (auto& pr : cc_edge_vec) {
+    for (auto& pr : visitor.getCCEdges()) {
         printf("%d --> %d\n", pr.first, pr.second);
     }
 
-    auto cc_vec = visitor.getCCSorted();
-    for (int cc : cc_vec) printf("%d ", cc);
+    for (int cc : visitor.getCCSorted()) printf("%d ", cc);
     printf("\n");
 }
 
@@ -106,8 +103,8 @@ void test_bgraph() {
 int main(int argc, char* argv[]) {
     // osutils::Timer tm;
 
-    // test_scc();
-    test_bgraph();
+    test_scc();
+    // test_bgraph();
 
     return 0;
 }
