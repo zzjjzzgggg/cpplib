@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <climits>
+#include <cassert>
 
 #include "../io/ioutils.h"
 #include "../adv/rngutils.h"

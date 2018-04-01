@@ -7,3 +7,4 @@
 
 #include "ugraph.cpp"
 #include "dgraph.cpp"
+#include "bgraph.cpp"

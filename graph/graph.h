@@ -9,6 +9,7 @@
 #include "comm.h"
 #include "ugraph.h"
 #include "dgraph.h"
+#include "bgraph.h"
 #include "gio.h"
 #include "triad.h"
 #include "network.h"

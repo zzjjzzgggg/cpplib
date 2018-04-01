@@ -52,10 +52,8 @@ void test_scc() {
     }
 
     auto cc_vec = visitor.getCCSorted();
-    for (int cc: cc_vec)
-        printf("%d ", cc);
+    for (int cc : cc_vec) printf("%d ", cc);
     printf("\n");
-
 }
 
 void test_net() {
@@ -75,10 +73,41 @@ void test_net() {
     }
 }
 
+void test_bgraph() {
+    BGraph graph;
+    graph.addEdge(1, 1);
+    graph.addEdge(1, 2);
+    graph.addEdge(2, 2);
+    graph.addEdge(2, 3);
+    graph.addEdge(2, 4);
+    graph.defrag();
+    printf("L: %d, R: %d, E: %d\n\n", graph.getNodesL(), graph.getNodesR(),
+           graph.getEdges());
+
+    for (auto ni = graph.beginNIL(); ni != graph.endNIL(); ni++) {
+        auto& nd = ni->second;
+        printf("%d: %d\n", nd.getID(), nd.getDeg());
+    }
+
+    printf("\n");
+
+    for (auto ni = graph.beginNIR(); ni != graph.endNIR(); ni++) {
+        auto& nd = ni->second;
+        printf("%d: %d\n", nd.getID(), nd.getDeg());
+    }
+
+    printf("\n");
+
+    for (auto ei = graph.beginEI(); ei != graph.endEI(); ei++) {
+        printf("%d - %d\n", ei.getSrcID(), ei.getDstID());
+    }
+}
+
 int main(int argc, char* argv[]) {
     // osutils::Timer tm;
 
-    test_scc();
+    // test_scc();
+    test_bgraph();
 
     return 0;
 }

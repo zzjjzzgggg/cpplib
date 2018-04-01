@@ -1,10 +1,10 @@
 /**
- * Copyright (C) by J.Z. (06/30/2017 13:45)
+ * Copyright (C) by J.Z. (04/01/2018 20:40)
  * Distributed under terms of the MIT license.
  */
 
-#ifndef __UGRAPH_H__
-#define __UGRAPH_H__
+#ifndef __BGRAPH_H__
+#define __BGRAPH_H__
 
 #include "node_interface.h"
 #include "edge_iter_interface.h"
@@ -12,9 +12,9 @@
 namespace graph {
 
 /**
- * undirected graph.
+ * Bipartite Graph
  */
-class UGraph {
+class BGraph {
 public:
     typedef typename std::vector<int>::const_iterator NbrIter;
 
@@ -95,57 +95,78 @@ public:
 
 private:
     GraphType gtype_;
-    mutable rngutils::default_rng rng_;    // we don't care rng_
-    std::unordered_map<int, Node> nodes_;  // maps a node id to its node object
+    mutable rngutils::default_rng rng_;  // we don't care rng_
+    std::unordered_map<int, Node> nodes_L_,
+        nodes_R_;  // maps a node id to its node object
 
 public:
-    UGraph(const GraphType gtype = GraphType::SIMPLE) : gtype_(gtype) {}
-    virtual ~UGraph() {}
+    BGraph(const GraphType gtype = GraphType::SIMPLE) : gtype_(gtype) {}
+    virtual ~BGraph() {}
 
     // disable copy constructor/assignment
-    UGraph(const UGraph&) = delete;
-    UGraph& operator=(const UGraph&) = delete;
+    BGraph(const BGraph&) = delete;
+    BGraph& operator=(const BGraph&) = delete;
 
     // move constructor/assignment
-    UGraph(UGraph&& other)
-        : gtype_(other.gtype_), nodes_(std::move(other.nodes_)) {}
+    BGraph(BGraph&& other)
+        : gtype_(other.gtype_), nodes_L_(std::move(other.nodes_L_)),
+          nodes_R_(std::move(other.nodes_R_)) {}
 
-    UGraph& operator=(UGraph&& other) {
+    BGraph& operator=(BGraph&& other) {
         gtype_ = other.gtype_;
-        nodes_ = std::move(other.nodes_);
+        nodes_L_ = std::move(other.nodes_L_);
+        nodes_R_ = std::move(other.nodes_R_);
         return *this;
     }
 
     void save(const std::string& filename) const;
     void load(const std::string& filename);
 
-    bool isNode(const int id) const { return nodes_.find(id) != nodes_.end(); }
+    bool isNode(const int id) const { return isNodeL(id) || isNodeR(id); }
+    bool isNodeL(const int id) const {
+        return nodes_L_.find(id) != nodes_L_.end();
+    }
+    bool isNodeR(const int id) const {
+        return nodes_R_.find(id) != nodes_R_.end();
+    }
     bool isEdge(const int src, const int dst) const {
-        if (!isNode(src) || !isNode(dst)) return false;
-        return nodes_.at(src).isNbr(dst);
+        if (!isNodeL(src) || !isNodeR(dst)) return false;
+        return nodes_L_.at(src).isNbr(dst);
     }
 
-    const int getNodes() const { return nodes_.size(); }
+    const int getNodes() const { return nodes_L_.size() + nodes_R_.size(); }
+    const int getNodesL() const { return nodes_L_.size(); }
+    const int getNodesR() const { return nodes_R_.size(); }
+
     const int getEdges() const {
         int edges = 0;
-        for (const auto& p : nodes_) edges += p.second.getDeg();
-        return edges / 2;
+        for (const auto& p : nodes_L_) edges += p.second.getDeg();
+        return edges;
     }
 
-    Node& getNode(const int id) { return nodes_[id]; }
-    const Node& getNode(const int id) const { return nodes_.at(id); }
-    Node& operator[](int id) { return nodes_[id]; };
-    const Node& operator[](int id) const { return nodes_.at(id); };
+    Node& getNodeL(const int id) { return nodes_L_[id]; }
+    Node& getNodeR(const int id) { return nodes_R_[id]; }
+    const Node& getNodeL(const int id) const { return nodes_L_.at(id); }
+    const Node& getNodeR(const int id) const { return nodes_R_.at(id); }
 
-    int sampleNode() const {
-        auto iter = rng_.choose(nodes_.begin(), nodes_.end());
+    int sampleNodeL() const {
+        auto iter = rng_.choose(nodes_L_.begin(), nodes_L_.end());
         return iter->first;
     }
 
-    int sampleNbr(int id) const { return getNode(id).sampleNbr(rng_); }
+    int sampleNodeR() const {
+        auto iter = rng_.choose(nodes_R_.begin(), nodes_R_.end());
+        return iter->first;
+    }
 
-    void addNode(int id) {
-        if (!isNode(id)) nodes_[id] = Node{id};
+    int sampleNbrL(int id) const { return getNodeL(id).sampleNbr(rng_); }
+    int sampleNbrR(int id) const { return getNodeR(id).sampleNbr(rng_); }
+
+    void addNodeL(int id) {
+        if (!isNodeL(id)) nodes_L_[id] = Node{id};
+    }
+    void addNodeR(int id) {
+        if (!isNodeR(id)) nodes_R_[id] = Node{id};
     }
 
     /**
@@ -155,12 +176,10 @@ public:
      * NOTE: Callers are responsible to avoid duplidate edges.
      */
     void addEdge(const int src, const int dst) {
-        addNode(src);
-        nodes_[src].addNbr(dst);
-        if (dst != src) {
-            addNode(dst);
-            nodes_[dst].addNbr(src);
-        }
+        addNodeL(src);
+        nodes_L_[src].addNbr(dst);
+        addNodeR(dst);
+        nodes_R_[dst].addNbr(src);
     }
 
     /**
@@ -168,27 +187,33 @@ public:
      * including sorting and uniqing neighbors of each node increasingly.
      */
     void defrag() {
-        for (auto& p : nodes_) p.second.sort();
-        if (gtype_ == GraphType::SIMPLE)
-            for (auto& p : nodes_) p.second.uniq();
+        for (auto& p : nodes_L_) p.second.sort();
+        for (auto& p : nodes_R_) p.second.sort();
+        if (gtype_ == GraphType::SIMPLE) {
+            for (auto& p : nodes_L_) p.second.uniq();
+            for (auto& p : nodes_R_) p.second.uniq();
+        }
     }
 
     // iterators
 
-    NodeIter beginNI() const { return nodes_.begin(); }
-    NodeIter endNI() const { return nodes_.end(); }
+    NodeIter beginNIL() const { return nodes_L_.begin(); }
+    NodeIter endNIL() const { return nodes_L_.end(); }
+    NodeIter beginNIR() const { return nodes_R_.begin(); }
+    NodeIter endNIR() const { return nodes_R_.end(); }
 
     /**
      * find the first node that degree is nonzero, and first neighbor <= node
      */
     EdgeIter beginEI() const {
-        auto ni = nodes_.begin();
-        while (ni != nodes_.end() && ni->second.getDeg() == 0) ni++;
-        return EdgeIter(ni, nodes_.end());
+        auto ni = nodes_L_.begin();
+        while (ni != nodes_L_.end() && ni->second.getDeg() == 0) ni++;
+        return EdgeIter(ni, nodes_L_.end());
     }
-    EdgeIter endEI() const { return EdgeIter(nodes_.end(), nodes_.end()); }
-};
+    EdgeIter endEI() const { return EdgeIter(nodes_L_.end(), nodes_L_.end()); }
 
-}  // end namespace graph
+}; /* BGraph */
 
-#endif /* __UGRAPH_H__ */
+} /* namespace graph */
+
+#endif /* __BGRAPH_H__ */
