@@ -61,7 +61,10 @@ public:
 
         void addNbr(const int nbr) { nbrs_.push_back(nbr); }
 
-        void sort() { std::sort(nbrs_.begin(), nbrs_.end()); }
+        void shrinkAndSort() {
+            nbrs_.shrink_to_fit();
+            std::sort(nbrs_.begin(), nbrs_.end());
+        }
 
         void uniq() {
             auto last = std::unique(nbrs_.begin(), nbrs_.end());
@@ -168,7 +171,7 @@ public:
      * including sorting and uniqing neighbors of each node increasingly.
      */
     void defrag() {
-        for (auto& p : nodes_) p.second.sort();
+        for (auto& p : nodes_) p.second.shrinkAndSort();
         if (gtype_ == GraphType::SIMPLE)
             for (auto& p : nodes_) p.second.uniq();
     }

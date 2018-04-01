@@ -93,7 +93,9 @@ public:
         void addInNbr(const int nbr) { in_nbrs_.push_back(nbr); }
         void addOutNbr(const int nbr) { out_nbrs_.push_back(nbr); }
 
-        void sort() {
+        void shrinkAndSort() {
+            in_nbrs_.shrink_to_fit();
+            out_nbrs_.shrink_to_fit();
             std::sort(in_nbrs_.begin(), in_nbrs_.end());
             std::sort(out_nbrs_.begin(), out_nbrs_.end());
         }
@@ -208,7 +210,7 @@ public:
      * Including: sort neighbors of each node increasingly.
      */
     void defrag() {
-        for (auto& p : nodes_) p.second.sort();
+        for (auto& p : nodes_) p.second.shrinkAndSort();
         if (gtype_ == GraphType::SIMPLE)
             for (auto& p : nodes_) p.second.uniq();
     }
