@@ -21,6 +21,7 @@ public:
     DirBFS(const Graph& graph) : graph_(graph) {}
 
     void doBFS(const int start_nd, const int mx_hop = INT_MAX);
+    void doBFS(const std::vector<int>& start_nds, const int mx_hop = INT_MAX);
     int getBFSTreeSize() const { return nd_to_hop_.size(); }
 
 }; /* DirBFS */
@@ -36,6 +37,30 @@ void DirBFS<Graph>::doBFS(const int start_nd, const int mx_hop) {
         queue.pop();
         if (hop >= mx_hop) break;
         auto& nd = graph_[u];
+        for (auto&& nbr_iter = nd.beginOutNbr(); nbr_iter != nd.endOutNbr();
+             nbr_iter++) {
+            int v = *nbr_iter;
+            if (nd_to_hop_.find(v) == nd_to_hop_.end()) {
+                nd_to_hop_[v] = hop + 1;
+                queue.push(v);
+            }
+        }
+    }
+}
+
+template <class Graph>
+void DirBFS<Graph>::doBFS(const std::vector<int>& start_nds, const int mx_hop) {
+    nd_to_hop_.clear();
+    std::queue<int> queue;
+    for (int nd : start_nds) {
+        nd_to_hop_[nd] = 0;
+        queue.push(nd);
+    }
+    while (!queue.empty()) {
+        int u = queue.front(), hop = nd_to_hop_[u];
+        queue.pop();
+        if (hop >= mx_hop) break;
+        const auto& nd = graph_[u];
         for (auto&& nbr_iter = nd.beginOutNbr(); nbr_iter != nd.endOutNbr();
              nbr_iter++) {
             int v = *nbr_iter;
