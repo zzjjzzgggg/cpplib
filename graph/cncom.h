@@ -16,7 +16,7 @@ namespace graph {
  */
 template <class Graph>
 class SCCVisitor {
-public:
+private:
     class Element {
     public:
         int id, parent, rank, min, edge, deg;

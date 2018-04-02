@@ -17,14 +17,13 @@ namespace graph {
  * HyperANF: Approximating the Neighbourhood Function of Very Large Graphs on a
  * Budget
  *
- * A register has length 1 byte
+ * Each register has length 1 byte
  */
 template <class Graph>
 class HyperANF {
 public:
     typedef unsigned char uchar;
     typedef unsigned long long uint64;
-    typedef std::vector<uint64> Bits;
 
     static constexpr uchar CLZ_TABLE_4BIT[16] = {4, 3, 2, 2, 1, 1, 1, 1,
                                                  0, 0, 0, 0, 0, 0, 0, 0};
@@ -34,12 +33,12 @@ public:
 private:
     const Graph& graph_;
 
-    int p_, m_;  // m=2^p where p is precision
+    int p_, m_;  // m = 2^p where p is precision
     double alpha_;
-    Bits bits_;  // HLL counters are stored in a bit-vector
+    std::vector<uint64> bits_;  // HLL counters are stored in a bit-vector
     std::unordered_map<int, int> cc_bitpos_, nd_cc_;
-    int units_per_counter_;  // number of uint64 units per HLL counter = m_ /
-                             // 8
+
+    int units_per_counter_;  // # of uint64 integers per HLL counter = m_ / 8
     rngutils::default_rng rng;
 
 private:
@@ -88,17 +87,12 @@ private:
      */
     inline void mergeCounter(const int pos_i, const int pos_j) {
         for (int k = 0; k < units_per_counter_; k++) {
-            uint64 &x = bits_[pos_i + k], y = bits_[pos_j + k];
-            uint64 z = ((((x | H8) - (y & ~H8)) | (x ^ y)) ^ (x | ~y)) & H8;
-            uint64 m = ((((z >> 7) | H8) - L8) | H8) ^ z;
+            uint64 &x = bits_[pos_i + k], y = bits_[pos_j + k],
+                   z = ((((x | H8) - (y & ~H8)) | (x ^ y)) ^ (x | ~y)) & H8,
+                   m = ((((z >> 7) | H8) - L8) | H8) ^ z;
             x = (x & m) | (y & ~m);
         }
     }
-
-    /**
-     * Constructing CC DAG then initialing bits.
-     */
-    void initBitsCC();
 
     /**
      * Given counter posiiton, use LC and HLL to estimate cardinality. If
@@ -116,7 +110,10 @@ public:
         alpha_ = alpha();
     }
 
-    void init() { initBitsCC(); }
+    /**
+     * Constructing CC DAG then initialing bits.
+     */
+    void initBitsCC();
 
     double estimate(const int nd) const {
         return count((uchar*)(bits_.data() + cc_bitpos_.at(nd_cc_.at(nd))));
@@ -140,7 +137,7 @@ double HyperANF<Graph>::count(const uchar* reg) const {
 template <class Graph>
 void HyperANF<Graph>::initBitsCC() {
     // do a DFS on the input graph
-    SCCVisitor sccvis(graph_);
+    SCCVisitor<Graph> sccvis(graph_);
     sccvis.performDFS();
 
     // build bipartite graph: represents component-node inclusion relationship,

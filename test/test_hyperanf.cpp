@@ -12,12 +12,16 @@ void test_HLL() {
     std::string gfn = "/dat/workspace/datasets/cit-HepTh_wcc_digraph_mapped.gz";
     DGraph graph = loadEdgeList<DGraph>(gfn);
 
-    DirBFS bfs(graph);
-
-    HyperANF anf(graph);
-    anf.init();
-
     osutils::Timer tm;
+    tm.tick();
+    DirBFS bfs(graph);
+    printf("Perform BFS: %.4fs\n", tm.seconds());
+
+    tm.tick();
+    HyperANF anf(graph, 12);
+    anf.initBitsCC();
+    printf("ANF: %.4fs\n", tm.seconds());
+
     for (int i = 0; i < 10; i++) {
         int nd = graph.sampleNode();
 
