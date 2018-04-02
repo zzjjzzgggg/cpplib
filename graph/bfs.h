@@ -14,14 +14,14 @@
 template <class Graph>
 class DirBFS {
 public:
-    const Graph graph_;
+    const Graph& graph_;
     std::unordered_map<int, int> nd_to_hop_;
 
 public:
     DirBFS(const Graph& graph) : graph_(graph) {}
-    virtual ~DirBFS() {}
 
     void doBFS(const int start_nd, const int mx_hop = INT_MAX);
+    int getBFSTreeSize() const { return nd_to_hop_.size(); }
 
 }; /* DirBFS */
 
@@ -38,8 +38,8 @@ void DirBFS<Graph>::doBFS(const int start_nd, const int mx_hop) {
         auto& nd = graph_[u];
         for (auto&& nbr_iter = nd.beginOutNbr(); nbr_iter != nd.endOutNbr();
              nbr_iter++) {
-            int v = nbr_iter->first;
-            if (nd_to_hop_.find(v)==nd_to_hop_.end()) {
+            int v = *nbr_iter;
+            if (nd_to_hop_.find(v) == nd_to_hop_.end()) {
                 nd_to_hop_[v] = hop + 1;
                 queue.push(v);
             }

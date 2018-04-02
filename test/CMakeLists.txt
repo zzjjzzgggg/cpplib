@@ -23,3 +23,6 @@ target_link_libraries(test_graph graph)
 
 add_executable(test_mathutils test_mathutils.cpp)
 target_link_libraries(test_mathutils mathutils)
+
+add_executable(test_hyperanf test_hyperanf.cpp)
+target_link_libraries(test_hyperanf graph)

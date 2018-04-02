@@ -14,6 +14,8 @@
 #include "triad.h"
 #include "network.h"
 
+#include "bfs.h"
 #include "cncom.h"
+#include "hyperanf.h"
 
 #endif /* __GRAPH_H__ */
