@@ -14,7 +14,7 @@ namespace graph {
 /**
  * Directed network allowing node and edge to store data. Use an adjacency list
  * data structure. For each node, only its out neighbors are stored and sorted
- * by function Cmp. For example, Cmp could be std::less<int>
+ * by function Cmp. For example, Cmp could be std::less<int>.
  */
 template <class NDat, class EDat, class Cmp>
 class DatNet {
@@ -43,8 +43,8 @@ public:
 
         // move constructor/assignment
         Node(Node&& other)
-            : INode<NbrIter>(other.id_),
-              out_nbrs_(std::move(other.out_nbrs_)) {}
+            : INode<NbrIter>(other.id_), out_nbrs_(std::move(other.out_nbrs_)) {
+        }
         Node& operator=(Node&& other) {
             this->id_ = other.id_;
             out_nbrs_ = std::move(other.out_nbrs_);
@@ -52,11 +52,8 @@ public:
         }
 
         // only structure is saved
-        void save(std::unique_ptr<ioutils::IOOut>& po) const override {
-        }
-
-        void load(std::unique_ptr<ioutils::IOIn>& pi) override {
-        }
+        void save(std::unique_ptr<ioutils::IOOut>& po) const override {}
+        void load(std::unique_ptr<ioutils::IOIn>& pi) override {}
 
         int getDeg() const override { return out_nbrs_.size(); }
         int getInDeg() const override { return out_nbrs_.size(); }
@@ -76,7 +73,17 @@ public:
 
         bool isNbr(const int nbr) const override { return true; }
 
-        int getNbr(const int d) const override { return -1; }
+        int getNbr(const int d) const override {
+            auto it = out_nbrs_.begin();
+            std::advance(it, d);
+            return it->first;
+        }
+
+        EDat& getNbrEDat(const int d) const {
+            auto it = out_nbrs_.begin();
+            std::advance(it, d);
+            return it->second;
+        }
 
         void addOutNbr(const int nbr, const EDat& dat) {
             out_nbrs_.emplace(nbr, dat);
@@ -108,6 +115,7 @@ public:
 
         int getSrcID() const override { return this->cur_nd_->second.getID(); }
         int getDstID() const override { return this->cur_edge_->first; }
+
         const EDat& getDat() const { return this->cur_edge_->second; }
     };
 
