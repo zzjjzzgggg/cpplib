@@ -72,12 +72,6 @@ public:
 
         int getNbrID(const NbrIter& it) const override { return it->first; }
 
-        int getNbr(const int d) const override {
-            auto it = out_nbrs_.begin();
-            std::advance(it, d);
-            return it->first;
-        }
-
         EDat& getNbrEDat(const NbrIter& it) { return it->second; }
         const EDat& getNbrEDat(const NbrIter& it) const { return it->second; }
 

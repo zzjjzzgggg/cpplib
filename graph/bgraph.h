@@ -42,7 +42,6 @@ public:
         void load(std::unique_ptr<ioutils::IOIn>& pi) override;
 
         int getDeg() const override { return nbrs_.size(); }
-        int getNbr(const int d) const override { return nbrs_[d]; }
 
         int getNbrID(const NbrIter& it) const override { return *it; }
 

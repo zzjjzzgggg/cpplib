@@ -77,7 +77,7 @@ private:
             x <<= 4;
         } else
             n = 0;
-        return n + CLZ_TABLE_4BIT[x >> 60];
+        return n + CLZ_TABLE_4BIT[(x >> 60) & 0x0F];
     }
 
     /**
@@ -178,8 +178,8 @@ void HyperANF<Graph>::initBitsCC() {
     for (auto it = cc_vec.rbegin(); it != cc_vec.rend(); it++) {
         int ccj = *it;
         const auto& ccj_nd = dag[ccj];
-        for (int d = 0; d < ccj_nd.getInDeg(); d++) {
-            int cci = ccj_nd.getInNbr(d);
+        for (auto ni = ccj_nd.beginInNbr(); ni != ccj_nd.endInNbr(); ni++) {
+            int cci = ccj_nd.getNbrID(ni);
             mergeCounter(cc_bitpos_[cci], cc_bitpos_[ccj]);
         }
     }

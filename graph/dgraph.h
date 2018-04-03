@@ -45,27 +45,23 @@ public:
         void save(std::unique_ptr<ioutils::IOOut>& po) const override;
         void load(std::unique_ptr<ioutils::IOIn>& pi) override;
 
-        int getDeg() const override { return getInDeg() + getOutDeg(); }
+        int getDeg() const override {
+            return in_nbrs_.size() + out_nbrs_.size();
+        }
         int getInDeg() const override { return in_nbrs_.size(); }
         int getOutDeg() const override { return out_nbrs_.size(); }
-
-        int getInNbr(const int d) const override { return in_nbrs_[d]; }
-        int getOutNbr(const int d) const override { return out_nbrs_[d]; }
-        int getNbr(const int d) const override {
-            return d < getOutDeg() ? getOutNbr(d) : getInNbr(d - getOutDeg());
-        }
 
         int getNbrID(const NbrIter& it) const override { return *it; }
 
         bool isInNbr(const int nbr) const override {
             return std::binary_search(in_nbrs_.begin(), in_nbrs_.end(), nbr);
         }
-
         bool isOutNbr(const int nbr) const override {
             return std::binary_search(out_nbrs_.begin(), out_nbrs_.end(), nbr);
         }
-
-        bool isNbr(const int nbr) const override { return isOutNbr(nbr); }
+        bool isNbr(const int nbr) const override {
+            return isOutNbr(nbr) || isOutNbr(nbr);
+        }
 
         NbrIter beginNbr() const override {
             return in_nbrs_.empty() ? out_nbrs_.begin() : in_nbrs_.begin();

@@ -26,10 +26,6 @@ public:
     virtual int getInDeg() const { return getDeg(); }
     virtual int getOutDeg() const { return getDeg(); }
 
-    virtual int getNbr(const int d) const = 0;
-    virtual int getInNbr(const int d) const { return getNbr(d); }
-    virtual int getOutNbr(const int d) const { return getNbr(d); }
-
     virtual int getNbrID(const NbrIter&) const = 0;
 
     virtual bool isNbr(const int nbr) const = 0;

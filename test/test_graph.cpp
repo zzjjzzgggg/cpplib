@@ -126,6 +126,7 @@ void test_nbr_iter() {
 
     g.addEdge(3, 4);
     g.addEdge(1, 4);
+    g.defrag();
 
     const auto& nd = g[2];
     for (auto ni = nd.beginNbr(); ni != nd.endNbr(); nd.nextNbr(ni)) {
@@ -166,6 +167,26 @@ void test_bgraph() {
     }
 }
 
+void test_dyn_dgraph() {
+    DynDGraph G;
+    G.addEdge(1, 2);
+    G.addEdge(2, 3);
+    G.addEdge(2, 4);
+    G.addEdge(4, 5);
+
+    G.addEdge(3, 4);
+    G.addEdge(1, 4);
+
+    const auto& nd = G[2];
+    for (auto ni = nd.beginNbr(); ni != nd.endNbr(); nd.nextNbr(ni)) {
+        printf("%d, %d\n", nd.getID(), nd.getNbrID(ni));
+    }
+
+    int nt = countNodeDirTriads<DynDGraph>(2, G);
+    printf("nt: %d\n", nt);
+}
+
+
 int main(int argc, char* argv[]) {
     // osutils::Timer tm;
 
@@ -173,7 +194,8 @@ int main(int argc, char* argv[]) {
     // test_scc();
     // test_scc_net();
     // test_bgraph();
-    test_nbr_iter();
+    // test_nbr_iter();
+    test_dyn_dgraph();
 
     return 0;
 }

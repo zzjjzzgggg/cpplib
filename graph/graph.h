@@ -7,13 +7,16 @@
 #define __GRAPH_H__
 
 #include "comm.h"
+
 #include "ugraph.h"
 #include "dgraph.h"
 #include "bgraph.h"
-#include "gio.h"
-#include "triad.h"
+
+#include "dyn_dgraph.h"
 #include "network.h"
 
+#include "gio.h"
+#include "triad.h"
 #include "bfs.h"
 #include "cncom.h"
 #include "hyperanf.h"
