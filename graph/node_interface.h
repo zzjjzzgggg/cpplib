@@ -36,8 +36,11 @@ public:
     virtual bool isInNbr(const int nbr) const { return isNbr(nbr); };
     virtual bool isOutNbr(const int nbr) const { return isNbr(nbr); };
 
+    // The following three iterators are designed to iterate over both in and
+    // out neighbors of a node.
     virtual NbrIter beginNbr() const = 0;
     virtual NbrIter endNbr() const = 0;
+    virtual void nextNbr(NbrIter& ni) const { ni++; };
 
     virtual NbrIter beginInNbr() const { return beginNbr(); }
     virtual NbrIter endInNbr() const { return endNbr(); }
@@ -46,5 +49,5 @@ public:
     virtual NbrIter endOutNbr() const { return endNbr(); }
 
 }; /* INode */
-}  /* namespace graph */
+} /* namespace graph */
 #endif /* __NODE_INTERFACE_H__ */

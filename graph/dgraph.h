@@ -67,8 +67,14 @@ public:
 
         bool isNbr(const int nbr) const override { return isOutNbr(nbr); }
 
-        NbrIter beginNbr() const override { return out_nbrs_.begin(); }
+        NbrIter beginNbr() const override {
+            return in_nbrs_.empty() ? out_nbrs_.begin() : in_nbrs_.begin();
+        }
         NbrIter endNbr() const override { return out_nbrs_.end(); }
+        void nextNbr(NbrIter& ni) const override {
+            ni++;
+            if (ni == in_nbrs_.end()) ni = out_nbrs_.begin();
+        };
 
         NbrIter beginInNbr() const override { return in_nbrs_.begin(); }
         NbrIter endInNbr() const override { return in_nbrs_.end(); }

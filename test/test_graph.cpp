@@ -5,6 +5,53 @@
 
 using namespace graph;
 
+void test_scc_net() {
+    typedef DatNet<int, int, std::greater<std::pair<int, int>>> DNet;
+    DNet g;
+    g.addEdge(0, 1, 0);
+    g.addEdge(0, 5, 0);
+    g.addEdge(2, 0, 0);
+    g.addEdge(2, 3, 0);
+    g.addEdge(3, 2, 0);
+    g.addEdge(3, 5, 0);
+    g.addEdge(4, 2, 0);
+    g.addEdge(4, 3, 0);
+    g.addEdge(5, 4, 0);
+    g.addEdge(6, 0, 0);
+    g.addEdge(6, 4, 0);
+    g.addEdge(6, 9, 0);
+    g.addEdge(7, 6, 0);
+    g.addEdge(7, 8, 0);
+    g.addEdge(8, 7, 0);
+    g.addEdge(8, 9, 0);
+    g.addEdge(9, 10, 0);
+    g.addEdge(9, 11, 0);
+    g.addEdge(10, 12, 0);
+    g.addEdge(11, 4, 0);
+    g.addEdge(11, 12, 0);
+    g.addEdge(12, 9, 0);
+    SCCVisitor<DNet> visitor(g);
+    visitor.performDFS();
+    int cc = -1;
+    for (auto& pr : visitor.getCNEdges()) {
+        int c = pr.first, v = pr.second;
+        if (c != cc) {
+            cc = c;
+            printf("\nSCC[%d]: ", c);
+        }
+        printf(" %d", v);
+    }
+    printf("\n");
+
+    for (auto& pr : visitor.getCCEdges()) {
+        printf("%d --> %d\n", pr.first, pr.second);
+    }
+
+    for (int cc : visitor.getCCSorted()) printf("%d ", cc);
+    printf("\n");
+}
+
+
 /**
  * test SCC on directed graph
  */
@@ -32,7 +79,7 @@ void test_scc() {
     g.addEdge(11, 4);
     g.addEdge(11, 12);
     g.addEdge(12, 9);
-    SCCVisitor visitor(g);
+    SCCVisitor<DGraph> visitor(g);
     visitor.performDFS();
     int cc = -1;
     for (auto& pr : visitor.getCNEdges()) {
@@ -70,6 +117,25 @@ void test_net() {
     }
 }
 
+void test_nbr_iter() {
+    DGraph g;
+    g.addEdge(1, 2);
+    g.addEdge(2, 3);
+    g.addEdge(2, 4);
+    g.addEdge(4, 5);
+
+    g.addEdge(3, 4);
+    g.addEdge(1, 4);
+
+    const auto& nd = g[2];
+    for (auto ni = nd.beginNbr(); ni != nd.endNbr(); nd.nextNbr(ni)) {
+        printf("%d, %d\n", nd.getID(), nd.getNbrID(ni));
+    }
+
+    int nt = countNodeDirTriads<DGraph>(2, g);
+    printf("nt: %d\n", nt);
+}
+
 void test_bgraph() {
     BGraph graph;
     graph.addEdge(1, 1);
@@ -104,8 +170,10 @@ int main(int argc, char* argv[]) {
     // osutils::Timer tm;
 
     // test_net();
-    test_scc();
+    // test_scc();
+    // test_scc_net();
     // test_bgraph();
+    test_nbr_iter();
 
     return 0;
 }
