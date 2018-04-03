@@ -13,13 +13,11 @@ void test_HLL() {
     DGraph graph = loadEdgeList<DGraph>(gfn);
 
     osutils::Timer tm;
-    tm.tick();
     DirBFS bfs(graph);
-    printf("Perform BFS: %.4fs\n", tm.seconds());
 
     tm.tick();
-    HyperANF anf(graph, 12);
-    anf.initBitsCC();
+    HyperANF anf(10);
+    anf.initBitsCC(graph);
     printf("ANF: %.4fs\n", tm.seconds());
 
     for (int i = 0; i < 10; i++) {

@@ -8,34 +8,30 @@
 
 #include "comm.h"
 #include "dgraph.h"
-#include "bgraph.h"
 #include "cncom.h"
 #include "../adv/hll.h"
 
 namespace graph {
 
 /**
- * HyperANF: Approximating the Neighbourhood Function of Very Large Graphs on a
- * Budget
+ * Approximate Neighbourhood Function based on following paper: HyperANF:
+ * Approximating the Neighbourhood Function of Very Large Graphs on a Budget.
  *
  * Each register has length 1 byte
  */
-template <class Graph>
 class HyperANF {
-private:
-    const Graph& graph_;
-
-    int p_, m_;                   // m = 2^p where p is precision
+protected:
+    int p_,                  // precision,
+        m_,                  // = 2^p: number of registers in a HLL counter,
+        units_per_counter_;  // = m / 8: # of uint64 integers per HLL counter.
     std::vector<uint64_t> bits_;  // HLL counters are stored in a bit-vector
     std::unordered_map<int, int> cc_bitpos_, nd_cc_;
 
-    int units_per_counter_;  // # of uint64 integers per HLL counter = m_ / 8
     rngutils::default_rng rng;
 
-private:
+protected:
     /**
      * Merge HLL counter at pos_j to HLL counter at pos_i.
-     *
      * B(C_i) := max(B(C_i), B(C_j))
      */
     inline void mergeCounter(const int pos_i, const int pos_j) {
@@ -46,19 +42,19 @@ private:
     }
 
 public:
-    HyperANF(const Graph& graph, const int p = 16) : graph_(graph), p_(p) {
+    HyperANF(const int p = 16) : p_(p) {
         m_ = 1 << p_;
-        // ensure that a HLL counter (m registers) occupies at least one
-        // uint64_t
+        // ensure that a counter (m registers) occupies at least one uint64_t
         assert(m_ % 8 == 0);
-        // a HLL counter occupies m_/8 64-bit integers
+        // a counter occupies m/8 64-bit integers
         units_per_counter_ = m_ / 8;
     }
 
     /**
      * Constructing CC DAG then initialing bits.
      */
-    void initBitsCC();
+    template <class Graph>
+    void initBitsCC(const Graph& graph);
 
     double estimate(const int nd) const {
         uint8_t* regs = (uint8_t*)(bits_.data() + cc_bitpos_.at(nd_cc_.at(nd)));
@@ -68,19 +64,17 @@ public:
 }; /* HyperANF */
 
 template <class Graph>
-void HyperANF<Graph>::initBitsCC() {
+void HyperANF::initBitsCC(const Graph& graph) {
     // do a DFS on the input graph
-    SCCVisitor<Graph> sccvis(graph_);
+    SCCVisitor<Graph> sccvis(graph);
     sccvis.performDFS();
 
-    // build bipartite graph: represents component-node inclusion relationship,
-    // and node-CC mapping.
-    BGraph cng;
+    // state the number of nodes in each CC, and build node-CC mapping
+    std::unordered_map<int, int> cc_size;
     for (auto& pr : sccvis.getCNEdges()) {
-        cng.addEdge(pr.first, pr.second);  // (CC, node)
-        nd_cc_[pr.second] = pr.first;      // node -> CC
+        cc_size[pr.first]++;
+        nd_cc_[pr.second] = pr.first;  // node -> CC
     }
-    cng.defrag();
 
     // CCs in topological order
     auto cc_vec = sccvis.getCCSorted();
@@ -92,7 +86,7 @@ void HyperANF<Graph>::initBitsCC() {
     for (int cc : cc_vec) {
         uint8_t* reg_array = (uint8_t*)(bits_.data() + pos);
         // if CC contains n nodes, then need to add n random numbers
-        for (int n = 0; n < cng.getNodeL(cc).getDeg(); n++) {
+        for (int n = 0; n < cc_size.at(cc); n++) {
             uint64_t x = rng.randint<uint64_t>();
             int reg_idx = (x >> (64 - p_)) & ((1 << p_) - 1);
             uint8_t reg_rho = hll::clz8(x << p_ | 1 << (p_ - 1)) + 1;
@@ -105,7 +99,6 @@ void HyperANF<Graph>::initBitsCC() {
     // SCC DAG: represents CCs relationship
     DGraph dag;
     for (auto& pr : sccvis.getCCEdges()) dag.addEdge(pr.first, pr.second);
-    dag.defrag();
 
     // update CC bits in topological order
     for (auto it = cc_vec.rbegin(); it != cc_vec.rend(); it++) {
