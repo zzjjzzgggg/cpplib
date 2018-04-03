@@ -19,11 +19,11 @@ class SCCVisitor {
 private:
     class Element {
     public:
-        int id, parent, rank, min, edge, deg;
+        int id, parent, rank, min;
+        typename Graph::NbrIter cur_nbr, end_nbr;
 
     public:
-        Element(int v = -1, int r = -1, int d = 0)
-            : id(v), parent(-1), rank(r), min(v), edge(0), deg(d) {}
+        Element(int v = -1, int r = -1) : id(v), parent(-1), rank(r), min(v) {}
     }; /* Node */
 
 private:
@@ -82,7 +82,9 @@ public:
 
 template <class Graph>
 void SCCVisitor<Graph>::makeActive(const int v, const int parent) {
-    record_[v] = Element(v, ++rank_, graph_[v].getOutDeg());
+    record_[v] = Element(v, ++rank_);
+    record_[v].cur_nbr = graph_[v].beginOutNbr();
+    record_[v].end_nbr = graph_[v].endOutNbr();
     if (parent != -1) record_[v].parent = parent;
     stack_.push(v);
 }
@@ -90,8 +92,8 @@ void SCCVisitor<Graph>::makeActive(const int v, const int parent) {
 template <class Graph>
 int SCCVisitor<Graph>::explore(const int v) {
     Element& ve = record_[v];
-    if (ve.edge != ve.deg) {  // v has untagged edge
-        const int u = graph_[v].getOutNbr(ve.edge++);
+    if (ve.cur_nbr != ve.end_nbr) {  // v has untagged edge
+        const int u = graph_[v].getNbrID(ve.cur_nbr++);
         if (record_.find(u) != record_.end()) {  // seen u before
             int u_rank = record_[u].rank, v_min_rank = record_[ve.min].rank;
             if (u_rank < v_min_rank) ve.min = u;
@@ -152,8 +154,9 @@ std::vector<std::pair<int, int>> SCCVisitor<Graph>::getCCEdges() const {
             discovered_ccs.clear();
         }
         discovered_ccs.insert(cc_from);
-        for (int d = 0; d < record_.at(v).deg; d++) {
-            int cc_to = record_.at(graph_[v].getOutNbr(d)).parent;
+        for (auto&& ni = graph_[v].beginOutNbr(); ni != graph_[v].endOutNbr();
+             ni++) {
+            int cc_to = record_.at(graph_[v].getNbrID(ni)).parent;
             if (discovered_ccs.find(cc_to) == discovered_ccs.end()) {
                 discovered_ccs.insert(cc_to);
                 cc_edge_vec.emplace_back(cc_from, cc_to);

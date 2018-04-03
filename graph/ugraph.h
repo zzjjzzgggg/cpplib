@@ -44,6 +44,8 @@ public:
         int getDeg() const override { return nbrs_.size(); }
         int getNbr(const int d) const override { return nbrs_[d]; }
 
+        int getNbrID(const NbrIter& it) const override { return *it; }
+
         NbrIter beginNbr() const override { return nbrs_.begin(); }
         NbrIter endNbr() const override { return nbrs_.end(); }
 

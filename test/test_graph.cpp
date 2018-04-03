@@ -103,8 +103,8 @@ void test_bgraph() {
 int main(int argc, char* argv[]) {
     // osutils::Timer tm;
 
-    test_net();
-    // test_scc();
+    // test_net();
+    test_scc();
     // test_bgraph();
 
     return 0;

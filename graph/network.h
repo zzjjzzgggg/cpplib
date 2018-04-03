@@ -59,9 +59,6 @@ public:
         int getInDeg() const override { return out_nbrs_.size(); }
         int getOutDeg() const override { return out_nbrs_.size(); }
 
-        // std::pair<int, EDat>& getNbr(const int d) const { return
-        // out_nbrs_[d]; }
-
         NbrIter beginOutNbr() const override { return out_nbrs_.begin(); }
         NbrIter endOutNbr() const override { return out_nbrs_.end(); }
 
@@ -73,17 +70,16 @@ public:
 
         bool isNbr(const int nbr) const override { return true; }
 
+        int getNbrID(const NbrIter& it) const override { return it->first; }
+
         int getNbr(const int d) const override {
             auto it = out_nbrs_.begin();
             std::advance(it, d);
             return it->first;
         }
 
-        EDat& getNbrEDat(const int d) const {
-            auto it = out_nbrs_.begin();
-            std::advance(it, d);
-            return it->second;
-        }
+        EDat& getNbrEDat(const NbrIter& it) { return it->second; }
+        const EDat& getNbrEDat(const NbrIter& it) const { return it->second; }
 
         void addOutNbr(const int nbr, const EDat& dat) {
             out_nbrs_.emplace(nbr, dat);

@@ -55,6 +55,8 @@ public:
             return d < getOutDeg() ? getOutNbr(d) : getInNbr(d - getOutDeg());
         }
 
+        int getNbrID(const NbrIter& it) const override { return *it; }
+
         bool isInNbr(const int nbr) const override {
             return std::binary_search(in_nbrs_.begin(), in_nbrs_.end(), nbr);
         }
