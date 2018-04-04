@@ -96,7 +96,7 @@ public:
 
     void estimate(const int n) {
         printf("real\t\thll\t\tlc\t\tall\t\ter_hll\t\ter_lc\t\ter_all\n");
-        int step = 10;
+        int step = 1;
         for (int i = 1; i <= n; i++) {
             uint64 x = rng_.randint<uint64>();
             int reg_idx = (x >> (64 - p_)) & ((1 << p_) - 1);
@@ -111,7 +111,7 @@ public:
                        err_lc = std::abs(est_lc - i) / i * 100,
                        err = std::abs(est - i) / i * 100;
                 printf(
-                    "%d\t\t%.0f\t\t%.0f\t\t%.0f\t\t%.2f%%\t\t%.2f%%\t\t%.2f%%"
+                    "%d\t\t%.1f\t\t%.1f\t\t%.1f\t\t%.1f%%\t\t%.1f%%\t\t%.1f%%"
                     "\n",
                     i, est_hll, est_lc, est, err_hll, err_lc, err);
                 step *= 2;
@@ -122,7 +122,7 @@ public:
 }; /* countHLL */
 
 void test_HLL() {
-    HyperLL hll(16);
+    HyperLL hll(12);
     hll.estimate(1000000);
     // hll.test_clz();
 }

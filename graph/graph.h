@@ -12,8 +12,8 @@
 #include "dgraph.h"
 #include "bgraph.h"
 
-#include "dyn_dgraph.h"
-#include "network.h"
+// #include "dyn_dgraph.h"
+// #include "network.h"
 
 #include "gio.h"
 #include "triad.h"

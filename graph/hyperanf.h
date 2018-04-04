@@ -41,8 +41,23 @@ protected:
         }
     }
 
+    /**
+     * Generate HLL counter for a CC at pos. If a CC contains num nodes, then
+     * need to add num random numbers.
+     */
+    inline void genHLLCounter(const int pos, const int num = 1) {
+        uint8_t* reg_array = (uint8_t*)(bits_.data() + pos);
+        for (int n = 0; n < num; n++) {
+            uint64_t x = rng.randint<uint64_t>();
+            int reg_idx = (x >> (64 - p_)) & ((1 << p_) - 1);
+            // uint8_t reg_rho = hll::clz8(x << p_ | 1 << (p_ - 1)) + 1;
+            uint8_t reg_rho = hll::clz8(x << p_) + 1;
+            if (reg_rho > reg_array[reg_idx]) reg_array[reg_idx] = reg_rho;
+        }
+    }
+
 public:
-    HyperANF(const int p = 16) : p_(p) {
+    HyperANF(const int p = 12) : p_(p) {
         m_ = 1 << p_;
         // ensure that a counter (m registers) occupies at least one uint64_t
         assert(m_ % 8 == 0);
@@ -66,46 +81,39 @@ public:
 template <class Graph>
 void HyperANF::initBitsCC(const Graph& graph) {
     // do a DFS on the input graph
-    SCCVisitor<Graph> sccvis(graph);
-    sccvis.performDFS();
+    SCCVisitor<Graph> dfs(graph);
+    dfs.performDFS();
 
     // state the number of nodes in each CC, and build node-CC mapping
     std::unordered_map<int, int> cc_size;
-    for (auto& pr : sccvis.getCNEdges()) {
+    for (auto& pr : dfs.getCNEdges()) {
         cc_size[pr.first]++;
         nd_cc_[pr.second] = pr.first;  // node -> CC
     }
 
     // CCs in topological order
-    auto cc_vec = sccvis.getCCSorted();
+    auto cc_vec = dfs.getCCSorted();
 
     // generate bits for each CC
     bits_.resize(cc_vec.size() * units_per_counter_);
     std::fill(bits_.begin(), bits_.end(), 0);
     int pos = 0;
     for (int cc : cc_vec) {
-        uint8_t* reg_array = (uint8_t*)(bits_.data() + pos);
-        // if CC contains n nodes, then need to add n random numbers
-        for (int n = 0; n < cc_size.at(cc); n++) {
-            uint64_t x = rng.randint<uint64_t>();
-            int reg_idx = (x >> (64 - p_)) & ((1 << p_) - 1);
-            uint8_t reg_rho = hll::clz8(x << p_ | 1 << (p_ - 1)) + 1;
-            if (reg_rho > reg_array[reg_idx]) reg_array[reg_idx] = reg_rho;
-        }
+        genHLLCounter(pos, cc_size.at(cc));
         cc_bitpos_[cc] = pos;
         pos += units_per_counter_;
     }
 
     // SCC DAG: represents CCs relationship
-    DGraph dag;
-    for (auto& pr : sccvis.getCCEdges()) dag.addEdge(pr.first, pr.second);
+    dir::DGraph dag;
+    for (auto& pr : dfs.getCCEdges()) dag.addEdgeFast(pr.first, pr.second);
 
     // update CC bits in topological order
     for (auto it = cc_vec.rbegin(); it != cc_vec.rend(); it++) {
         int ccj = *it;
-        const auto& ccj_nd = dag[ccj];
-        for (auto ni = ccj_nd.beginInNbr(); ni != ccj_nd.endInNbr(); ni++) {
-            int cci = ccj_nd.getNbrID(ni);
+        const auto& nd = dag[ccj];
+        for (auto ni = nd.beginInNbr(); ni != nd.endInNbr(); ni++) {
+            int cci = nd.getNbrID(ni);
             mergeCounter(cc_bitpos_[cci], cc_bitpos_[ccj]);
         }
     }

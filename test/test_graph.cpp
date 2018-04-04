@@ -5,6 +5,7 @@
 
 using namespace graph;
 
+/*
 void test_scc_net() {
     typedef DatNet<int, int, std::greater<std::pair<int, int>>> DNet;
     DNet g;
@@ -50,13 +51,13 @@ void test_scc_net() {
     for (int cc : visitor.getCCSorted()) printf("%d ", cc);
     printf("\n");
 }
-
+*/
 
 /**
  * test SCC on directed graph
  */
 void test_scc() {
-    DGraph g;
+    dir::DGraph g;
     g.addEdge(0, 1);
     g.addEdge(0, 5);
     g.addEdge(2, 0);
@@ -79,7 +80,7 @@ void test_scc() {
     g.addEdge(11, 4);
     g.addEdge(11, 12);
     g.addEdge(12, 9);
-    SCCVisitor<DGraph> visitor(g);
+    SCCVisitor<dir::DGraph> visitor(g);
     visitor.performDFS();
     int cc = -1;
     for (auto& pr : visitor.getCNEdges()) {
@@ -100,6 +101,7 @@ void test_scc() {
     printf("\n");
 }
 
+/*
 void test_net() {
     DatNet<int, int, std::greater<std::pair<int, int>>> net;
     net.addEdge(1, 2, 1);
@@ -116,29 +118,28 @@ void test_net() {
         printf("%d, %d\n", ni->first, ni->second.getOutDeg());
     }
 }
+*/
 
 void test_nbr_iter() {
-    DGraph g;
+    dir::DGraph g;
     g.addEdge(1, 2);
     g.addEdge(2, 3);
     g.addEdge(2, 4);
     g.addEdge(4, 5);
-
     g.addEdge(3, 4);
     g.addEdge(1, 4);
-    g.defrag();
 
     const auto& nd = g[2];
     for (auto ni = nd.beginNbr(); ni != nd.endNbr(); nd.nextNbr(ni)) {
         printf("%d, %d\n", nd.getID(), nd.getNbrID(ni));
     }
 
-    int nt = countNodeDirTriads<DGraph>(2, g);
+    int nt = countNodeDirTriads<dir::DGraph>(2, g);
     printf("nt: %d\n", nt);
 }
 
 void test_bgraph() {
-    BGraph graph;
+    bi::BGraph graph;
     graph.addEdge(1, 1);
     graph.addEdge(1, 2);
     graph.addEdge(2, 2);
@@ -167,6 +168,7 @@ void test_bgraph() {
     }
 }
 
+/*
 void test_dyn_dgraph() {
     DynDGraph G;
     G.addEdge(1, 2);
@@ -185,7 +187,7 @@ void test_dyn_dgraph() {
     int nt = countNodeDirTriads<DynDGraph>(2, G);
     printf("nt: %d\n", nt);
 }
-
+*/
 
 int main(int argc, char* argv[]) {
     // osutils::Timer tm;
@@ -194,8 +196,8 @@ int main(int argc, char* argv[]) {
     // test_scc();
     // test_scc_net();
     // test_bgraph();
-    // test_nbr_iter();
-    test_dyn_dgraph();
+    test_nbr_iter();
+    // test_dyn_dgraph();
 
     return 0;
 }

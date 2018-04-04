@@ -154,9 +154,9 @@ std::vector<std::pair<int, int>> SCCVisitor<Graph>::getCCEdges() const {
             discovered_ccs.clear();
         }
         discovered_ccs.insert(cc_from);
-        for (auto&& ni = graph_[v].beginOutNbr(); ni != graph_[v].endOutNbr();
-             ni++) {
-            int cc_to = record_.at(graph_[v].getNbrID(ni)).parent;
+        auto& ndv = graph_[v];
+        for (auto&& ni = ndv.beginOutNbr(); ni != ndv.endOutNbr(); ni++) {
+            int cc_to = record_.at(ndv.getNbrID(ni)).parent;
             if (discovered_ccs.find(cc_to) == discovered_ccs.end()) {
                 discovered_ccs.insert(cc_to);
                 cc_edge_vec.emplace_back(cc_from, cc_to);

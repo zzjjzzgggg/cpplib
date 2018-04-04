@@ -6,10 +6,17 @@
 #ifndef __BGRAPH_H__
 #define __BGRAPH_H__
 
-#include "node_interface.h"
-#include "edge_iter_interface.h"
+#include "ugraph.h"
 
-namespace graph {
+namespace graph::bi {
+
+typedef typename std::vector<int>::const_iterator NbrIter;
+
+using graph::undir::Node;
+
+typedef std::unordered_map<int, Node>::const_iterator NodeIter;
+
+using graph::undir::EdgeIter;
 
 /**
  * Bipartite Graph
@@ -17,85 +24,6 @@ namespace graph {
 class BGraph {
 public:
     typedef typename std::vector<int>::const_iterator NbrIter;
-
-    class Node : public INode<NbrIter> {
-    private:
-        std::vector<int> nbrs_;  // neighbors
-
-    public:
-        Node() : INode(-1) {}
-        Node(const int id) : INode(id) {}
-
-        // disable copy constructor/assignment
-        Node(const Node&) = delete;
-        Node& operator=(const Node&) = delete;
-
-        // move constructor/assignment
-        Node(Node&& other) : INode(other.id_), nbrs_(std::move(other.nbrs_)) {}
-        Node& operator=(Node&& other) {
-            id_ = other.id_;
-            nbrs_ = std::move(other.nbrs_);
-            return *this;
-        }
-
-        void save(std::unique_ptr<ioutils::IOOut>& po) const override;
-        void load(std::unique_ptr<ioutils::IOIn>& pi) override;
-
-        int getDeg() const override { return nbrs_.size(); }
-
-        int getNbrID(const NbrIter& it) const override { return *it; }
-
-        NbrIter beginNbr() const override { return nbrs_.begin(); }
-        NbrIter endNbr() const override { return nbrs_.end(); }
-
-        /**
-         * Make sure the node has neighbors before calling this method
-         */
-        int sampleNbr(rngutils::random_generator<>& rng) const {
-            auto iter = rng.choose(nbrs_.begin(), nbrs_.end());
-            return *iter;
-        }
-
-        bool isNbr(const int nbr) const override {
-            return std::binary_search(nbrs_.begin(), nbrs_.end(), nbr);
-        }
-
-        void addNbr(const int nbr) { nbrs_.push_back(nbr); }
-
-        void shrinkAndSort() {
-            nbrs_.shrink_to_fit();
-            std::sort(nbrs_.begin(), nbrs_.end());
-        }
-
-        void uniq() {
-            auto last = std::unique(nbrs_.begin(), nbrs_.end());
-            nbrs_.erase(last, nbrs_.end());
-        }
-    };
-
-    typedef std::unordered_map<int, Node>::const_iterator NodeIter;
-    /**
-     *   cur_edge_
-     *      |
-     *      V
-     * v1: {0 1 ... d1}  <- cur_nd_
-     * v2: {0 2 ... d2}
-     * ...               <- end_nd_
-     */
-    class EdgeIter : public IEdgeIter<EdgeIter, NodeIter, NbrIter> {
-    public:
-        EdgeIter() {}
-        EdgeIter(const NodeIter& start_nd_iter, const NodeIter& end_nd_iter)
-            : IEdgeIter(start_nd_iter, end_nd_iter) {}
-
-        // copy assignment
-        EdgeIter& operator=(const EdgeIter& ei) {
-            return IEdgeIter<EdgeIter, NodeIter, NbrIter>::operator=(ei);
-        }
-
-        int getSrcID() const override { return cur_nd_->second.getID(); }
-        int getDstID() const override { return *cur_edge_; }
-    };
 
 private:
     GraphType gtype_;

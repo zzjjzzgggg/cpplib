@@ -5,24 +5,7 @@
 
 #include "bgraph.h"
 
-namespace graph {
-
-void BGraph::Node::save(std::unique_ptr<ioutils::IOOut>& po) const {
-    po->save(id_);                        // id
-    po->save((int)nbrs_.size());          // deg
-    for (int nbr : nbrs_) po->save(nbr);  // neighbors
-}
-
-void BGraph::Node::load(std::unique_ptr<ioutils::IOIn>& pi) {
-    int deg, nbr;
-    pi->load(id_);       // id
-    pi->load(deg);       // deg
-    nbrs_.reserve(deg);  // neighbors
-    for (int d = 0; d < deg; d++) {
-        pi->load(nbr);
-        nbrs_.push_back(nbr);
-    }
-}
+namespace graph::bi {
 
 void BGraph::save(const std::string& filename) const {
     auto po = ioutils::getIOOut(filename);

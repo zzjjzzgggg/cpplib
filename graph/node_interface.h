@@ -32,6 +32,16 @@ public:
     virtual bool isInNbr(const int nbr) const { return isNbr(nbr); };
     virtual bool isOutNbr(const int nbr) const { return isNbr(nbr); };
 
+    virtual void addNbr(const int nbr) = 0;
+    virtual void addInNbr(const int nbr) { addNbr(nbr); }
+    virtual void addOutNbr(const int nbr) { addNbr(nbr); }
+
+    virtual void addNbrFast(const int nbr) = 0;
+    virtual void addInNbrFast(const int nbr) { addNbrFast(nbr); }
+    virtual void addOutNbrFast(const int nbr) { addNbrFast(nbr); }
+
+    virtual void clear() = 0;
+
     // The following three iterators are designed to iterate over both in and
     // out neighbors of a node.
     virtual NbrIter beginNbr() const = 0;

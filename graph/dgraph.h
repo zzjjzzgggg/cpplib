@@ -6,232 +6,200 @@
 #ifndef __DGRAPH_H__
 #define __DGRAPH_H__
 
-#include "node_interface.h"
-#include "edge_iter_interface.h"
+#include "graph_interface.h"
 
-namespace graph {
+namespace graph::dir {
+
+typedef typename std::vector<int>::const_iterator NbrIter;
+
+/**
+ * Directed graph node class
+ */
+class Node : public INode<NbrIter> {
+private:
+    std::vector<int> in_nbrs_, out_nbrs_;
+
+public:
+    Node() : INode(-1) {}
+    Node(const int id) : INode(id) {}
+
+    // disable copy constructor/assignment
+    Node(const Node&) = delete;
+    Node& operator=(const Node&) = delete;
+
+    // move constructor/assignment
+    Node(Node&& other)
+        : INode(other.id_), in_nbrs_(std::move(other.in_nbrs_)),
+          out_nbrs_(std::move(other.out_nbrs_)) {}
+
+    Node& operator=(Node&& other) {
+        id_ = other.id_;
+        in_nbrs_ = std::move(other.in_nbrs_);
+        out_nbrs_ = std::move(other.out_nbrs_);
+        return *this;
+    }
+
+    void save(std::unique_ptr<ioutils::IOOut>& po) const override;
+    void load(std::unique_ptr<ioutils::IOIn>& pi) override;
+
+    int getDeg() const override { return in_nbrs_.size() + out_nbrs_.size(); }
+    int getInDeg() const override { return in_nbrs_.size(); }
+    int getOutDeg() const override { return out_nbrs_.size(); }
+
+    int getNbrID(const NbrIter& it) const override { return *it; }
+
+    bool isInNbr(const int v) const override {
+        return std::binary_search(in_nbrs_.begin(), in_nbrs_.end(), v);
+    }
+    bool isOutNbr(const int v) const override {
+        return std::binary_search(out_nbrs_.begin(), out_nbrs_.end(), v);
+    }
+    bool isNbr(const int v) const override {
+        return isOutNbr(v) || isOutNbr(v);
+    }
+
+    void addInNbr(const int v) override;
+    void addOutNbr(const int v) override;
+    void addNbr(const int v) override { addOutNbr(v); }
+
+    void addInNbrFast(const int v) override { in_nbrs_.push_back(v); }
+    void addOutNbrFast(const int v) override { out_nbrs_.push_back(v); }
+    void addNbrFast(const int v) override { addOutNbrFast(v); }
+
+    void clear() override;
+
+    NbrIter beginNbr() const override {
+        return in_nbrs_.empty() ? out_nbrs_.begin() : in_nbrs_.begin();
+    }
+    NbrIter endNbr() const override { return out_nbrs_.end(); }
+    void nextNbr(NbrIter& ni) const override {
+        ni++;
+        if (ni == in_nbrs_.end()) ni = out_nbrs_.begin();
+    };
+
+    NbrIter beginInNbr() const override { return in_nbrs_.begin(); }
+    NbrIter endInNbr() const override { return in_nbrs_.end(); }
+
+    NbrIter beginOutNbr() const override { return out_nbrs_.begin(); }
+    NbrIter endOutNbr() const override { return out_nbrs_.end(); }
+
+    /**
+     * Make sure the node has out-neighbors before calling this method
+     */
+    int sampleOutNbr(rngutils::random_generator<>& rng) const {
+        auto iter = rng.choose(out_nbrs_.begin(), out_nbrs_.end());
+        return *iter;
+    }
+
+    /**
+     * Make sure the node has in-neighbors before calling this method
+     */
+    int sampleInNbr(rngutils::random_generator<>& rng) const {
+        auto iter = rng.choose(in_nbrs_.begin(), in_nbrs_.end());
+        return *iter;
+    }
+
+    void shrinkAndSort() {
+        in_nbrs_.shrink_to_fit();
+        out_nbrs_.shrink_to_fit();
+        std::sort(in_nbrs_.begin(), in_nbrs_.end());
+        std::sort(out_nbrs_.begin(), out_nbrs_.end());
+    }
+
+    void uniq() {
+        auto last_i = std::unique(in_nbrs_.begin(), in_nbrs_.end());
+        in_nbrs_.erase(last_i, in_nbrs_.end());
+        auto last_o = std::unique(out_nbrs_.begin(), out_nbrs_.end());
+        out_nbrs_.erase(last_o, out_nbrs_.end());
+    }
+};
+typedef std::unordered_map<int, Node>::const_iterator NodeIter;
+
+/**
+ * Undirected graph EdgeIter class.
+ *
+ *   cur_edge_
+ *      |
+ *      V
+ * v1: {0 1 ... d1}  <- cur_nd_
+ * v2: {0 2 ... d2}
+ * ...               <- end_nd_
+ */
+class EdgeIter : public IEdgeIter<EdgeIter, NodeIter, NbrIter> {
+public:
+    EdgeIter() {}
+    EdgeIter(const NodeIter& start_nd_iter, const NodeIter& end_nd_iter)
+        : IEdgeIter(start_nd_iter, end_nd_iter) {}
+
+    // copy assignment
+    EdgeIter& operator=(const EdgeIter& ei) {
+        return IEdgeIter<EdgeIter, NodeIter, NbrIter>::operator=(ei);
+    }
+
+    int getSrcID() const override { return cur_nd_->second.getID(); }
+    int getDstID() const override { return *cur_edge_; }
+};
 
 /**
  * directed graph
  */
-class DGraph {
+class DGraph : public IGraph<DGraph, Node, NodeIter, EdgeIter, NbrIter> {
 public:
     typedef typename std::vector<int>::const_iterator NbrIter;
 
-    class Node : public INode<NbrIter> {
-    private:
-        std::vector<int> in_nbrs_, out_nbrs_;
-
-    public:
-        Node() : INode(-1) {}
-        Node(const int id) : INode(id) {}
-
-        // disable copy constructor/assignment
-        Node(const Node&) = delete;
-        Node& operator=(const Node&) = delete;
-
-        // move constructor/assignment
-        Node(Node&& other)
-            : INode(other.id_), in_nbrs_(std::move(other.in_nbrs_)),
-              out_nbrs_(std::move(other.out_nbrs_)) {}
-
-        Node& operator=(Node&& other) {
-            id_ = other.id_;
-            in_nbrs_ = std::move(other.in_nbrs_);
-            out_nbrs_ = std::move(other.out_nbrs_);
-            return *this;
-        }
-
-        void save(std::unique_ptr<ioutils::IOOut>& po) const override;
-        void load(std::unique_ptr<ioutils::IOIn>& pi) override;
-
-        int getDeg() const override {
-            return in_nbrs_.size() + out_nbrs_.size();
-        }
-        int getInDeg() const override { return in_nbrs_.size(); }
-        int getOutDeg() const override { return out_nbrs_.size(); }
-
-        int getNbrID(const NbrIter& it) const override { return *it; }
-
-        bool isInNbr(const int nbr) const override {
-            return std::binary_search(in_nbrs_.begin(), in_nbrs_.end(), nbr);
-        }
-        bool isOutNbr(const int nbr) const override {
-            return std::binary_search(out_nbrs_.begin(), out_nbrs_.end(), nbr);
-        }
-        bool isNbr(const int nbr) const override {
-            return isOutNbr(nbr) || isOutNbr(nbr);
-        }
-
-        NbrIter beginNbr() const override {
-            return in_nbrs_.empty() ? out_nbrs_.begin() : in_nbrs_.begin();
-        }
-        NbrIter endNbr() const override { return out_nbrs_.end(); }
-        void nextNbr(NbrIter& ni) const override {
-            ni++;
-            if (ni == in_nbrs_.end()) ni = out_nbrs_.begin();
-        };
-
-        NbrIter beginInNbr() const override { return in_nbrs_.begin(); }
-        NbrIter endInNbr() const override { return in_nbrs_.end(); }
-
-        NbrIter beginOutNbr() const override { return out_nbrs_.begin(); }
-        NbrIter endOutNbr() const override { return out_nbrs_.end(); }
-
-        /**
-         * Make sure the node has out-neighbors before calling this method
-         */
-        int sampleOutNbr(rngutils::random_generator<>& rng) const {
-            auto iter = rng.choose(out_nbrs_.begin(), out_nbrs_.end());
-            return *iter;
-        }
-
-        /**
-         * Make sure the node has in-neighbors before calling this method
-         */
-        int sampleInNbr(rngutils::random_generator<>& rng) const {
-            auto iter = rng.choose(in_nbrs_.begin(), in_nbrs_.end());
-            return *iter;
-        }
-
-        void addInNbr(const int nbr) { in_nbrs_.push_back(nbr); }
-        void addOutNbr(const int nbr) { out_nbrs_.push_back(nbr); }
-
-        void shrinkAndSort() {
-            in_nbrs_.shrink_to_fit();
-            out_nbrs_.shrink_to_fit();
-            std::sort(in_nbrs_.begin(), in_nbrs_.end());
-            std::sort(out_nbrs_.begin(), out_nbrs_.end());
-        }
-
-        void uniq() {
-            auto last_i = std::unique(in_nbrs_.begin(), in_nbrs_.end());
-            in_nbrs_.erase(last_i, in_nbrs_.end());
-            auto last_o = std::unique(out_nbrs_.begin(), out_nbrs_.end());
-            out_nbrs_.erase(last_o, out_nbrs_.end());
-        }
-    };
-    typedef std::unordered_map<int, Node>::const_iterator NodeIter;
-
-    /**
-     * Iterate over out-neighbors
-     *
-     *   cur_edge_
-     *      |
-     *      v
-     * v1: {0 1 ... d1}  <- cur_nd_
-     * v2: {0 2 ... d2}
-     * ...               <- end_nd_
-     */
-    class EdgeIter : public IEdgeIter<EdgeIter, NodeIter, NbrIter> {
-    public:
-        EdgeIter() {}
-        EdgeIter(const NodeIter& start_nd_iter, const NodeIter& end_nd_iter)
-            : IEdgeIter(start_nd_iter, end_nd_iter) {}
-
-        // copy assignment
-        EdgeIter& operator=(const EdgeIter& ei) {
-            return IEdgeIter<EdgeIter, NodeIter, NbrIter>::operator=(ei);
-        }
-
-        int getSrcID() const override { return cur_nd_->second.getID(); }
-        int getDstID() const override { return *cur_edge_; }
-    };
-
-private:
-    GraphType gtype_;
-    mutable rngutils::default_rng rng_;
-    std::unordered_map<int, Node> nodes_;  // maps a node id to its node object
-
 public:
-    DGraph(const GraphType gtype = GraphType::SIMPLE) : gtype_(gtype) {}
+    DGraph(const GraphType gtype = GraphType::SIMPLE)
+        : IGraph<DGraph, Node, NodeIter, EdgeIter, NbrIter>(gtype) {}
     virtual ~DGraph() {}
 
     // disable copy constructor/assignment
     DGraph(const DGraph&) = delete;
     DGraph& operator=(const DGraph&) = delete;
 
-    // move constructor/assignment
+    // move constructor
     DGraph(DGraph&& other)
-        : gtype_(other.gtype_), nodes_(std::move(other.nodes_)) {}
+        : IGraph<DGraph, Node, NodeIter, EdgeIter, NbrIter>(std::move(other)) {}
 
+    // move assignment
     DGraph& operator=(DGraph&& other) {
-        gtype_ = other.gtype_;
-        nodes_ = std::move(other.nodes_);
-        return *this;
+        return static_cast<DGraph&>(
+            IGraph<DGraph, Node, NodeIter, EdgeIter, NbrIter>::operator=(
+                std::move(other)));
     }
 
-    void save(const std::string& filename) const;
-    void load(const std::string& filename);
+    void save(const std::string& filename) const override;
+    void load(const std::string& filename) override;
 
-    bool isNode(const int id) const { return nodes_.find(id) != nodes_.end(); }
-    bool isEdge(const int src, const int dst) const {
+    bool isEdge(const int src, const int dst) const override {
         if (!isNode(src) || !isNode(dst)) return false;
         return nodes_.at(src).isOutNbr(dst);
     }
 
-    const int getNodes() const { return nodes_.size(); }
-    const int getEdges() const {
+    const int getEdges() const override {
         int edges = 0;
         for (const auto& p : nodes_) edges += p.second.getOutDeg();
         return edges;
     }
 
-    Node& getNode(const int id) { return nodes_[id]; }
-    const Node& getNode(const int id) const { return nodes_.at(id); }
-    Node& operator[](int id) { return nodes_[id]; };
-    const Node& operator[](int id) const { return nodes_.at(id); };
-
-    /**
-     * Make sure the graph has nodes before calling this method
-     */
-    int sampleNode() const {
-        auto iter = rng_.choose(nodes_.begin(), nodes_.end());
-        return iter->first;
-    }
-
     int sampleInNbr(int id) const { return getNode(id).sampleInNbr(rng_); }
     int sampleOutNbr(int id) const { return getNode(id).sampleOutNbr(rng_); }
-
-    void addNode(int id) {
-        if (!isNode(id)) nodes_[id] = Node{id};
-    }
 
     /**
      * Add edge (src, dst) to the graph. For efficiency consideration, this
      * function does not check whether or not the edge has existed. Callers are
      * responsible to avoid duplidate edges.
      */
-    void addEdge(const int src, const int dst) {
-        addNode(src);
-        addNode(dst);
-        nodes_[src].addOutNbr(dst);
-        nodes_[dst].addInNbr(src);
-    }
+    void addEdgeFast(const int src, const int dst) override;
 
     /**
-     * Optimize the graph data structure for the purpose of fast access.
-     * Including: sort neighbors of each node increasingly.
+     * Add edge and keep neighbors in order.
      */
-    void defrag() {
-        for (auto& p : nodes_) p.second.shrinkAndSort();
-        if (gtype_ == GraphType::SIMPLE)
-            for (auto& p : nodes_) p.second.uniq();
-    }
-
-    // iterators
-    NodeIter beginNI() const { return nodes_.begin(); }
-    NodeIter endNI() const { return nodes_.end(); }
+    void addEdge(const int src, const int dst) override;
 
     /**
      * Find the first node that out degree is nonzero
      */
-    EdgeIter beginEI() const {
-        auto ni = nodes_.begin();
-        while (ni != nodes_.end() && ni->second.getOutDeg() == 0) ni++;
-        return EdgeIter(ni, nodes_.end());
-    }
-    EdgeIter endEI() const { return EdgeIter(nodes_.end(), nodes_.end()); }
+    EdgeIter beginEI() const override;
 };
 
 }  // end namespace graph

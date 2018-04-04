@@ -5,9 +5,9 @@
 
 #include "dgraph.h"
 
-namespace graph {
+namespace graph::dir {
 
-void DGraph::Node::save(std::unique_ptr<ioutils::IOOut>& po) const {
+void Node::save(std::unique_ptr<ioutils::IOOut>& po) const {
     po->save(id_);                            // id
     po->save((int)in_nbrs_.size());           // in-deg
     for (int nbr : in_nbrs_) po->save(nbr);   // in-neighbors
@@ -15,7 +15,7 @@ void DGraph::Node::save(std::unique_ptr<ioutils::IOOut>& po) const {
     for (int nbr : out_nbrs_) po->save(nbr);  // out-neighbors
 }
 
-void DGraph::Node::load(std::unique_ptr<ioutils::IOIn>& pi) {
+void Node::load(std::unique_ptr<ioutils::IOIn>& pi) {
     int deg, nbr;
     pi->load(id_);          // id
     pi->load(deg);          // in-deg
@@ -30,6 +30,33 @@ void DGraph::Node::load(std::unique_ptr<ioutils::IOIn>& pi) {
         pi->load(nbr);
         out_nbrs_.push_back(nbr);
     }
+}
+
+void Node::addInNbr(const int nbr) {
+    in_nbrs_.push_back(nbr);
+    int i = in_nbrs_.size() - 1, tmp;
+    while (i > 0 && in_nbrs_[i] < in_nbrs_[i - 1]) {
+        tmp = in_nbrs_[i];
+        in_nbrs_[i] = in_nbrs_[i - 1];
+        in_nbrs_[i - 1] = tmp;
+        i--;
+    }
+}
+
+void Node::addOutNbr(const int nbr) {
+    out_nbrs_.push_back(nbr);
+    int i = out_nbrs_.size() - 1, tmp;
+    while (i > 0 && out_nbrs_[i] < out_nbrs_[i - 1]) {
+        tmp = out_nbrs_[i];
+        out_nbrs_[i] = out_nbrs_[i - 1];
+        out_nbrs_[i - 1] = tmp;
+        i--;
+    }
+}
+
+void Node::clear() {
+    in_nbrs_.clear();
+    out_nbrs_.clear();
 }
 
 void DGraph::save(const std::string& filename) const {
@@ -48,6 +75,26 @@ void DGraph::load(const std::string& filename) {
         node.load(pi);
         nodes_[node.getID()] = std::move(node);
     }
+}
+
+void DGraph::addEdgeFast(const int src, const int dst) {
+    addNode(src);
+    addNode(dst);
+    nodes_[src].addOutNbrFast(dst);
+    nodes_[dst].addInNbrFast(src);
+}
+
+void DGraph::addEdge(const int src, const int dst) {
+    addNode(src);
+    addNode(dst);
+    nodes_[src].addOutNbr(dst);
+    nodes_[dst].addInNbr(src);
+}
+
+EdgeIter DGraph::beginEI() const {
+    auto ni = nodes_.begin();
+    while (ni != nodes_.end() && ni->second.getOutDeg() == 0) ni++;
+    return EdgeIter(ni, nodes_.end());
 }
 
 }  // end of namespace graph

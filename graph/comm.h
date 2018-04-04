@@ -17,13 +17,15 @@
 #include <algorithm>
 #include <iterator>
 
-
 #include "../io/ioutils.h"
 #include "../adv/rngutils.h"
 
 namespace graph {
 
-enum class GraphType { SIMPLE, MULTI };
+enum class GraphType {
+    SIMPLE,  // simple graph
+    MULTI,   // multi-graph (two nodes may have multiple edges between them)
+};
 }
 
 #endif /* __COMM_H__ */

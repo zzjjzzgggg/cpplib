@@ -21,8 +21,14 @@ target_link_libraries(test_rngutils rngutils)
 add_executable(test_graph test_graph.cpp)
 target_link_libraries(test_graph graph)
 
+add_executable(test_cc test_cc.cpp)
+target_link_libraries(test_cc graph)
+
 add_executable(test_mathutils test_mathutils.cpp)
 target_link_libraries(test_mathutils mathutils)
 
 add_executable(test_hyperanf test_hyperanf.cpp)
 target_link_libraries(test_hyperanf graph)
+
+add_executable(test_HLL test_HLL.cpp)
+# target_link_libraries(test_HLL graph)

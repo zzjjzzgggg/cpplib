@@ -5,15 +5,15 @@
 
 #include "ugraph.h"
 
-namespace graph {
+namespace graph::undir {
 
-void UGraph::Node::save(std::unique_ptr<ioutils::IOOut>& po) const {
+void Node::save(std::unique_ptr<ioutils::IOOut>& po) const {
     po->save(id_);                        // id
     po->save((int)nbrs_.size());          // deg
     for (int nbr : nbrs_) po->save(nbr);  // neighbors
 }
 
-void UGraph::Node::load(std::unique_ptr<ioutils::IOIn>& pi) {
+void Node::load(std::unique_ptr<ioutils::IOIn>& pi) {
     int deg, nbr;
     pi->load(id_);       // id
     pi->load(deg);       // deg
@@ -21,6 +21,17 @@ void UGraph::Node::load(std::unique_ptr<ioutils::IOIn>& pi) {
     for (int d = 0; d < deg; d++) {
         pi->load(nbr);
         nbrs_.push_back(nbr);
+    }
+}
+
+void Node::addNbr(const int nbr) {
+    nbrs_.push_back(nbr);
+    int i = nbrs_.size() - 1, tmp;
+    while (i > 0 && nbrs_[i] < nbrs_[i - 1]) {
+        tmp = nbrs_[i];
+        nbrs_[i] = nbrs_[i - 1];
+        nbrs_[i - 1] = tmp;
+        i--;
     }
 }
 
@@ -42,4 +53,24 @@ void UGraph::load(const std::string& filename) {
     }
 }
 
-}  // end of namespace graph
+void UGraph::addEdge(const int src, const int dst) {
+    addNode(src);
+    nodes_[src].addNbr(dst);
+    addNode(dst);
+    nodes_[dst].addNbr(src);
+}
+
+void UGraph::addEdgeFast(const int src, const int dst) {
+    addNode(src);
+    nodes_[src].addNbrFast(dst);
+    addNode(dst);
+    nodes_[dst].addNbrFast(src);
+}
+
+EdgeIter UGraph::beginEI() const {
+    auto ni = nodes_.begin();
+    while (ni != nodes_.end() && ni->second.getDeg() == 0) ni++;
+    return EdgeIter(ni, nodes_.end());
+}
+
+}  // end of namespace graph::undir

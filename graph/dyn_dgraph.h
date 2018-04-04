@@ -79,10 +79,13 @@ public:
         NbrIter beginOutNbr() const override { return out_nbrs_.begin(); }
         NbrIter endOutNbr() const override { return out_nbrs_.end(); }
 
-
         void addInNbr(const int nbr) { in_nbrs_.insert(nbr); }
         void addOutNbr(const int nbr) { out_nbrs_.insert(nbr); }
 
+        void clear() override {
+            in_nbrs_.clear();
+            out_nbrs_.clear();
+        }
     };
     typedef std::unordered_map<int, Node>::const_iterator NodeIter;
 
@@ -177,6 +180,11 @@ public:
         addNode(dst);
         nodes_[src].addOutNbr(dst);
         nodes_[dst].addInNbr(src);
+    }
+
+    void clear() {
+        for (auto& pr : nodes_) pr.second.clear();
+        nodes_.clear();
     }
 
     // iterators
