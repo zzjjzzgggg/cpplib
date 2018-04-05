@@ -103,12 +103,12 @@ std::vector<std::pair<T1, T2>> loadPrVec(const std::string& filename,
     return vec;
 }
 
-// tuple vector
+// Triplet vector
 template <typename T1, typename T2, typename T3>
-void saveTupleVec(const std::vector<std::tuple<T1, T2, T3>>& vec,
-                  const std::string& filename, const bool echo = true,
-                  const std::string& format = "{}\t{}\t{}\n",
-                  const std::string& anno = "") {
+void saveTripletVec(const std::vector<std::tuple<T1, T2, T3>>& vec,
+                    const std::string& filename, const bool echo = true,
+                    const std::string& format = "{}\t{}\t{}\n",
+                    const std::string& anno = "") {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
     for (auto&& e : vec)
@@ -119,21 +119,21 @@ void saveTupleVec(const std::vector<std::tuple<T1, T2, T3>>& vec,
 }
 
 template <typename T1, typename T2, typename T3>
-void loadTupleVec(const std::string& filename,
-                  std::vector<std::tuple<T1, T2, T3>>& vec, const int c0 = 0,
-                  const int c1 = 1, const int c2 = 2) {
+void loadTripletVec(const std::string& filename,
+                    std::vector<std::tuple<T1, T2, T3>>& vec, const int c0 = 0,
+                    const int c1 = 1, const int c2 = 2) {
     TSVParser ss(filename);
     while (ss.next())
         vec.emplace_back(ss.get<T1>(c0), ss.get<T2>(c1), ss.get<T3>(c2));
 }
 
 template <typename T1, typename T2, typename T3>
-std::vector<std::tuple<T1, T2, T3>> loadTupleVec(const std::string& filename,
-                                                 const int c0 = 0,
-                                                 const int c1 = 1,
-                                                 const int c2 = 2) {
+std::vector<std::tuple<T1, T2, T3>> loadTripletVec(const std::string& filename,
+                                                   const int c0 = 0,
+                                                   const int c1 = 1,
+                                                   const int c2 = 2) {
     std::vector<std::tuple<T1, T2, T3>> vec;
-    loadTupleVec(filename, vec, c0, c1, c2);
+    loadTripletVec(filename, vec, c0, c1, c2);
     return vec;
 }
 
