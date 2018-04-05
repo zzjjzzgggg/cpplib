@@ -107,6 +107,16 @@ public:
      *
      * NOTE: Callers are responsible to avoid duplidate edges.
      */
+    void addEdgeFast(const int src, const int dst) {
+        addNodeL(src);
+        nodes_L_[src].addNbrFast(dst);
+        addNodeR(dst);
+        nodes_R_[dst].addNbrFast(src);
+    }
+
+    /**
+     * Add edge and keep neighbors in ordered vector.
+     */
     void addEdge(const int src, const int dst) {
         addNodeL(src);
         nodes_L_[src].addNbr(dst);
