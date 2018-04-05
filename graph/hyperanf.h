@@ -66,6 +66,13 @@ protected:
         }
     }
 
+    /**
+     * Return the counter position of a node u.
+     */
+    inline int getCounterPos(const int u) const {
+        return cc_bitpos_.at(nd_cc_.at(u));
+    }
+
 public:
     HyperANF(const int p = 12) : p_(p) {
         m_ = 1 << p_;
@@ -82,7 +89,7 @@ public:
     void initBitsCC(const Graph& graph);
 
     double estimate(const int nd) const {
-        uint8_t* regs = (uint8_t*)(bits_.data() + cc_bitpos_.at(nd_cc_.at(nd)));
+        uint8_t* regs = (uint8_t*)(bits_.data() + getCounterPos(nd));
         return hll::count(regs, m_);
     }
 
@@ -90,7 +97,7 @@ public:
     double estimate(InputIt first, InputIt last) const {
         std::vector<uint64_t> tmp_bits(units_per_counter_, 0);
         for (; first != last; ++first)
-            mergeCounter(tmp_bits.data(), cc_bitpos_.at(nd_cc_.at(*first)));
+            mergeCounter(tmp_bits.data(), getCounterPos(*first));
         return hll::count((uint8_t*)tmp_bits.data(), m_);
     }
 
