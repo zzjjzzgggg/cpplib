@@ -61,28 +61,26 @@ void test_anf_set() {
 
     printf("nd\ttruth\ttm\test\ttm\terr(%%)\n");
 
-    std::unordered_set<int> nodes_set;
-    std::vector<int> nodes_vec;
+    std::unordered_set<int> nodes;
 
     for (size_t sz : {5, 10, 20}) {
         for (int i = 0; i < 10; i++) {
-            nodes_set.clear();
-            while (nodes_set.size() < sz) nodes_set.insert(graph.sampleNode());
-            nodes_vec.clear();
-            nodes_vec.insert(nodes_vec.end(), nodes_set.begin(),
-                             nodes_set.end());
+            nodes.clear();
+            while (nodes.size() < sz) nodes.insert(graph.sampleNode());
 
             tm.tick();
-            bfs.doBFS(nodes_vec);
+            bfs.doBFS(nodes.begin(), nodes.end());
             int truth = bfs.getBFSTreeSize();
             double t1 = tm.seconds();
 
             tm.tick();
-            double est = anf.estimate(nodes_vec);
+            double est = anf.estimate(nodes.begin(), nodes.end());
             double t2 = tm.seconds();
 
+            double err = std::abs(est - truth) / truth * 100;
+
             printf("%lu\t%d\t%.2e\t%.2f\t%.2e\t%.2f\n", sz, truth, t1, est, t2,
-                   std::abs(est - truth) / truth * 100);
+                   err);
         }
     }
 }

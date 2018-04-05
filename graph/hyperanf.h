@@ -86,10 +86,11 @@ public:
         return hll::count(regs, m_);
     }
 
-    double estimate(const std::vector<int>& nodes) const {
+    template <class InputIt>
+    double estimate(InputIt first, InputIt last) const {
         std::vector<uint64_t> tmp_bits(units_per_counter_, 0);
-        for (int nd : nodes)
-            mergeCounter(tmp_bits.data(), cc_bitpos_.at(nd_cc_.at(nd)));
+        for (; first != last; ++first)
+            mergeCounter(tmp_bits.data(), cc_bitpos_.at(nd_cc_.at(*first)));
         return hll::count((uint8_t*)tmp_bits.data(), m_);
     }
 

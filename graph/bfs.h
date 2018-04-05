@@ -21,7 +21,10 @@ public:
     DirBFS(const Graph& graph) : graph_(graph) {}
 
     void doBFS(const int start_nd, const int mx_hop = INT_MAX);
-    void doBFS(const std::vector<int>& start_nds, const int mx_hop = INT_MAX);
+
+    template <class InputIt>
+    void doBFS(InputIt first, InputIt last, const int mx_hop = INT_MAX);
+
     int getBFSTreeSize() const { return nd_to_hop_.size(); }
 
 }; /* DirBFS */
@@ -49,12 +52,13 @@ void DirBFS<Graph>::doBFS(const int start_nd, const int mx_hop) {
 }
 
 template <class Graph>
-void DirBFS<Graph>::doBFS(const std::vector<int>& start_nds, const int mx_hop) {
+template <class InputIt>
+void DirBFS<Graph>::doBFS(InputIt first, InputIt last, const int mx_hop) {
     nd_to_hop_.clear();
     std::queue<int> queue;
-    for (int nd : start_nds) {
-        nd_to_hop_[nd] = 0;
-        queue.push(nd);
+    for (; first != last; ++first) {
+        nd_to_hop_[*first] = 0;
+        queue.push(*first);
     }
     while (!queue.empty()) {
         int u = queue.front(), hop = nd_to_hop_[u];
