@@ -42,6 +42,16 @@ protected:
     }
 
     /**
+     * Merge counter at pos to given target.
+     */
+    inline void mergeCounter(uint64_t* target, const int pos) const {
+        for (int k = 0; k < units_per_counter_; k++) {
+            uint64_t &x = target[k], y = bits_[pos + k];
+            hll::merge(x, y);
+        }
+    }
+
+    /**
      * Generate HLL counter for a CC at pos. If a CC contains num nodes, then
      * need to add num random numbers.
      */
@@ -74,6 +84,13 @@ public:
     double estimate(const int nd) const {
         uint8_t* regs = (uint8_t*)(bits_.data() + cc_bitpos_.at(nd_cc_.at(nd)));
         return hll::count(regs, m_);
+    }
+
+    double estimate(const std::vector<int>& nodes) const {
+        std::vector<uint64_t> tmp_bits(units_per_counter_, 0);
+        for (int nd : nodes)
+            mergeCounter(tmp_bits.data(), cc_bitpos_.at(nd_cc_.at(nd)));
+        return hll::count((uint8_t*)tmp_bits.data(), m_);
     }
 
 }; /* HyperANF */
@@ -110,11 +127,11 @@ void HyperANF::initBitsCC(const Graph& graph) {
 
     // update CC bits in topological order
     for (auto it = cc_vec.rbegin(); it != cc_vec.rend(); it++) {
-        int ccj = *it;
-        const auto& nd = dag[ccj];
+        int cj = *it;
+        const auto& nd = dag[cj];
         for (auto ni = nd.beginInNbr(); ni != nd.endInNbr(); ni++) {
-            int cci = nd.getNbrID(ni);
-            mergeCounter(cc_bitpos_[cci], cc_bitpos_[ccj]);
+            int ci = nd.getNbrID(ni);
+            mergeCounter(cc_bitpos_[ci], cc_bitpos_[cj]);
         }
     }
 }
