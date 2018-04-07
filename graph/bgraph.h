@@ -27,23 +27,31 @@ public:
 
 private:
     GraphType gtype_;
-    mutable rngutils::default_rng rng_;  // we don't care rng_
-    std::unordered_map<int, Node> nodes_L_,
-        nodes_R_;  // maps a node id to its node object
+    std::unordered_map<int, Node> nodes_L_, nodes_R_;
 
+    mutable rngutils::default_rng rng_;  // we don't care rng_
 public:
     BGraph(const GraphType gtype = GraphType::SIMPLE) : gtype_(gtype) {}
     virtual ~BGraph() {}
 
-    // disable copy constructor/assignment
-    BGraph(const BGraph&) = delete;
-    BGraph& operator=(const BGraph&) = delete;
+    // copy constructor assignment
+    BGraph(const BGraph& o)
+        : gtype_(o.gtype_), nodes_L_(o.nodes_L_), nodes_R_(o.nodes_R_) {}
 
-    // move constructor/assignment
+    // copy assignment
+    BGraph& operator=(const BGraph& o) {
+        gtype_ = o.gtype_;
+        nodes_L_ = o.nodes_L_;
+        nodes_R_ = o.nodes_R_;
+        return *this;
+    }
+
+    // move constructor
     BGraph(BGraph&& other)
         : gtype_(other.gtype_), nodes_L_(std::move(other.nodes_L_)),
           nodes_R_(std::move(other.nodes_R_)) {}
 
+    // move assignment
     BGraph& operator=(BGraph&& other) {
         gtype_ = other.gtype_;
         nodes_L_ = std::move(other.nodes_L_);
@@ -76,8 +84,8 @@ public:
         return edges;
     }
 
-    Node& getNodeL(const int id) { return nodes_L_[id]; }
-    Node& getNodeR(const int id) { return nodes_R_[id]; }
+    Node& getNodeL(const int id) { return nodes_L_.at(id); }
+    Node& getNodeR(const int id) { return nodes_R_.at(id); }
     const Node& getNodeL(const int id) const { return nodes_L_.at(id); }
     const Node& getNodeR(const int id) const { return nodes_R_.at(id); }
 
@@ -137,6 +145,12 @@ public:
         }
     }
 
+    void clear() {
+        for (auto& pr : nodes_L_) pr.second.clear();
+        nodes_L_.clear();
+        for (auto& pr : nodes_R_) pr.second.clear();
+        nodes_R_.clear();
+    }
     // iterators
 
     NodeIter beginNIL() const { return nodes_L_.begin(); }

@@ -20,18 +20,26 @@ private:
     std::vector<int> nbrs_;  // neighbors
 
 public:
-    Node() : INode(-1) {}
-    Node(const int id) : INode(id) {}
+    Node() : INode<NbrIter>(-1) {}
+    Node(const int id) : INode<NbrIter>(id) {}
 
-    // disable copy constructor/assignment
-    Node(const Node&) = delete;
-    Node& operator=(const Node&) = delete;
+    // copy constructor
+    Node(const Node& o) : INode<NbrIter>(o), nbrs_(o.nbrs_) {}
 
-    // move constructor/assignment
-    Node(Node&& other) : INode(other.id_), nbrs_(std::move(other.nbrs_)) {}
-    Node& operator=(Node&& other) {
-        id_ = other.id_;
-        nbrs_ = std::move(other.nbrs_);
+    // copy assignment
+    Node& operator=(const Node& o) {
+        INode<NbrIter>::operator=(o);
+        nbrs_ = o.nbrs_;
+        return *this;
+    }
+
+    // move constructor
+    Node(Node&& o) : INode<NbrIter>(std::move(o)), nbrs_(std::move(o.nbrs_)) {}
+
+    // move assignment
+    Node& operator=(Node&& o) {
+        INode<NbrIter>::operator=(std::move(o));
+        nbrs_ = std::move(o.nbrs_);
         return *this;
     }
 
@@ -117,14 +125,14 @@ public:
     UGraph& operator=(const UGraph&) = delete;
 
     // move constructor
-    UGraph(UGraph&& other)
-        : IGraph<UGraph, Node, NodeIter, EdgeIter, NbrIter>(std::move(other)) {}
+    UGraph(UGraph&& o)
+        : IGraph<UGraph, Node, NodeIter, EdgeIter, NbrIter>(std::move(o)) {}
 
     // move assignment
-    UGraph& operator=(UGraph&& other) {
+    UGraph& operator=(UGraph&& o) {
         return static_cast<UGraph&>(
             IGraph<UGraph, Node, NodeIter, EdgeIter, NbrIter>::operator=(
-                std::move(other)));
+                std::move(o)));
     }
 
     void save(const std::string& filename) const override;

@@ -18,6 +18,18 @@ public:
     INode(int id) : id_(id) {}
     virtual ~INode() {}
 
+    INode(const INode& o) : id_(o.id_) {}
+    INode(INode&& o) : id_(o.id_) {}
+
+    INode& operator=(const INode& o) {
+        id_ = o.id_;
+        return *this;
+    }
+    INode& operator=(INode&& o) {
+        id_ = o.id_;
+        return *this;
+    }
+
     const int getID() const { return id_; }
     virtual void save(std::unique_ptr<ioutils::IOOut>& po) const = 0;
     virtual void load(std::unique_ptr<ioutils::IOIn>& pi) = 0;
