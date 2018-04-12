@@ -16,7 +16,7 @@ void test_anf_single() {
     DGraph graph = loadEdgeList<DGraph>(gfn);
 
     osutils::Timer tm;
-    DirBFS bfs(graph);
+    DirBFS<DGraph> bfs(graph);
 
     tm.tick();
     HyperANF anf(12);
@@ -52,7 +52,7 @@ void test_anf_set() {
     DGraph graph = loadEdgeList<DGraph>(gfn);
 
     osutils::Timer tm;
-    DirBFS bfs(graph);
+    DirBFS<DGraph> bfs(graph);
 
     tm.tick();
     HyperANF anf(12);

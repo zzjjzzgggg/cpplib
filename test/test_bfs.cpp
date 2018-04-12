@@ -11,7 +11,7 @@ using namespace graph;
 void test_bfs() {
     std::string gfn = "/dat/workspace/datasets/cit-HepTh_wcc_digraph_mapped.gz";
     dir::DGraph graph = loadEdgeList<dir::DGraph>(gfn);
-    DirBFS bfs(graph);
+    DirBFS<dir::DGraph> bfs(graph);
 
     int num = 2;
 
