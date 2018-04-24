@@ -15,12 +15,28 @@ template <class T, class Node, class NodeIter, class EdgeIter, class NbrIter>
 class IGraph {
 protected:
     GraphType gtype_;
-    mutable rngutils::default_rng rng_;
     std::unordered_map<int, Node> nodes_;
+
+    mutable rngutils::default_rng rng_;
 
 public:
     IGraph(const GraphType gtype = GraphType::SIMPLE) : gtype_(gtype) {}
     virtual ~IGraph() {}
+
+    /**
+     * Copy constructor
+     */
+    IGraph(const IGraph& other)
+        : gtype_(other.gtype_), nodes_(other.nodes_) {}
+
+    /**
+     * Copy assignment
+     */
+    T& operator=(const T& other) {
+        gtype_ = other.gtype_;
+        nodes_ = other.nodes_;
+        return *static_cast<T*>(this);
+    }
 
     /**
      * Move constructor

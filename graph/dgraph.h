@@ -23,19 +23,27 @@ public:
     Node() : INode(-1) {}
     Node(const int id) : INode(id) {}
 
-    // disable copy constructor/assignment
-    Node(const Node&) = delete;
-    Node& operator=(const Node&) = delete;
+    // copy constructor
+    Node(const Node& o)
+        : INode<NbrIter>(o), in_nbrs_(o.in_nbrs_), out_nbrs_(o.out_nbrs_) {}
+
+    // copy assignment
+    Node& operator=(const Node& o) {
+        INode<NbrIter>::operator=(o);
+        in_nbrs_ = o.in_nbrs_;
+        out_nbrs_ = o.out_nbrs_;
+        return *this;
+    }
 
     // move constructor/assignment
-    Node(Node&& other)
-        : INode(other.id_), in_nbrs_(std::move(other.in_nbrs_)),
-          out_nbrs_(std::move(other.out_nbrs_)) {}
+    Node(Node&& o)
+        : in_nbrs_(std::move(o.in_nbrs_)),
+          out_nbrs_(std::move(o.out_nbrs_)), INode<NbrIter>(std::move(o)) {}
 
-    Node& operator=(Node&& other) {
-        id_ = other.id_;
-        in_nbrs_ = std::move(other.in_nbrs_);
-        out_nbrs_ = std::move(other.out_nbrs_);
+    Node& operator=(Node&& o) {
+        in_nbrs_ = std::move(o.in_nbrs_);
+        out_nbrs_ = std::move(o.out_nbrs_);
+        INode<NbrIter>::operator=(std::move(o));
         return *this;
     }
 
@@ -153,18 +161,23 @@ public:
     virtual ~DGraph() {}
 
     // disable copy constructor/assignment
-    DGraph(const DGraph&) = delete;
-    DGraph& operator=(const DGraph&) = delete;
+    DGraph(const DGraph& o)
+        : IGraph<DGraph, Node, NodeIter, EdgeIter, NbrIter>(o) {}
+
+    DGraph& operator=(const DGraph& o) {
+        return static_cast<DGraph&>(
+            IGraph<DGraph, Node, NodeIter, EdgeIter, NbrIter>::operator=(o));
+    }
 
     // move constructor
-    DGraph(DGraph&& other)
-        : IGraph<DGraph, Node, NodeIter, EdgeIter, NbrIter>(std::move(other)) {}
+    DGraph(DGraph&& o)
+        : IGraph<DGraph, Node, NodeIter, EdgeIter, NbrIter>(std::move(o)) {}
 
     // move assignment
-    DGraph& operator=(DGraph&& other) {
+    DGraph& operator=(DGraph&& o) {
         return static_cast<DGraph&>(
             IGraph<DGraph, Node, NodeIter, EdgeIter, NbrIter>::operator=(
-                std::move(other)));
+                std::move(o)));
     }
 
     void save(const std::string& filename) const override;

@@ -137,6 +137,41 @@ std::vector<std::tuple<T1, T2, T3>> loadTripletVec(const std::string& filename,
     return vec;
 }
 
+// Quadruplet vector
+template <typename T1, typename T2, typename T3, typename T4>
+void saveQuadrupletVec(const std::vector<std::tuple<T1, T2, T3, T4>>& vec,
+                       const std::string& filename, const bool echo = true,
+                       const std::string& format = "{}\t{}\t{}\t{}\n",
+                       const std::string& anno = "") {
+    std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
+    if (!anno.empty()) out_ptr->save(anno);
+    for (auto&& e : vec)
+        out_ptr->save(fmt::format(format, std::get<0>(e), std::get<1>(e),
+                                  std::get<2>(e), std::get<3>(e)));
+    out_ptr->close();
+    if (echo) printf("saved to %s\n", filename.c_str());
+}
+
+template <typename T1, typename T2, typename T3, typename T4>
+void loadQuadrupletVec(const std::string& filename,
+                       std::vector<std::tuple<T1, T2, T3, T4>>& vec,
+                       const int c0 = 0, const int c1 = 1, const int c2 = 2,
+                       const int c3 = 3) {
+    TSVParser ss(filename);
+    while (ss.next())
+        vec.emplace_back(ss.get<T1>(c0), ss.get<T2>(c1), ss.get<T3>(c2),
+                         ss.get<T4>(c3));
+}
+
+template <typename T1, typename T2, typename T3, typename T4>
+std::vector<std::tuple<T1, T2, T3, T4>> loadQuadrupletVec(
+    const std::string& filename, const int c0 = 0, const int c1 = 1,
+    const int c2 = 2, const int c3 = 3) {
+    std::vector<std::tuple<T1, T2, T3, T4>> vec;
+    loadTripletVec(filename, vec, c0, c1, c2, c3);
+    return vec;
+}
+
 // map
 template <typename TKey, typename TVal>
 void saveMap(const std::unordered_map<TKey, TVal>& map,

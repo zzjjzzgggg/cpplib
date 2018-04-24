@@ -6,6 +6,8 @@
 #ifndef __RNGUTILS_H__
 #define __RNGUTILS_H__
 
+#include <unordered_set>
+
 #include "random_generator.h"
 
 namespace rngutils {
@@ -52,6 +54,28 @@ const Numeric choice(const std::vector<Numeric> &population,
                      random_generator<RandomEngine, DefaultSeedSeq> &rng) {
     size_t idx = rng.uniform(std::size_t{0}, population.size() - 1);
     return population[idx];
+}
+
+/**
+ * Choose num elements from the population uniformly at random without
+ * replacemet.
+ * Return: a vector of samples, if population.size() < num, then return
+ * population.
+ * Require: the population is non-empty
+ */
+template <typename Numeric, typename RandomEngine = std::default_random_engine,
+          typename DefaultSeedSeq = auto_seed_256>
+std::vector<Numeric> choice(
+    const std::vector<Numeric> &population, const int num,
+    random_generator<RandomEngine, DefaultSeedSeq> &rng) {
+    int L = population.size(), n = std::min(num, L);
+    std::unordered_set<Numeric> set;
+    while (set.size() < n) set.insert(population[rng.uniform(0, L - 1)]);
+
+    std::vector<Numeric> samples;
+    samples.reserve(n);
+    for (auto i : set) samples.push_back(i);
+    return samples;
 }
 
 /**

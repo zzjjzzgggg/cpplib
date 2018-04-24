@@ -18,13 +18,15 @@ public:
     INode(int id) : id_(id) {}
     virtual ~INode() {}
 
+    // Conpy constructor/assignment
     INode(const INode& o) : id_(o.id_) {}
-    INode(INode&& o) : id_(o.id_) {}
-
     INode& operator=(const INode& o) {
         id_ = o.id_;
         return *this;
     }
+
+    // Move constructor/assignment
+    INode(INode&& o) : id_(o.id_) {}
     INode& operator=(INode&& o) {
         id_ = o.id_;
         return *this;

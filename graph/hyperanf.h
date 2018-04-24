@@ -82,6 +82,22 @@ public:
         units_per_counter_ = m_ / 8;
     }
 
+    // copy constructor
+    HyperANF(const HyperANF& o)
+        : p_(o.p_), m_(o.m_), units_per_counter_(o.units_per_counter_),
+          bits_(o.bits_), cc_bitpos_(o.cc_bitpos_), nd_cc_(o.nd_cc_) {}
+
+    // copy assignment
+    HyperANF& operator=(const HyperANF& o) {
+        p_ = o.p_;
+        m_ = o.m_;
+        units_per_counter_ = o.units_per_counter_;
+        bits_ = o.bits_;
+        cc_bitpos_ = o.cc_bitpos_;
+        nd_cc_ = o.nd_cc_;
+        return *this;
+    }
+
     /**
      * Constructing CC DAG then initialing bits.
      */
@@ -99,6 +115,12 @@ public:
         for (; first != last; ++first)
             mergeCounter(tmp_bits.data(), getCounterPos(*first));
         return hll::count((uint8_t*)tmp_bits.data(), m_);
+    }
+
+    void clear() {
+        bits_.clear();
+        cc_bitpos_.clear();
+        nd_cc_.clear();
     }
 
 }; /* HyperANF */
