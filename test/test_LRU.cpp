@@ -4,7 +4,7 @@
 #include "../adv/LRUCache.h"
 
 int main(int argc, char* argv[]) {
-    lru11::Cache<std::string, std::string> cache(3);
+    lru::Cache<std::string, std::string> cache(3);
     cache.insert("hello", "world");
     cache.insert("foo", "bar");
 
