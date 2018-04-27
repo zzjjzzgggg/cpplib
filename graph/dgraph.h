@@ -37,13 +37,13 @@ public:
 
     // move constructor/assignment
     Node(Node&& o)
-        : in_nbrs_(std::move(o.in_nbrs_)),
-          out_nbrs_(std::move(o.out_nbrs_)), INode<NbrIter>(std::move(o)) {}
+        : INode<NbrIter>(std::move(o)), in_nbrs_(std::move(o.in_nbrs_)),
+          out_nbrs_(std::move(o.out_nbrs_)) {}
 
     Node& operator=(Node&& o) {
+        INode<NbrIter>::operator=(std::move(o));
         in_nbrs_ = std::move(o.in_nbrs_);
         out_nbrs_ = std::move(o.out_nbrs_);
-        INode<NbrIter>::operator=(std::move(o));
         return *this;
     }
 
@@ -160,10 +160,11 @@ public:
         : IGraph<DGraph, Node, NodeIter, EdgeIter, NbrIter>(gtype) {}
     virtual ~DGraph() {}
 
-    // disable copy constructor/assignment
+    // copy constructor
     DGraph(const DGraph& o)
         : IGraph<DGraph, Node, NodeIter, EdgeIter, NbrIter>(o) {}
 
+    // copy assignment
     DGraph& operator=(const DGraph& o) {
         return static_cast<DGraph&>(
             IGraph<DGraph, Node, NodeIter, EdgeIter, NbrIter>::operator=(o));

@@ -35,3 +35,5 @@ target_link_libraries(test_hyperanf graph)
 
 add_executable(test_HLL test_HLL.cpp)
 # target_link_libraries(test_HLL graph)
+
+add_executable(test_LRU test_LRU.cpp)

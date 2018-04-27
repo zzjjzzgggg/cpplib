@@ -21,9 +21,9 @@ namespace graph {
  */
 class HyperANF {
 protected:
-    int p_,                  // precision,
-        m_,                  // = 2^p: number of registers in a HLL counter,
-        units_per_counter_;  // = m / 8: # of uint64 integers per HLL counter.
+    // p_: precision, m_=2^p: number of registers in a HLL counter,
+    // units = m / 8: # of uint64 integers per HLL counter.
+    int p_, m_, units_per_counter_;
     std::vector<uint64_t> bits_;  // HLL counters are stored in a bit-vector
     std::unordered_map<int, int> cc_bitpos_, nd_cc_;
 

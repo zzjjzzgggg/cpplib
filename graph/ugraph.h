@@ -50,6 +50,9 @@ public:
 
     int getNbrID(const NbrIter& it) const override { return *it; }
 
+    std::vector<int>& getNbrs() { return nbrs_; }
+    const std::vector<int>& getNbrs() const { return nbrs_; }
+
     NbrIter beginNbr() const override { return nbrs_.begin(); }
     NbrIter endNbr() const override { return nbrs_.end(); }
 
