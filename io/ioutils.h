@@ -1,6 +1,7 @@
 #ifndef __IOUTILS_H__
 #define __IOUTILS_H__
 
+#include <tuple>
 #include <unordered_map>
 
 #include "iobase.h"
