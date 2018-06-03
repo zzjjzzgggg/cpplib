@@ -10,21 +10,23 @@ using namespace rngutils;
 void test_basic() {
     rngutils::default_rng rng;
 
-    std::vector<int> population_int = {1, 2, 3, 4, 5};
-    int s_int = rngutils::choice(population_int, rng);
+    printf("\n choose 1:\n");
+    std::vector<int> population = {1, 2, 3, 4, 5};
+    int s_int = rngutils::choice(population, rng);
     printf("%d\n", s_int);
 
-    std::vector<double> population_double = {1, 2, 3, 4, 5};
-    double s_double = rngutils::choice(population_double, rng);
-    printf("%.2f\n", s_double);
+    printf("\n choose 3:\n");
+    auto samples = rngutils::choice(population, 3, rng);
+    for (int s: samples) printf(" %d,", s);
+    printf("\n");
 
+    printf("\n init uniform:\n");
     std::vector<double> pop(10);
     rngutils::initUniform(pop, 2);
     for (auto val : pop) printf("%.2f  ", val);
     printf("\n");
-
     double sum = std::accumulate(pop.begin(), pop.end(), 0.0);
-    printf("%.2f\n", sum);
+    printf("sum: %.2f\n", sum);
 }
 
 void test_rng() {
@@ -37,7 +39,7 @@ void test_rng() {
 }
 
 int main(int argc, char *argv[]) {
-    test_rng();
+    test_basic();
 
     return 0;
 }

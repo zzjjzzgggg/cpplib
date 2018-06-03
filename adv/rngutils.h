@@ -59,6 +59,9 @@ const Numeric choice(const std::vector<Numeric> &population,
 /**
  * Choose num elements from the population uniformly at random without
  * replacemet.
+ *
+ * Refer to https://stackoverflow.com/a/311716/1661545
+ *
  * Return: a vector of samples, if population.size() < num, then return
  * population.
  * Require: the population is non-empty
@@ -68,13 +71,25 @@ template <typename Numeric, typename RandomEngine = std::default_random_engine,
 std::vector<Numeric> choice(
     const std::vector<Numeric> &population, const int num,
     random_generator<RandomEngine, DefaultSeedSeq> &rng) {
-    int L = population.size(), n = std::min(num, L);
-    std::unordered_set<Numeric> set;
-    while (set.size() < n) set.insert(population[rng.uniform(0, L - 1)]);
+    int N = population.size(), n = std::min(num, N);
 
-    std::vector<Numeric> samples;
-    samples.reserve(n);
-    for (auto i : set) samples.push_back(i);
+    int t = 0;  // total input records dealt with
+    int m = 0;  // number of items selected so far
+
+    std::vector<Numeric> samples(n);
+
+    while (m < n) {
+        double u = rng.uniform();
+
+        if ((N - t) * u >= n - m) {
+            t++;
+        } else {
+            samples[m] = population[t];
+            t++;
+            m++;
+        }
+    }
+
     return samples;
 }
 
