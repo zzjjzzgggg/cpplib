@@ -21,6 +21,10 @@ set(CMAKE_BUILD_TYPE Release)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
 
+
+
+find_package(gflags REQUIRED)
+
 add_library(lz4 SHARED lz4/lib/lz4.c)
 set_target_properties(lz4 PROPERTIES COMPILE_FLAGS "-c -x c")
 

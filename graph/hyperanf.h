@@ -33,22 +33,35 @@ protected:
     /**
      * Merge HLL counter at pos_j to HLL counter at pos_i.
      * B(C_i) := max(B(C_i), B(C_j))
+     * Return true if value in pos_i is changed.
      */
     inline void mergeCounter(const int pos_i, const int pos_j) {
         for (int k = 0; k < units_per_counter_; k++) {
             uint64_t &x = bits_[pos_i + k], y = bits_[pos_j + k];
-            hll::merge(x, y);
+            hll::max(x, y);
         }
     }
 
     /**
      * Merge counter at pos to given target.
+     * Return true if value in pos_i is changed.
      */
     inline void mergeCounter(uint64_t* target, const int pos) const {
         for (int k = 0; k < units_per_counter_; k++) {
             uint64_t &x = target[k], y = bits_[pos + k];
-            hll::merge(x, y);
+            hll::max(x, y);
         }
+    }
+
+    /**
+     * Test whether pos_j is a successor of pos_i.
+     */
+    inline bool isGreaterEqual(const int pos_i, const int pos_j) const {
+        for (int k = 0; k < units_per_counter_; k++) {
+            uint64_t x = bits_[pos_i + k], y = bits_[pos_j + k];
+            if (!hll::isGreaterEqual(x, y)) return false;
+        }
+        return true;
     }
 
     /**

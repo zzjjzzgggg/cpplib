@@ -85,10 +85,12 @@ void DGraph::addEdgeFast(const int src, const int dst) {
 }
 
 void DGraph::addEdge(const int src, const int dst) {
-    addNode(src);
-    addNode(dst);
-    nodes_[src].addOutNbr(dst);
-    nodes_[dst].addInNbr(src);
+    if (!isEdge(src, dst)) {
+        addNode(src);
+        addNode(dst);
+        nodes_[src].addOutNbr(dst);
+        nodes_[dst].addInNbr(src);
+    }
 }
 
 EdgeIter DGraph::beginEI() const {
@@ -97,4 +99,4 @@ EdgeIter DGraph::beginEI() const {
     return EdgeIter(ni, nodes_.end());
 }
 
-}  // end of namespace graph
+}  // namespace graph::dir
