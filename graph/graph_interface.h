@@ -26,8 +26,7 @@ public:
     /**
      * Copy constructor
      */
-    IGraph(const IGraph& other)
-        : gtype_(other.gtype_), nodes_(other.nodes_) {}
+    IGraph(const IGraph& other) : gtype_(other.gtype_), nodes_(other.nodes_) {}
 
     /**
      * Copy assignment
@@ -80,6 +79,11 @@ public:
 
     virtual void addNode(int id) {
         if (!isNode(id)) nodes_[id] = Node{id};
+    }
+
+    virtual void addNodes(const std::vector<int>& id_vec) {
+        for (int id : id_vec)
+            if (!isNode(id)) nodes_[id] = Node{id};
     }
 
     virtual void addEdge(const int, const int) = 0;

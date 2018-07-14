@@ -206,7 +206,8 @@ public:
     void addEdgeFast(const int src, const int dst) override;
 
     /**
-     * Add edge and keep neighbors in order.
+     * Add edge and keep neighbors in order. If the edge already exists, then do
+     * nothing.
      */
     void addEdge(const int src, const int dst) override;
 

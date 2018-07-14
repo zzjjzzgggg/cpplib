@@ -45,10 +45,16 @@ uint8_t clz8(uint64_t x) {
     return n + CLZ_TABLE_4BIT[(x >> 60) & 0x0F];
 }
 
-void merge(uint64_t& x, const uint64_t& y) {
+void max(uint64_t& x, const uint64_t& y) {
     uint64_t z = ((((x | H8) - (y & ~H8)) | (x ^ y)) ^ (x | ~y)) & H8,
              m = ((((z >> 7) | H8) - L8) | H8) ^ z;
     x = (x & m) | (y & ~m);
+}
+
+bool isGreaterEqual(const uint64_t& x, const uint64_t& y) {
+    uint64_t z = ((((x | H8) - (y & ~H8)) | (x ^ y)) ^ (x | ~y)) & H8,
+        m = ((((z >> 7) | H8) - L8) | H8) ^ z;
+    return m == A1;
 }
 
 double count(const uint8_t* reg, const int m) {
