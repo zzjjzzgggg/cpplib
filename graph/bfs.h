@@ -40,9 +40,8 @@ void DirBFS<Graph>::doBFS(const int start_nd, const int mx_hop) {
         queue.pop();
         if (hop >= mx_hop) break;
         auto& nd = graph_[u];
-        for (auto&& nbr_iter = nd.beginOutNbr(); nbr_iter != nd.endOutNbr();
-             nbr_iter++) {
-            int v = *nbr_iter;
+        for (auto&& ni = nd.beginOutNbr(); ni != nd.endOutNbr(); ++ni) {
+            int v = *ni;
             if (nd_to_hop_.find(v) == nd_to_hop_.end()) {
                 nd_to_hop_[v] = hop + 1;
                 queue.push(v);
@@ -65,9 +64,8 @@ void DirBFS<Graph>::doBFS(InputIt first, InputIt last, const int mx_hop) {
         queue.pop();
         if (hop >= mx_hop) break;
         const auto& nd = graph_[u];
-        for (auto&& nbr_iter = nd.beginOutNbr(); nbr_iter != nd.endOutNbr();
-             nbr_iter++) {
-            int v = *nbr_iter;
+        for (auto&& ni = nd.beginOutNbr(); ni != nd.endOutNbr(); ++ni) {
+            int v = *ni;
             if (nd_to_hop_.find(v) == nd_to_hop_.end()) {
                 nd_to_hop_[v] = hop + 1;
                 queue.push(v);
