@@ -29,11 +29,7 @@ private:
     std::unique_ptr<IOIn> in_ptr_;
 
 public:
-    TSVParser(const std::string& filename) : line_NO_(0), split_ch_('\t') {
-        in_ptr_ = getIOIn(filename);
-    }
-
-    TSVParser(const std::string& filename, const char sep)
+    TSVParser(const std::string& filename, const char sep='\t')
         : line_NO_(0), split_ch_(sep) {
         in_ptr_ = getIOIn(filename);
     }
