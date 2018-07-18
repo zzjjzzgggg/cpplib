@@ -47,14 +47,16 @@ uint8_t clz8(uint64_t x) {
 
 void max(uint64_t& x, const uint64_t& y) {
     uint64_t z = ((((x | H8) - (y & ~H8)) | (x ^ y)) ^ (x | ~y)) & H8,
-             m = ((((z >> 7) | H8) - L8) | H8) ^ z;
-    x = (x & m) | (y & ~m);
+             msk = ((((z >> 7) | H8) - L8) | H8) ^ z;
+    // If some blocks of mask are all one's, then this block of x is chosen;
+    // otherwise the blocks of y are chosen.
+    x = (x & msk) | (y & ~msk);
 }
 
 bool isGreaterEqual(const uint64_t& x, const uint64_t& y) {
     uint64_t z = ((((x | H8) - (y & ~H8)) | (x ^ y)) ^ (x | ~y)) & H8,
-        m = ((((z >> 7) | H8) - L8) | H8) ^ z;
-    return m == A1;
+             msk = ((((z >> 7) | H8) - L8) | H8) ^ z;
+    return msk == A1;
 }
 
 double count(const uint8_t* reg, const int m) {
@@ -64,9 +66,11 @@ double count(const uint8_t* reg, const int m) {
         if (reg[i] == 0) ez++;
     }
     sum += beta(ez);
-    double est_HLL = alpha(m) * m * (m - ez) / sum + 0.5,
-           est_LC = m * std::log(m / ez);
-    return est_HLL < 10000 ? est_LC : est_HLL;
+    double est_HLL = alpha(m) * m * (m - ez) / sum + 0.5;
+
+    // if HLL estimate is too small, then use liner counting estimate
+    if (est_HLL < 10000 && ez != 0) return m * std::log(m / ez);
+    return est_HLL;
 }
 
 } /* namespace hll */
