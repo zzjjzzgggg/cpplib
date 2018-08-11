@@ -89,30 +89,32 @@ public:
     using Guard = std::lock_guard<lock_type>;
     /**
      * the max size is the hard limit of keys and (maxSize + elasticity) is the
-     * soft limit
-     * the cache is allowed to grow till maxSize + elasticity and is pruned back
-     * to maxSize keys
-     * set maxSize = 0 for an unbounded cache (but in that case, you're better
-     * off
-     * using a std::unordered_map
-     * directly anyway! :)
+     * soft limit the cache is allowed to grow till maxSize + elasticity and is
+     * pruned back to maxSize keys set maxSize = 0 for an unbounded cache (but
+     * in that case, you're better off using a std::unordered_map directly
+     * anyway! :)
      */
     explicit Cache(size_t maxSize = 64, size_t elasticity = 10)
         : maxSize_(maxSize), elasticity_(elasticity) {}
+
     virtual ~Cache() = default;
+
     size_t size() const {
         Guard g(lock_);
         return cache_.size();
     }
+
     bool empty() const {
         Guard g(lock_);
         return cache_.empty();
     }
+
     void clear() {
         Guard g(lock_);
         cache_.clear();
         keys_.clear();
     }
+
     void insert(const Key& k, const Value& v) {
         Guard g(lock_);
         const auto iter = cache_.find(k);
@@ -126,6 +128,7 @@ public:
         cache_[k] = keys_.begin();
         prune();
     }
+
     bool tryGet(const Key& kIn, Value& vOut) {
         Guard g(lock_);
         const auto iter = cache_.find(kIn);
@@ -136,6 +139,7 @@ public:
         vOut = iter->second->value;
         return true;
     }
+
     /**
      *	The const reference returned here is only
      *    guaranteed to be valid till the next insert/delete
@@ -149,10 +153,12 @@ public:
         keys_.splice(keys_.begin(), keys_, iter->second);
         return iter->second->value;
     }
+
     /**
      * returns a copy of the stored object (if found)
      */
     Value getCopy(const Key& k) { return get(k); }
+
     bool remove(const Key& k) {
         Guard g(lock_);
         auto iter = cache_.find(k);
@@ -163,6 +169,7 @@ public:
         cache_.erase(iter);
         return true;
     }
+
     bool contains(const Key& k) {
         Guard g(lock_);
         return cache_.find(k) != cache_.end();
@@ -171,6 +178,7 @@ public:
     size_t getMaxSize() const { return maxSize_; }
     size_t getElasticity() const { return elasticity_; }
     size_t getMaxAllowedSize() const { return maxSize_ + elasticity_; }
+
     template <typename F>
     void cwalk(F& f) const {
         Guard g(lock_);
@@ -180,9 +188,7 @@ public:
 protected:
     size_t prune() {
         size_t maxAllowed = maxSize_ + elasticity_;
-        if (maxSize_ == 0 || cache_.size() < maxAllowed) {
-            return 0;
-        }
+        if (maxSize_ == 0 || cache_.size() < maxAllowed) return 0;
         size_t count = 0;
         while (cache_.size() > maxSize_) {
             cache_.erase(keys_.back().key);
@@ -204,6 +210,6 @@ private:
     size_t elasticity_;
 };
 
-}  // namespace LRUCache11
+}  // namespace lru
 
 #endif /* __LRUCACHE_H__ */

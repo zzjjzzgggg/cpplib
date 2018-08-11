@@ -2,6 +2,7 @@
 #define __IOUTILS_H__
 
 #include <tuple>
+#include <map>
 #include <unordered_map>
 
 #include "iobase.h"
@@ -162,6 +163,19 @@ void saveTupleVec(const std::vector<std::tuple<T...>>& vec,
 }
 
 // map
+template <typename TKey, typename TVal>
+void saveMap(const std::map<TKey, TVal>& map,
+             const std::string& filename, const bool echo = true,
+             const std::string& format = "{}\t{}\n",
+             const std::string& anno = "") {
+    std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
+    if (!anno.empty()) out_ptr->save(anno);
+    for (auto& pr : map)
+        out_ptr->save(fmt::format(format, pr.first, pr.second));
+    if (echo) printf("saved to %s\n", filename.c_str());
+}
+
+// unordered_map
 template <typename TKey, typename TVal>
 void saveMap(const std::unordered_map<TKey, TVal>& map,
              const std::string& filename, const bool echo = true,
