@@ -641,6 +641,17 @@ public:
     }
 
     /**
+     * Geometric Distribution
+     * https://en.cppreference.com/w/cpp/numeric/random/geometric_distribution
+     *
+     * Geo(i;p) = p(1-p)^i where i=0,1,2,...
+     *
+     */
+    int geometric(const double p) {
+        return variate<int, std::geometric_distribution>(p);
+    }
+
+    /**
      * [0,1)
      */
     double uniform() { return variate<double, uniform_distribution>(0.0, 1.0); }
