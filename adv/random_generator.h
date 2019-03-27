@@ -644,7 +644,7 @@ public:
      * Geometric Distribution
      * https://en.cppreference.com/w/cpp/numeric/random/geometric_distribution
      *
-     * Geo(i;p) = p(1-p)^i where i=0,1,2,...
+     * Geo(i;p) = p(1-p)^i, i = 0,1,2,...
      *
      */
     int geometric(const double p) {
