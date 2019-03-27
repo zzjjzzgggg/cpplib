@@ -2,6 +2,7 @@
 #include <climits>
 #include <bitset>
 #include <iostream>
+#include <map>
 
 #include "../adv/rngutils.h"
 
@@ -17,7 +18,7 @@ void test_basic() {
 
     printf("\n choose 3:\n");
     auto samples = rngutils::choice(population, 3, rng);
-    for (int s: samples) printf(" %d,", s);
+    for (int s : samples) printf(" %d,", s);
     printf("\n");
 
     printf("\n init uniform:\n");
@@ -38,8 +39,21 @@ void test_rng() {
     std::cout << std::bitset<32>(UINT_MAX) << "  " << UINT_MAX << std::endl;
 }
 
+void test_geo() {
+    rngutils::default_rng rng;
+    std::map<int, int> hist;
+    for (int n = 0; n < 10000; ++n) {
+        hist[rng.geometric(0.5)]++;
+    }
+
+    for (auto p : hist) {
+        std::cout << p.first << ' ' << std::string(p.second / 100, '*') << '\n';
+    }
+}
+
 int main(int argc, char *argv[]) {
-    test_basic();
+    // test_basic();
+    test_geo();
 
     return 0;
 }
