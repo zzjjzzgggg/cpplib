@@ -624,7 +624,7 @@ public:
     }
 
     /**
-     * [lower, upper]
+     * Generate a uniformly distributed number in range [lower, upper]
      */
     template <typename Numeric>
     Numeric uniform(Numeric lower, Numeric upper) {
@@ -632,7 +632,8 @@ public:
     }
 
     /**
-     *
+     * Generate a uniformly distributed random integer in range [lower, upper].
+     * Default range: [0,\infty)
      */
     template <typename Numeric>
     Numeric randint(Numeric lower = 0,
@@ -645,17 +646,18 @@ public:
      * https://en.cppreference.com/w/cpp/numeric/random/geometric_distribution
      *
      * Geo(i;p) = p(1-p)^i, i = 0,1,2,...
-     *
      */
     int geometric(const double p) {
         return variate<int, std::geometric_distribution>(p);
     }
 
-    /**
-     * [0,1)
-     */
+    // Generate a uniformly distributed random number in [0,1).
     double uniform() { return variate<double, uniform_distribution>(0.0, 1.0); }
 
+    /**
+     * Generate a Gaussian random number N(mean, variance).
+     * Default: mean=0, variance=1
+     */
     double normal(double mean = 0, double variance = 1) {
         return variate<double, std::normal_distribution>(mean, variance);
     }
@@ -678,6 +680,10 @@ public:
                            std::forward<Params>(params)...);
     }
 
+    /**
+     * Shuffle an array [first, last).
+     * No return value.
+     */
     template <typename Iter>
     void shuffle(Iter first, Iter last) {
         std::shuffle(first, last, engine_);
@@ -688,6 +694,10 @@ public:
         shuffle(std::begin(range), std::end(range));
     }
 
+    /**
+     * Choose a random number in array [first, last).
+     * Return an iterator.
+     */
     template <typename Iter>
     Iter choose(Iter first, Iter last) {
         auto dist = std::distance(first, last);
