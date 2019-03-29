@@ -60,7 +60,7 @@ void saveVec(const std::vector<TVal>& vec, const std::string& filename,
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
     for (auto val : vec) out_ptr->save(fmt::format(format, val));
-    if (echo) printf("saved to %s\n", filename.c_str());
+    if (echo) std::cout << "saved to " << filename << std::endl;
 }
 
 template <typename T>
@@ -88,7 +88,7 @@ void savePrVec(const std::vector<std::pair<T1, T2>>& vec,
     for (auto& pr : vec)
         out_ptr->save(fmt::format(format, pr.first, pr.second));
     out_ptr->close();
-    if (echo) printf("saved to %s\n", filename.c_str());
+    if (echo) std::cout << "saved to " << filename << std::endl;
 }
 
 template <typename T1, typename T2>
@@ -118,7 +118,7 @@ void saveTripletVec(const std::vector<std::tuple<T1, T2, T3>>& vec,
         out_ptr->save(fmt::format(format, std::get<0>(e), std::get<1>(e),
                                   std::get<2>(e)));
     out_ptr->close();
-    if (echo) printf("saved to %s\n", filename.c_str());
+    if (echo) std::cout << "saved to " << filename << std::endl;
 }
 
 template <typename T1, typename T2, typename T3>
@@ -164,7 +164,7 @@ void saveTupleVec(const std::vector<std::tuple<T...>>& vec,
     }
 
     out_ptr->close();
-    if (echo) printf("saved to %s\n", filename.c_str());
+    if (echo) std::cout << "saved to " << filename << std::endl;
 }
 
 // map
@@ -176,7 +176,7 @@ void saveMap(const std::map<TKey, TVal>& map, const std::string& filename,
     if (!anno.empty()) out_ptr->save(anno);
     for (auto& pr : map)
         out_ptr->save(fmt::format(format, pr.first, pr.second));
-    if (echo) printf("saved to %s\n", filename.c_str());
+    if (echo) std::cout << "saved to " << filename << std::endl;
 }
 
 // unordered_map
@@ -189,7 +189,7 @@ void saveMap(const std::unordered_map<TKey, TVal>& map,
     if (!anno.empty()) out_ptr->save(anno);
     for (auto& pr : map)
         out_ptr->save(fmt::format(format, pr.first, pr.second));
-    if (echo) printf("saved to %s\n", filename.c_str());
+    if (echo) std::cout << "saved to " << filename << std::endl;
 }
 
 template <typename TKey, typename TVal>
@@ -215,7 +215,7 @@ void saveSet(const std::unordered_set<T>& set, const std::string& filename,
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
     for (auto val : set) out_ptr->save(fmt::format(format, val));
-    if (echo) printf("saved to %s\n", filename.c_str());
+    if (echo) std::cout << "saved to " << filename << std::endl;
 }
 
 template <typename TKey>
@@ -232,10 +232,28 @@ std::unordered_set<TKey> loadSet(const std::string& filename, const int c = 0) {
     return set;
 }
 
+/* printer */
+// vector
 template <typename TVal>
-void printVec(const std::vector<TVal>& vec, const std::string& ele_fmt = "{}") {
+void printVec(const std::vector<TVal>& vec) {
     std::cout << "{ ";
     for (auto val : vec) std::cout << val << ", ";
+    std::cout << "}\n";
+}
+
+// map
+template <typename TKey, typename TVal>
+void printMap(const std::map<TKey, TVal>& map) {
+    std::cout << "{ ";
+    for (auto& pr : map) std::cout << pr.first << " -> " << pr.second << ", ";
+    std::cout << "}\n";
+}
+
+// unordered_map
+template <typename TKey, typename TVal>
+void printMap(const std::unordered_map<TKey, TVal>& map) {
+    std::cout << "{ ";
+    for (auto& pr : map) std::cout << pr.first << " -> " << pr.second << ", ";
     std::cout << "}\n";
 }
 

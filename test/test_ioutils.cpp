@@ -11,5 +11,11 @@
 
 int main(int argc, char* argv[]) {
     ioutils::printVec<int>({1, 2, 3, 4});
+
+    std::unordered_map<int, int> m;
+    m[1] = 2;
+    m[2] = 3;
+    ioutils::printMap<int, int>(m);
+
     return 0;
 }
