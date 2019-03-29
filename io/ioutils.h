@@ -4,6 +4,7 @@
 #include <tuple>
 #include <map>
 #include <unordered_map>
+#include <iostream>
 
 #include "iobase.h"
 #include "lz4io.h"
@@ -12,13 +13,17 @@
 
 namespace ioutils {
 
+// Return true if the given filename is gzip format.
 bool isGZip(const std::string& filename);
 
+// Return true if the given filename is lz4 format.
 bool isLZ4(const std::string& filename);
 
+// Get a writer pointer.
 std::unique_ptr<IOOut> getIOOut(const std::string& filename,
                                 const bool append = false);
 
+// Get a reader pointer.
 std::unique_ptr<IOIn> getIOIn(const std::string& filename);
 
 class TSVParser {
@@ -30,7 +35,7 @@ private:
     std::unique_ptr<IOIn> in_ptr_;
 
 public:
-    TSVParser(const std::string& filename, const char sep='\t')
+    TSVParser(const std::string& filename, const char sep = '\t')
         : line_NO_(0), split_ch_(sep) {
         in_ptr_ = getIOIn(filename);
     }
@@ -164,9 +169,8 @@ void saveTupleVec(const std::vector<std::tuple<T...>>& vec,
 
 // map
 template <typename TKey, typename TVal>
-void saveMap(const std::map<TKey, TVal>& map,
-             const std::string& filename, const bool echo = true,
-             const std::string& format = "{}\t{}\n",
+void saveMap(const std::map<TKey, TVal>& map, const std::string& filename,
+             const bool echo = true, const std::string& format = "{}\t{}\n",
              const std::string& anno = "") {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
@@ -226,6 +230,13 @@ std::unordered_set<TKey> loadSet(const std::string& filename, const int c = 0) {
     std::unordered_set<TKey> set;
     loadSet(filename, set, c);
     return set;
+}
+
+template <typename TVal>
+void printVec(const std::vector<TVal>& vec, const std::string& ele_fmt = "{}") {
+    std::cout << "{ ";
+    for (auto val : vec) std::cout << val << ", ";
+    std::cout << "}\n";
 }
 
 } /* namespace ioutils */
