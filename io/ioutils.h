@@ -241,6 +241,14 @@ void printVec(const std::vector<TVal>& vec) {
     std::cout << "}\n";
 }
 
+// unordered_set
+template <typename TVal>
+void printSet(const std::unordered_set<TVal>& set) {
+    std::cout << "{ ";
+    for (auto val : set) std::cout << val << ", ";
+    std::cout << "}\n";
+}
+
 // map
 template <typename TKey, typename TVal>
 void printMap(const std::map<TKey, TVal>& map) {
