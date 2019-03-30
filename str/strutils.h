@@ -12,27 +12,29 @@ namespace strutils {
 /**
  * Split a full filename into three parts: base path, filename
  * without extension, and extension prefixed with '.'.
+ *
  * E.g., "~/work/test/cmp.sh" -> "~/work/test/", "cmp", ".sh"
  */
 void splitFilename(const std::string &fullname, std::string &base,
                    std::string &fnm_wo_ext, std::string &ext);
 
 /**
- * Insert a short string into the middle of a filename, also replace extension
- * if ext is non-empty.
- * E.g., "./syn/event.dat", "test" --> "./syn/event_test.dat"
+ * Insert a short string into the middle of "filename" with the given extension
+ * "ext". If "ext" is empty, the file extension does not change.
+ *
+ * E.g., "./syn/event.dat", "test"       --> "./syn/event_test.dat"
  *       "./syn/event.dat", "test", "gz" --> "./syn/event_test.gz"
  */
 std::string insertMiddle(const std::string &filename, const std::string &sufix,
                          const std::string &ext = "");
 
 /**
- * return the base path of fullname, with '/' at the tail
+ * Return the base path of fullname, with '/' at the tail
  */
 std::string getBasePath(const std::string &fullname);
 
 /**
- * substitute the filename in fullname with given filename.
+ * Substitute the filename in fullname with given filename.
  */
 std::string subFilename(const std::string &fullname,
                         const std::string &filename);
@@ -60,5 +62,5 @@ std::vector<std::string> split(const std::string &s, const char delim);
 std::string trim_left(const std::string &str);
 std::string trim_right(const std::string &str);
 std::string trim(const std::string &str);
-}
+}  // namespace strutils
 #endif /* __STRUTILS_H__ */
