@@ -26,6 +26,10 @@ public:
         save((int)vec.size());
         for (int v : vec) save(v);
     }
+    virtual void save(const std::vector<double>& vec) {
+        save((int)vec.size());
+        for (double v : vec) save(v);
+    }
 };
 
 class IOIn {
@@ -62,6 +66,16 @@ public:
     virtual void load(double& val) { read(&val, sizeof(double)); }
     virtual void load(std::vector<int>& vec) {
         int total, val;
+        load(total);
+        vec.reserve(total);
+        for (int i = 0; i < total; ++i) {
+            load(val);
+            vec.push_back(val);
+        }
+    }
+    virtual void load(std::vector<double>& vec) {
+        int total;
+        double val;
         load(total);
         vec.reserve(total);
         for (int i = 0; i < total; ++i) {
