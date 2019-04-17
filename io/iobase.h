@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <vector>
 
 namespace ioutils {
 
@@ -20,6 +21,10 @@ public:
     virtual void save(const char* str) { write(str, strlen(str)); }
     virtual void save(const std::string& str) {
         write(str.c_str(), str.size());
+    }
+    virtual void save(const std::vector<int>& vec) {
+        save((int)vec.size());
+        for (int v : vec) save(v);
     }
 };
 
@@ -55,6 +60,15 @@ public:
     virtual void load(int& val) { read(&val, sizeof(int)); }
     virtual void load(long& val) { read(&val, sizeof(long)); }
     virtual void load(double& val) { read(&val, sizeof(double)); }
+    virtual void load(std::vector<int>& vec) {
+        int total, val;
+        load(total);
+        vec.reserve(total);
+        for (int i = 0; i < total; ++i) {
+            load(val);
+            vec.push_back(val);
+        }
+    }
 };
 
 class NormOut : public IOOut {
@@ -119,6 +133,6 @@ public:
             return 0;
     }
 };
-}
+}  // namespace ioutils
 
 #endif /* __IOBASE_H__ */
