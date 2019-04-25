@@ -55,8 +55,8 @@ public:
 // vector
 template <typename TVal>
 void saveVec(const std::vector<TVal>& vec, const std::string& filename,
-             const bool echo = true, const std::string& format = "{}\n",
-             const std::string& anno = "") {
+             const std::string& format = "{}\n", const std::string& anno = "",
+             const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
     for (auto val : vec) out_ptr->save(fmt::format(format, val));
@@ -80,9 +80,9 @@ std::vector<T> loadVec(const std::string& filename, const int col = 0) {
 // vector pair
 template <typename T1, typename T2>
 void savePrVec(const std::vector<std::pair<T1, T2>>& vec,
-               const std::string& filename, const bool echo = true,
+               const std::string& filename,
                const std::string& format = "{}\t{}\n",
-               const std::string& anno = "") {
+               const std::string& anno = "", const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
     for (auto& pr : vec)
@@ -109,9 +109,9 @@ std::vector<std::pair<T1, T2>> loadPrVec(const std::string& filename,
 // Triplet vector
 template <typename T1, typename T2, typename T3>
 void saveTripletVec(const std::vector<std::tuple<T1, T2, T3>>& vec,
-                    const std::string& filename, const bool echo = true,
+                    const std::string& filename,
                     const std::string& format = "{}\t{}\t{}\n",
-                    const std::string& anno = "") {
+                    const std::string& anno = "", const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
     for (auto&& e : vec)
@@ -143,9 +143,8 @@ std::vector<std::tuple<T1, T2, T3>> loadTripletVec(const std::string& filename,
 // tuple vector
 template <typename... T>
 void saveTupleVec(const std::vector<std::tuple<T...>>& vec,
-                  const std::string& filename, const bool echo = true,
-                  const std::string& format = "",
-                  const std::string& anno = "") {
+                  const std::string& filename, const std::string& format = "",
+                  const std::string& anno = "", const bool echo = true) {
     int tuple_sz = std::tuple_size<std::tuple<T...>>::value;
 
     std::string fmt_str;
@@ -170,8 +169,8 @@ void saveTupleVec(const std::vector<std::tuple<T...>>& vec,
 // map
 template <typename TKey, typename TVal>
 void saveMap(const std::map<TKey, TVal>& map, const std::string& filename,
-             const bool echo = true, const std::string& format = "{}\t{}\n",
-             const std::string& anno = "") {
+             const std::string& format = "{}\t{}\n",
+             const std::string& anno = "", const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
     for (auto& pr : map)
@@ -182,9 +181,9 @@ void saveMap(const std::map<TKey, TVal>& map, const std::string& filename,
 // unordered_map
 template <typename TKey, typename TVal>
 void saveMap(const std::unordered_map<TKey, TVal>& map,
-             const std::string& filename, const bool echo = true,
+             const std::string& filename,
              const std::string& format = "{}\t{}\n",
-             const std::string& anno = "") {
+             const std::string& anno = "", const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
     for (auto& pr : map)
@@ -210,8 +209,8 @@ std::unordered_map<TKey, TVal> loadMap(const std::string& filename,
 // set
 template <typename T>
 void saveSet(const std::unordered_set<T>& set, const std::string& filename,
-             const bool echo = true, const std::string& format = "{}\n",
-             const std::string& anno = "") {
+             const std::string& format = "{}\n", const std::string& anno = "",
+             const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
     for (auto val : set) out_ptr->save(fmt::format(format, val));
