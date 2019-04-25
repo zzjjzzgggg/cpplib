@@ -31,7 +31,12 @@ std::unique_ptr<IOOut> getIOOut(const std::string& filename,
     return std::make_unique<NormOut>(filename, append);
 }
 
+/**
+ * Get file reader handler.
+ * If file does not exists, return a nullptr.
+ */
 std::unique_ptr<IOIn> getIOIn(const std::string& filename) {
+    if (!osutils::exists(filename)) return nullptr;
     if (isGZip(filename))
         return std::make_unique<GZipIn>(filename);
     else if (isLZ4(filename))
