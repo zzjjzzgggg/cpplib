@@ -5,6 +5,7 @@
 #include <map>
 
 #include "../adv/rngutils.h"
+#include "../io/ioutils.h"
 
 using namespace rngutils;
 
@@ -51,9 +52,17 @@ void test_geo() {
     }
 }
 
+void test_choice() {
+    rngutils::default_rng rng;
+    std::vector<int> pop = {0, 1, 2};
+    auto vec = rngutils::choice(pop, 2, rng);
+    ioutils::printVec(vec);
+}
+
 int main(int argc, char *argv[]) {
     // test_basic();
-    test_geo();
+    // test_geo();
+    test_choice();
 
     return 0;
 }

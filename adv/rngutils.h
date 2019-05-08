@@ -80,7 +80,6 @@ std::vector<Numeric> choice(
 
     while (m < n) {
         double u = rng.uniform();
-
         if ((N - t) * u >= n - m) {
             t++;
         } else {
@@ -89,7 +88,6 @@ std::vector<Numeric> choice(
             m++;
         }
     }
-
     return samples;
 }
 
