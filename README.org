@@ -1,0 +1,5 @@
+* install
+
+git clone --recursive git@github.com:zzjjzzgggg/cpplib.git
+
+sudo apt install libgflags-dev
