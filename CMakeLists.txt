@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.1)
+cmake_minimum_required(VERSION 3.10.1)
 project (cpplib C CXX)
 
 include(CheckCXXCompilerFlag)
@@ -25,6 +25,7 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
 
 find_package(gflags REQUIRED)
 
+include_directories(lz4/lib)
 add_library(lz4 SHARED lz4/lib/lz4.c)
 set_target_properties(lz4 PROPERTIES COMPILE_FLAGS "-c -x c")
 
