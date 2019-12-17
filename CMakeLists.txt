@@ -22,7 +22,6 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
 
 
-
 find_package(gflags REQUIRED)
 
 include_directories(lz4/lib)

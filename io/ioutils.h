@@ -28,16 +28,24 @@ std::unique_ptr<IOIn> getIOIn(const std::string& filename);
 
 class TSVParser {
 private:
-    size_t line_NO_;
     char split_ch_;
-    char buf_[1024];  // assume each line has a maximum length of 1024 bytes.
+    size_t line_NO_;
+    std::string filename_;
+
+    // assume each line has a maximum length of 1024 bytes.
+    char buf_[1024];
     std::vector<std::string> field_vec_;
     std::unique_ptr<IOIn> in_ptr_;
 
 public:
     TSVParser(const std::string& filename, const char sep = '\t')
-        : line_NO_(0), split_ch_(sep) {
+        : split_ch_(sep), line_NO_(0), filename_(filename) {
         in_ptr_ = getIOIn(filename);
+    }
+
+    void reset() {
+        line_NO_ = 0;
+        in_ptr_ = getIOIn(filename_);
     }
 
     bool next();

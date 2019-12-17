@@ -165,6 +165,6 @@ public:
 
     void decompress(const char* output_file_name);
 };
-}
+}  // namespace ioutils
 
 #endif /* __LZ4IO_H__ */

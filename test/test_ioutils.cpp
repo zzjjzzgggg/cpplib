@@ -6,8 +6,8 @@
  */
 
 #include <cstdio>
-#include "ioutils.h"
-#include "osutils.h"
+#include "../io/ioutils.h"
+#include "../os/osutils.h"
 
 void test_null_ptr() {
     // auto ptr = std::unique_ptr<ioutils::IOIn>();
@@ -27,7 +27,19 @@ void test_print() {
     ioutils::printMap<int, int>(m);
 }
 
+void test_tsvparser() {
+    printf("use file test.dat\n");
+    ioutils::TSVParser ss("test.dat");
+    while (ss.next()) printf("%d ", ss.get<int>(0));
+    printf("\n");
+
+    ss.reset();
+    while (ss.next()) printf("%d ", ss.get<int>(0));
+    printf("\n");
+}
+
 int main(int argc, char* argv[]) {
-    test_null_ptr();
+    // test_null_ptr();
+    test_tsvparser();
     return 0;
 }
