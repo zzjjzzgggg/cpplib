@@ -89,7 +89,7 @@ void print(bi::BGraph& graph) {
 
     printf("\n");
 
-    for (auto ei = graph.beginEI(); ei != graph.endEI(); ei++) {
+    for (auto ei = graph.beginEI(); ei != graph.endEI(); ++ei) {
         printf("%d - %d\n", ei.getSrcID(), ei.getDstID());
     }
 }
@@ -107,7 +107,6 @@ void test_bgraph() {
 
     print(graph);
     print(b);
-
 }
 
 int main(int argc, char* argv[]) {

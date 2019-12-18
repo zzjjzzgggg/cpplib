@@ -93,7 +93,7 @@ template <class Graph>
 int SCCVisitor<Graph>::explore(const int v) {
     Element& ve = record_[v];
     if (ve.cur_nbr != ve.end_nbr) {  // v has untagged edge
-        const int u = graph_[v].getNbrID(ve.cur_nbr++);
+        const int u = graph_[v].getNbrID(++ve.cur_nbr);
         if (record_.find(u) != record_.end()) {  // seen u before
             int u_rank = record_[u].rank, v_min_rank = record_[ve.min].rank;
             if (u_rank < v_min_rank) ve.min = u;
@@ -131,7 +131,7 @@ void SCCVisitor<Graph>::finish(const int v) {
 
 template <class Graph>
 void SCCVisitor<Graph>::performDFS() {
-    for (auto it = graph_.beginNI(); it != graph_.endNI(); it++) {
+    for (auto it = graph_.beginNI(); it != graph_.endNI(); ++it) {
         int v = it->first;
         if (record_.find(v) == record_.end()) {
             makeActive(v);
@@ -155,7 +155,7 @@ std::vector<std::pair<int, int>> SCCVisitor<Graph>::getCCEdges() const {
         }
         discovered_ccs.insert(cc_from);
         auto& ndv = graph_[v];
-        for (auto&& ni = ndv.beginOutNbr(); ni != ndv.endOutNbr(); ni++) {
+        for (auto&& ni = ndv.beginOutNbr(); ni != ndv.endOutNbr(); ++ni) {
             int cc_to = record_.at(ndv.getNbrID(ni)).parent;
             if (discovered_ccs.find(cc_to) == discovered_ccs.end()) {
                 discovered_ccs.insert(cc_to);

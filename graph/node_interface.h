@@ -60,7 +60,7 @@ public:
     // out neighbors of a node.
     virtual NbrIter beginNbr() const = 0;
     virtual NbrIter endNbr() const = 0;
-    virtual void nextNbr(NbrIter& ni) const { ni++; };
+    virtual void nextNbr(NbrIter& ni) const { ++ni; };
 
     virtual NbrIter beginInNbr() const { return beginNbr(); }
     virtual NbrIter endInNbr() const { return endNbr(); }

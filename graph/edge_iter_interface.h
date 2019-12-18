@@ -33,12 +33,12 @@ public:
         return *static_cast<T*>(this);
     }
 
-    // postfix increment: i++
+    // prefix increment: ++i
     // move to next valid edge; if not exists, move to end
-    T& operator++(int) {
-        cur_edge_++;
+    T& operator++() {
+        ++cur_edge_;
         while (cur_edge_ == cur_nd_->second.endOutNbr()) {
-            cur_nd_++;
+            ++cur_nd_;
             if (cur_nd_ == end_nd_) break;
             cur_edge_ = cur_nd_->second.beginOutNbr();
         }
@@ -63,6 +63,6 @@ public:
     virtual int getDstID() const = 0;
 
 }; /* IEdgeIter */
-}  /* namespace graph */
+} /* namespace graph */
 
 #endif /* __EDGE_ITER_INTERFACE_H__ */
