@@ -6,8 +6,7 @@
 #ifndef __TRIAD_H__
 #define __TRIAD_H__
 
-#include <vector>
-#include <unordered_map>
+#include "comm.h"
 
 namespace graph {
 /**
