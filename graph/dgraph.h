@@ -81,8 +81,7 @@ public:
     }
     NbrIter endNbr() const override { return out_nbrs_.end(); }
     void nextNbr(NbrIter& ni) const override {
-        ni++;
-        if (ni == in_nbrs_.end()) ni = out_nbrs_.begin();
+        if (++ni == in_nbrs_.end()) ni = out_nbrs_.begin();
     };
 
     NbrIter beginInNbr() const override { return in_nbrs_.begin(); }
@@ -217,6 +216,6 @@ public:
     EdgeIter beginEI() const override;
 };
 
-}  // end namespace graph
+}  // namespace graph::dir
 
 #endif /* __DGRAPH_H__ */
