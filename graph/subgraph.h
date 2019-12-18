@@ -21,7 +21,7 @@ Graph getSubgraph(const Graph& G, const std::vector<int>& nodes) {
         auto&& nd_v = G[v];
         for (auto ni = nd_v.beginOutNbr(); ni != nd_v.endOutNbr(); ++ni) {
             int nbr = nd_v.getNbrID(ni);
-            if (S.isNode(nbr)) S.addEdge(v, nbr);
+            if (S.isNode(nbr) && !S.isEdge(v, nbr)) S.addEdge(v, nbr);
         }
     }
     return S;
