@@ -20,5 +20,6 @@
 #include "bfs.h"
 #include "cncom.h"
 #include "hyperanf.h"
+#include "subgraph.h"
 
 #endif /* __GRAPH_H__ */

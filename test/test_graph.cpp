@@ -94,6 +94,15 @@ void print(bi::BGraph& graph) {
     }
 }
 
+void print(dir::DGraph& graph) {
+    printf("nodes:\n\t");
+    for (auto ni = graph.beginNI(); ni != graph.endNI(); ++ni)
+        printf("%d ", ni->first);
+    printf("\n");
+    for (auto ei = graph.beginEI(); ei != graph.endEI(); ++ei)
+        printf("%d -> %d\n", ei.getSrcID(), ei.getDstID());
+}
+
 void test_bgraph() {
     bi::BGraph graph;
     graph.addEdge(1, 1);
@@ -109,9 +118,23 @@ void test_bgraph() {
     print(b);
 }
 
+void test_subgraph() {
+    dir::DGraph graph;
+    graph.addEdge(2, 1);
+    graph.addEdge(2, 3);
+    graph.addEdge(3, 2);
+    // graph.addEdge(4, 1);
+    graph.addEdge(4, 3);
+
+    std::vector<int> nodes = {1, 3, 4};
+    auto S = getSubGraph(graph, nodes);
+    print(S);
+}
+
 int main(int argc, char* argv[]) {
-    test_bgraph();
+    // test_bgraph();
     // test_nbr_iter();
+    test_subgraph();
 
     return 0;
 }
