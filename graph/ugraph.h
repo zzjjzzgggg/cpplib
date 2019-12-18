@@ -155,8 +155,8 @@ public:
     int sampleNbr(int id) const { return getNode(id).sampleNbr(rng_); }
 
     /**
-     * Add edge (src, dst) to the graph. For the purpose of fast adding, this
-     * function does not check whether or not the edge has existed.
+     * Add edge (src, dst) to the graph.
+     * This function does not sort neighbors.
      *
      * NOTE: Callers are responsible to avoid duplidate edges.
      */
@@ -164,12 +164,14 @@ public:
 
     /**
      * The default addEdge method will sort neighbors.
+     *
+     * NOTE: Callers are responsible to avoid duplidate edges.
      */
     void addEdge(const int src, const int dst) override;
 
     EdgeIter beginEI() const override;
 };
 
-}  // end namespace graph
+}  // namespace graph::undir
 
 #endif /* __UGRAPH_H__ */
