@@ -127,7 +127,7 @@ void test_subgraph() {
     graph.addEdge(4, 3);
 
     std::vector<int> nodes = {1, 3, 4};
-    auto S = getSubGraph(graph, nodes);
+    auto S = getSubgraph(graph, nodes);
     print(S);
 }
 

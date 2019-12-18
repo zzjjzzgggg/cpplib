@@ -9,8 +9,12 @@
 #include "comm.h"
 
 namespace graph {
+
+/**
+ * Get the reduced subgraph from a vector of nodes
+ */
 template <class Graph>
-Graph getSubGraph(const Graph& G, const std::vector<int>& nodes) {
+Graph getSubgraph(const Graph& G, const std::vector<int>& nodes) {
     Graph S;
     for (int v : nodes) S.addNode(v);
     for (int v : nodes) {
