@@ -131,10 +131,24 @@ void test_subgraph() {
     print(S);
 }
 
+void test_nbrs() {
+    dir::DGraph graph;
+    graph.addEdge(2, 1);
+    graph.addEdge(2, 3);
+    graph.addEdge(3, 2);
+    graph.addEdge(4, 1);
+    graph.addEdge(4, 3);
+
+    std::vector<int> nbrs = graph[3].getNbrs();
+    for (int v : nbrs) printf("%d ", v);
+    printf("\n");
+}
+
 int main(int argc, char* argv[]) {
     // test_bgraph();
     // test_nbr_iter();
-    test_subgraph();
+    // test_subgraph();
+    test_nbrs();
 
     return 0;
 }

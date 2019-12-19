@@ -66,6 +66,8 @@ public:
         return isOutNbr(v) || isOutNbr(v);
     }
 
+    std::vector<int> getNbrs() const;
+
     void addInNbr(const int v) override;
     void addOutNbr(const int v) override;
     void addNbr(const int v) override { addOutNbr(v); }

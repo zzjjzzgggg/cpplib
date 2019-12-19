@@ -59,6 +59,13 @@ void Node::clear() {
     out_nbrs_.clear();
 }
 
+std::vector<int> Node::getNbrs() const {
+    std::unordered_set<int> nbrset;
+    nbrset.insert(in_nbrs_.begin(), in_nbrs_.end());
+    nbrset.insert(out_nbrs_.begin(), out_nbrs_.end());
+    return std::vector<int>(nbrset.begin(), nbrset.end());
+}
+
 void DGraph::save(const std::string& filename) const {
     auto po = ioutils::getIOOut(filename);
     po->save((int)nodes_.size());                // total number of nodes
