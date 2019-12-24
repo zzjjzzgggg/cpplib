@@ -14,11 +14,11 @@ void test_basic() {
 
     printf("\n choose 1:\n");
     std::vector<int> population = {1, 2, 3, 4, 5};
-    int s_int = rngutils::choice(population, rng);
+    int s_int = rngutils::choose(population, rng);
     printf("%d\n", s_int);
 
     printf("\n choose 3:\n");
-    auto samples = rngutils::choice(population, 3, rng);
+    auto samples = rngutils::choose(population, 3, rng);
     for (int s : samples) printf(" %d,", s);
     printf("\n");
 
@@ -52,17 +52,17 @@ void test_geo() {
     }
 }
 
-void test_choice() {
+void test_choose() {
     rngutils::default_rng rng;
     std::vector<int> pop = {0, 1, 2};
-    auto vec = rngutils::choice(pop, 2, rng);
+    auto vec = rngutils::choose(pop, 2, rng);
     ioutils::printVec(vec);
 }
 
 int main(int argc, char *argv[]) {
     // test_basic();
     // test_geo();
-    test_choice();
+    test_choose();
 
     return 0;
 }

@@ -50,7 +50,7 @@ const int sample(const std::vector<double> &weights, const double sum_weights,
  */
 template <typename Numeric, typename RandomEngine = std::default_random_engine,
           typename DefaultSeedSeq = auto_seed_256>
-const Numeric choice(const std::vector<Numeric> &population,
+const Numeric choose(const std::vector<Numeric> &population,
                      random_generator<RandomEngine, DefaultSeedSeq> &rng) {
     size_t idx = rng.uniform(std::size_t{0}, population.size() - 1);
     return population[idx];
@@ -68,7 +68,7 @@ const Numeric choice(const std::vector<Numeric> &population,
  */
 template <typename Numeric, typename RandomEngine = std::default_random_engine,
           typename DefaultSeedSeq = auto_seed_256>
-std::vector<Numeric> choice(
+std::vector<Numeric> choose(
     const std::vector<Numeric> &population, const int num,
     random_generator<RandomEngine, DefaultSeedSeq> &rng) {
     int N = population.size(), n = std::min(num, N);
