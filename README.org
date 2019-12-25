@@ -14,12 +14,12 @@
   Then clone the repository into directory ~$ENV{GIT_REPO}/cpplib~. Here
   ~GIT_REPO~ is an environment variable (e.g., defined in ~.zshenv~).
   #+begin_src shell
-  git clone --recursive git@github.com:zzjjzzgggg/cpplib.git
+  git clone --recursive https://github.com/zzjjzzgggg/cpplib.git
   #+end_src
 
   Tell ~cmake~ where to find the library. This requires another repository ~cmake~.
   #+begin_src shell
-  git clone --recursive git@github.com:zzjjzzgggg/cmake.git
+  git clone --recursive https://github.com:zzjjzzgggg/cmake.git
   #+end_src
   Then add following line in your project ~CMakeLists.txt~.
   #+begin_src shell
