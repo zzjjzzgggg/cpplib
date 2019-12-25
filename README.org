@@ -17,7 +17,11 @@
   git clone --recursive git@github.com:zzjjzzgggg/cpplib.git
   #+end_src
 
-  In your project ~CMakeLists.txt~, just tell cmake where to find the library.
+  Tell ~cmake~ where to find the library. This requires another repository ~cmake~.
   #+begin_src shell
-  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{GIT_REPO}/cpplib)
+  git clone --recursive git@github.com:zzjjzzgggg/cmake.git
+  #+end_src
+  Then add following line in your project ~CMakeLists.txt~.
+  #+begin_src shell
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{GIT_REPO}/cmake)
   #+end_src
