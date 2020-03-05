@@ -11,8 +11,9 @@ using namespace graph;
 using namespace graph::dir;
 
 void test_anf_single() {
-    std::string gfn = "/dat/workspace/datasets/cit-HepTh_wcc_digraph_mapped.gz";
-    // std::string gfn = "/home/jzzhao/workspace/streaming/test_graph.txt";
+    // std::string gfn =
+    // "/dat/workspace/datasets/cit-HepTh_wcc_digraph_mapped.gz";
+    std::string gfn = "/dat/workspace/graph_pds/test_graph.txt";
     DGraph graph = loadEdgeList<DGraph>(gfn);
 
     osutils::Timer tm;
@@ -25,7 +26,7 @@ void test_anf_single() {
 
     printf("nd\ttruth\ttime\test\ttime\terror(%%)\n");
 
-    auto fw = ioutils::getIOOut("hepth_anf.dat");
+    // auto fw = ioutils::getIOOut("hepth_anf.dat");
     for (int i = 0; i < 100; i++) {
         int nd = graph.sampleNode();
 
@@ -41,8 +42,8 @@ void test_anf_single() {
         double err = std::abs(est - truth) / truth * 100;
 
         printf("%d\t%d\t%.2e\t%.2f\t%.2e\t%.2f\n", nd, truth, t1, est, t2, err);
-        fw->save("{:d}\t{:d}\t{:.3e}\t{:.3f}\t{:.3e}\t{:.2f}\n"_format(
-            nd, truth, t1, est, t2, err));
+        // fw->save("{:d}\t{:d}\t{:.3e}\t{:.3f}\t{:.3e}\t{:.2f}\n"_format(
+        //     nd, truth, t1, est, t2, err));
     }
 }
 
@@ -86,7 +87,7 @@ void test_anf_set() {
 }
 
 int main(int argc, char* argv[]) {
-    osutils::Timer tm;
+    // osutils::Timer tm;
 
     test_anf_single();
     // test_anf_set();

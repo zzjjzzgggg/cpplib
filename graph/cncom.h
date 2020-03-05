@@ -93,7 +93,7 @@ template <class Graph>
 int SCCVisitor<Graph>::explore(const int v) {
     Element& ve = record_[v];
     if (ve.cur_nbr != ve.end_nbr) {  // v has untagged edge
-        const int u = graph_[v].getNbrID(++ve.cur_nbr);
+        const int u = graph_[v].getNbrID(ve.cur_nbr++);
         if (record_.find(u) != record_.end()) {  // seen u before
             int u_rank = record_[u].rank, v_min_rank = record_[ve.min].rank;
             if (u_rank < v_min_rank) ve.min = u;
