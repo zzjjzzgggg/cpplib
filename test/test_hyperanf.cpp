@@ -24,26 +24,18 @@ void test_anf_single() {
     anf.initBitsCC(graph);
     printf("ANF: %.4fs\n", tm.seconds());
 
-    printf("nd\ttruth\ttime\test\ttime\terror(%%)\n");
+    printf("nd\ttruth\test\terror\n");
 
-    // auto fw = ioutils::getIOOut("hepth_anf.dat");
-    for (int i = 0; i < 100; i++) {
-        int nd = graph.sampleNode();
+    for (auto ni = graph.beginNI(); ni != graph.endNI(); ni++) {
+        int nd = ni->first;
 
-        tm.tick();
         bfs.doBFS(nd);
+
         int truth = bfs.getBFSTreeSize();
-        double t1 = tm.seconds();
-
-        tm.tick();
         double est = anf.estimate(nd);
-        double t2 = tm.seconds();
+        double err = std::abs(est - truth) / truth;
 
-        double err = std::abs(est - truth) / truth * 100;
-
-        printf("%d\t%d\t%.2e\t%.2f\t%.2e\t%.2f\n", nd, truth, t1, est, t2, err);
-        // fw->save("{:d}\t{:d}\t{:.3e}\t{:.3f}\t{:.3e}\t{:.2f}\n"_format(
-        //     nd, truth, t1, est, t2, err));
+        printf("%d\t%d\t%.2f\t%.4f\n", nd, truth, est, err);
     }
 }
 

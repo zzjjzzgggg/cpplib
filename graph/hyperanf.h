@@ -75,7 +75,6 @@ protected:
         for (int n = 0; n < num; n++) {
             uint64_t x = rng.randint<uint64_t>();
             int reg_idx = (x >> (64 - p_)) & ((1 << p_) - 1);
-            // uint8_t reg_rho = hll::clz8(x << p_ | 1 << (p_ - 1)) + 1;
             uint8_t reg_rho = hll::clz8(x << p_) + 1;
             if (reg_rho > reg_array[reg_idx]) reg_array[reg_idx] = reg_rho;
         }
