@@ -14,15 +14,17 @@
 namespace graph {
 
 /**
- * Approximate Neighbourhood Function based on following paper: HyperANF:
- * Approximating the Neighbourhood Function of Very Large Graphs on a Budget.
+ * Approximate Neighbourhood Function based on the paper:
+ *
+ * P. Boldi, M. Rosa, and S. Vigna. HyperANF: Approximating the Neighbourhood
+ * Function of Very Large Graphs on a Budget. WWW, 2011.
  *
  * Each register has length 1 byte
  */
 class HyperANF {
 protected:
-    // p_: precision, m_=2^p: number of registers in a HLL counter,
-    // units = m / 8: # of uint64 integers per HLL counter.
+    // p: precision, m = 2^p: number of registers in a HLL counter
+    // units_per_counter = m / 8: # of uint64 integers per HLL counter
     int p_, m_, units_per_counter_;
     std::vector<uint64_t> bits_;  // HLL counters are stored in a bit-vector
     std::unordered_map<int, int> cc_bitpos_, nd_cc_;
