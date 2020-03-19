@@ -35,7 +35,6 @@ protected:
     /**
      * Merge HLL counter at pos_j to HLL counter at pos_i.
      * B(C_i) := max(B(C_i), B(C_j))
-     * Return true if value in pos_i is changed.
      */
     inline void mergeCounter(const int pos_i, const int pos_j) {
         for (int k = 0; k < units_per_counter_; k++) {
@@ -46,7 +45,6 @@ protected:
 
     /**
      * Merge counter at pos to given target.
-     * Return true if value in pos_i is changed.
      */
     inline void mergeCounter(uint64_t* target, const int pos) const {
         for (int k = 0; k < units_per_counter_; k++) {
