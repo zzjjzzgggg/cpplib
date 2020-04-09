@@ -126,10 +126,12 @@ public:
      * Add edge and keep neighbors in ordered vector.
      */
     void addEdge(const int src, const int dst) {
-        addNodeL(src);
-        nodes_L_[src].addNbr(dst);
-        addNodeR(dst);
-        nodes_R_[dst].addNbr(src);
+        if (!isEdge(src, dst)) {
+            addNodeL(src);
+            nodes_L_[src].addNbr(dst);
+            addNodeR(dst);
+            nodes_R_[dst].addNbr(src);
+        }
     }
 
     /**
@@ -170,6 +172,6 @@ public:
 
 }; /* BGraph */
 
-} /* namespace graph */
+}  // namespace graph::bi
 
 #endif /* __BGRAPH_H__ */
