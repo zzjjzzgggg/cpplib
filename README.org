@@ -5,17 +5,21 @@
 
 * Install on Linux
 
-  Install ~cmake~, ~g++~, ~gcc~, and ~libgflags-dev~.
+**  Install ~cmake~, ~g++~, ~gcc~, and ~libgflags-dev~.
 
   #+begin_src shell
   sudo apt install cmake g++ gcc libgflags-dev
   #+end_src
 
+** Clone ~cpplib~
   Then clone the repository into directory ~$ENV{GIT_REPO}/cpplib~. Here
   ~GIT_REPO~ is an environment variable (e.g., defined in ~.zshenv~).
   #+begin_src shell
   git clone --recursive https://github.com/zzjjzzgggg/cpplib.git
   #+end_src
+
+** Compile
+
 
   Tell ~cmake~ where to find the library. This requires another repository ~cmake~.
   #+begin_src shell
