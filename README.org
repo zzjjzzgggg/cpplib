@@ -50,8 +50,7 @@
 
   #+begin_src makefile
   IDIR=-I$(CPPLIB_DIR) -I/usr/include/gflags
-  LIBS=-L$(CPPLIB_DIR)/lib $(CPPLIBS) -lgflags
-  CPPLIBS=-losutils -lioutils -lstrutils
+  LIBS=-L$(CPPLIB_DIR)/lib -losutils -lioutils -lstrutils -lgflags
 
   test: test.cpp
     g++ $(IDIR) $(LIBS) -Wall -o $@ $<
