@@ -20,12 +20,39 @@
 
 ** Compile
 
+  #+begin_src shell
+  mkdir build
+  cd build
+  cmake ..
+  make
+  #+end_src
 
-  Tell ~cmake~ where to find the library. This requires another repository ~cmake~.
+* Tell ~cmake~ where to find the library
+
+  This requires another repository ~cmake~.
   #+begin_src shell
   git clone https://github.com:zzjjzzgggg/cmake.git
   #+end_src
   Then add following line in your project ~CMakeLists.txt~.
   #+begin_src shell
   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} $ENV{GIT_REPO}/cmake)
+  #+end_src
+
+* Tell ~make~ where to find the library
+
+  Set environment variable ~CPPLIB_DIR~ in ~.zshenv~ or other place, e.g.,
+
+  #+begin_src shell
+  export CPPLIB_DIR=$HOME/git_project/cpplib
+  #+end_src
+
+  In your Makefile, add follows
+
+  #+begin_src makefile
+  IDIR=-I$(CPPLIB_DIR) -I/usr/include/gflags
+  LIBS=-L$(CPPLIB_DIR)/lib $(CPPLIBS) -lgflags
+  CPPLIBS=-losutils -lioutils -lstrutils
+
+  test: test.cpp
+    g++ $(IDIR) $(LIBS) -Wall -o $@ $<
   #+end_src
