@@ -9,8 +9,8 @@
 #define FMT_HEADER_ONLY
 #include "../fmt/fmt/format.h"
 
-#include "../Assert/src/ppk_assert.h"
-#define assert_msg PPK_ASSERT
+/* #include "../Assert/src/ppk_assert.h" */
+/* #define assert_msg PPK_ASSERT */
 
 namespace osutils {
 
