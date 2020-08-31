@@ -38,5 +38,8 @@ add_executable(test_HLL test_HLL.cpp)
 
 add_executable(test_LRU test_LRU.cpp)
 
+add_executable(test_thread_pool test_thread_pool.cpp)
+target_link_libraries(test_thread_pool pthread)
+
 add_executable(test_bits_op test_bits_op.cpp)
 target_link_libraries(test_bits_op gflags hll)

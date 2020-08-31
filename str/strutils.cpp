@@ -2,7 +2,7 @@
 
 namespace strutils {
 
-void splitFilename(const std::string filename, std::string &base,
+void splitFilename(const std::string &filename, std::string &base,
                    std::string &filename_wo_ext, std::string &ext) {
     if (filename.empty()) return;
     auto dir_idx = filename.rfind('/');
@@ -19,8 +19,8 @@ void splitFilename(const std::string filename, std::string &base,
     if (ext_idx != std::string::npos) ext = filename_w_ext.substr(ext_idx);
 }
 
-std::string insertMiddle(const std::string filename, const std::string sufix,
-                         const std::string ext) {
+std::string insertMiddle(const std::string &filename, const std::string &sufix,
+                         const std::string &ext) {
     auto idx = filename.rfind('.');
     if (idx != std::string::npos) {
         std::string extension = ext.empty() ? filename.substr(idx + 1) : ext;
@@ -32,7 +32,7 @@ std::string insertMiddle(const std::string filename, const std::string sufix,
     }
 }
 
-std::string getBasePath(const std::string filename) {
+std::string getBasePath(const std::string &filename) {
     auto idx = filename.rfind('/');
     if (idx != std::string::npos) {
         return filename.substr(0, idx + 1);
@@ -41,12 +41,12 @@ std::string getBasePath(const std::string filename) {
     }
 }
 
-std::string subFilename(const std::string fullname,
-                        const std::string filename) {
+std::string subFilename(const std::string &fullname,
+                        const std::string &filename) {
     return getBasePath(fullname) + filename;
 }
 
-std::string subFileExt(const std::string filename, const std::string ext) {
+std::string subFileExt(const std::string &filename, const std::string &ext) {
     auto idx = filename.rfind('.');
     if (idx != std::string::npos) {
         return filename.substr(0, idx) + ext;
@@ -78,7 +78,7 @@ std::string prettySize(const int size) {
         return fmt::format("{:.2f}G", size / Gigabytes);
 }
 
-void split(const std::string s, const char delim,
+void split(const std::string &s, const char delim,
            std::vector<std::string> &elems) {
     std::stringstream ss;
     ss.str(s);
@@ -86,21 +86,21 @@ void split(const std::string s, const char delim,
     while (std::getline(ss, item, delim)) elems.push_back(item);
 }
 
-std::vector<std::string> split(const std::string s, const char delim) {
+std::vector<std::string> split(const std::string &s, const char delim) {
     std::vector<std::string> elems;
     split(s, delim, elems);
     return elems;
 }
 
-std::string trim_left(const std::string str) {
-    const std::string pattern = " \f\n\r\t\v";
+std::string trim_left(const std::string &str) {
+    const std::string &pattern = " \f\n\r\t\v";
     return str.substr(str.find_first_not_of(pattern));
 }
 
-std::string trim_right(const std::string str) {
-    const std::string pattern = " \f\n\r\t\v";
+std::string trim_right(const std::string &str) {
+    const std::string &pattern = " \f\n\r\t\v";
     return str.substr(0, str.find_last_not_of(pattern) + 1);
 }
 
-std::string trim(const std::string str) { return trim_left(trim_right(str)); }
+std::string trim(const std::string &str) { return trim_left(trim_right(str)); }
 }  // namespace strutils
