@@ -15,7 +15,7 @@ namespace strutils {
  *
  * E.g., "~/work/test/cmp.sh" -> "~/work/test/", "cmp", ".sh"
  */
-void splitFilename(const std::string &fullname, std::string &base,
+void splitFilename(const std::string fullname, std::string &base,
                    std::string &fnm_wo_ext, std::string &ext);
 
 /**
@@ -25,19 +25,26 @@ void splitFilename(const std::string &fullname, std::string &base,
  * E.g., "./syn/event.dat", "test"       --> "./syn/event_test.dat"
  *       "./syn/event.dat", "test", "gz" --> "./syn/event_test.gz"
  */
-std::string insertMiddle(const std::string &filename, const std::string &sufix,
-                         const std::string &ext = "");
+std::string insertMiddle(const std::string filename, const std::string sufix,
+                         const std::string ext = "");
 
 /**
  * Return the base path of fullname, with '/' at the tail
  */
-std::string getBasePath(const std::string &fullname);
+std::string getBasePath(const std::string fullname);
 
 /**
  * Substitute the filename in fullname with given filename.
  */
-std::string subFilename(const std::string &fullname,
-                        const std::string &filename);
+std::string subFilename(const std::string fullname, const std::string filename);
+
+/**
+ * Substitute the file extension.
+ *
+ * E.g., "event.dat", ".txt"   -->   "event.txt"
+ *       "event",     ".txt"   -->   "event.txt"
+ */
+std::string subFileExt(const std::string filename, const std::string ext);
 
 /**
  * Return a string representation of a number.
@@ -54,13 +61,13 @@ std::string prettySize(const int size);
 /**
  * Split a string into parts by specified char.
  */
-void split(const std::string &s, const char delim,
+void split(const std::string s, const char delim,
            std::vector<std::string> &elems);
 
-std::vector<std::string> split(const std::string &s, const char delim);
+std::vector<std::string> split(const std::string s, const char delim);
 
-std::string trim_left(const std::string &str);
-std::string trim_right(const std::string &str);
-std::string trim(const std::string &str);
+std::string trim_left(const std::string str);
+std::string trim_right(const std::string str);
+std::string trim(const std::string str);
 }  // namespace strutils
 #endif /* __STRUTILS_H__ */
