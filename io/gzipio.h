@@ -10,6 +10,8 @@
 //   -- extraction:  .gz, .7z, .rar, .zip, .cab, .arj. bzip2
 //   -- compression: .gz, .7z, .rar, .zip, .cab, .arj. bzip2
 
+// TODO: make sure 7za-full is installed on linux
+
 #include <cstdio>
 #include <cstring>
 
@@ -85,5 +87,5 @@ public:
 
     std::string getCmd(const std::string& zip_fnm) const;
 };
-}
+}  // namespace ioutils
 #endif /* __GZIPIO_H__ */
