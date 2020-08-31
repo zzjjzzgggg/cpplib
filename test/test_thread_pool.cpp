@@ -35,7 +35,8 @@ public:
 void job(const A &a) { std::cout << "in: " << a.vec.size() << std::endl; }
 
 int main(int argc, char *argv[]) {
-    ThreadPool pool(2);
+    syn::ThreadPool pool(2);
+    std::vector<std::future<void>> results;
 
     A a;
     a.vec.push_back(1);
@@ -46,9 +47,9 @@ int main(int argc, char *argv[]) {
 
     // return 0;
 
-    auto result = pool.enqueue([](const A &a) { job(a); }, std::move(a));
+    results.emplace_back(pool.enqueue([](const A &a) { job(a); }, std::move(a)));
 
-    result.get();
+    for (auto &&result : results) result.get();
 
     std::cout << "out: " << a.vec.size() << std::endl;
 

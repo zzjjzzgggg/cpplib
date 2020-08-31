@@ -5,7 +5,7 @@
 #include <condition_variable>
 #include <queue>
 
-namespace advds {
+namespace syn {
 
 template <typename T>
 class SynQueue {
@@ -103,5 +103,5 @@ public:
 
     const size_t getSize() const { return queue_.size(); }
 };
-}  // namespace advds
+}  // namespace syn
 #endif

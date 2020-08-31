@@ -5,6 +5,8 @@
 #include <future>
 #include <queue>
 
+namespace syn {
+
 class ThreadPool {
 public:
     explicit ThreadPool(size_t);
@@ -78,5 +80,6 @@ ThreadPool::~ThreadPool() {
         worker.join();
     }
 }
+}  // namespace syn
 
 #endif
