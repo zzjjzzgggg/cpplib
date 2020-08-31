@@ -1,14 +1,16 @@
 cmake_minimum_required(VERSION 3.10.1)
 project (cpplib C CXX)
 
-include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag("-std=c++1z" COMPILER_SUPPORTS_CXX_1z)
-check_cxx_compiler_flag("-std=c++14" COMPILER_SUPPORTS_CXX_14)
-check_cxx_compiler_flag("-std=c++17" COMPILER_SUPPORTS_CXX_17)
+set(CMAKE_C_COMPILER "/usr/bin/gcc")
+set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 
-if (COMPILER_SUPPORTS_CXX_1z)
-  message(STATUS "Compiling with C++1z")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++1z")
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag("-std=c++17" COMPILER_SUPPORTS_CXX_17)
+check_cxx_compiler_flag("-std=c++14" COMPILER_SUPPORTS_CXX_14)
+
+if (COMPILER_SUPPORTS_CXX_17)
+  message(STATUS "Compiling with C++17")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++17")
 elseif (COMPILER_SUPPORTS_CXX_14)
   message(STATUS "Compiling with C++14")
   set(CMAKE_CXX_STANDARD 14)
@@ -20,7 +22,6 @@ set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/build/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib)
-
 
 find_package(gflags REQUIRED)
 
