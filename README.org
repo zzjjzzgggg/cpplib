@@ -31,7 +31,7 @@
 
   This requires another repository ~cmake~.
   #+begin_src shell
-  git clone https://github.com:zzjjzzgggg/cmake.git
+  git clone https://github.com/zzjjzzgggg/cmake.git
   #+end_src
   Then add following line in your project ~CMakeLists.txt~.
   #+begin_src shell
