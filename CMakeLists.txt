@@ -1,22 +1,29 @@
-cmake_minimum_required(VERSION 3.10.1)
+cmake_minimum_required(VERSION 3.10)
 project (cpplib C CXX)
 
 set(CMAKE_C_COMPILER "/usr/bin/gcc")
 set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 
-include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag("-std=c++17" COMPILER_SUPPORTS_CXX_17)
-check_cxx_compiler_flag("-std=c++14" COMPILER_SUPPORTS_CXX_14)
+# include(CheckCXXCompilerFlag)
+# check_cxx_compiler_flag("-std=c++17" COMPILER_SUPPORTS_CXX_17)
+# check_cxx_compiler_flag("-std=c++14" COMPILER_SUPPORTS_CXX_14)
 
-if (COMPILER_SUPPORTS_CXX_17)
-  message(STATUS "Compiling with C++17")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++17")
-elseif (COMPILER_SUPPORTS_CXX_14)
-  message(STATUS "Compiling with C++14")
-  set(CMAKE_CXX_STANDARD 14)
-else()
-  message(FATAL_ERROR "Please install a modern C++ compiler.")
-endif()
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+# export compile_commands.json
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# if (COMPILER_SUPPORTS_CXX_17)
+#   message(STATUS "Compiling with C++17")
+#   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++17")
+# elseif (COMPILER_SUPPORTS_CXX_14)
+#   message(STATUS "Compiling with C++14")
+#   set(CMAKE_CXX_STANDARD 14)
+# else()
+#   message(FATAL_ERROR "Please install a modern C++ compiler.")
+# endif()
+
 
 set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
