@@ -32,12 +32,12 @@ public:
      * Return a node-to-hop unordered map.
      */
     template <class InputIt>
-    std::unordered_map<int, int> doIncBFS(InputIt first, InputIt last,
+    std::unordered_set<int> doIncBFS(InputIt first, InputIt last,
                                           const int seed,
                                           const int mx_hop = INT_MAX);
 
     // BFS along in-edges.
-    void doRevBFS(const int start_nd, const int mx_hop = INT_MAX);
+    void doRevBFS(const int start_nd, const int x,const int mx_hop = INT_MAX);
 
     template <class InputIt>
     void doRevBFS(InputIt first, InputIt last, const int mx_hop = INT_MAX);
@@ -48,8 +48,9 @@ public:
 
 template <class Graph>
 void DirBFS<Graph>::doBFS(const int start_nd, const int mx_hop) {
-    if (!graph_.isNode(start_nd)) return;
     nd_to_hop_.clear();
+    if (!graph_.isNode(start_nd)) { return;}
+    
     nd_to_hop_[start_nd] = 0;
     std::queue<int> queue;
     queue.push(start_nd);
@@ -96,24 +97,23 @@ void DirBFS<Graph>::doBFS(InputIt first, InputIt last, const int mx_hop) {
 
 template <class Graph>
 template <class InputIt>
-std::unordered_map<int, int> DirBFS<Graph>::doIncBFS(InputIt first, InputIt last,
+std::unordered_set<int> DirBFS<Graph>::doIncBFS(InputIt first, InputIt last,
                                                      const int seed,
                                                      const int mx_hop) {
     nd_to_hop_.clear();
+
+    if (!graph_.isNode(seed))
+        return {};
+    std::unordered_map<int, int> nd_to_hop;
     // First, perform a BFS from the node set.
     doBFS(first, last, mx_hop);
-    std::unordered_map<int, int> nd_to_hop;
 
-    // If the seed node is already in the BFS tree, return empty.
-    if (!graph_.isNode(seed) || nd_to_hop_.find(seed) != nd_to_hop_.end())
-        return nd_to_hop;
-
-    // Then, perform a BFS from the seed node, and only expand the new BFS tree
-    // from unvisted nodes.
     nd_to_hop[seed] = 0;
     std::queue<int> queue;
     queue.push(seed);
 
+    std::unordered_set<int> res_nd;
+    if(nd_to_hop_.find(seed) == nd_to_hop_.end()){res_nd.insert(seed);}
     while (!queue.empty()) {
         int u = queue.front(), hop = nd_to_hop[u];
         queue.pop();
@@ -121,20 +121,24 @@ std::unordered_map<int, int> DirBFS<Graph>::doIncBFS(InputIt first, InputIt last
         const auto& nd = graph_[u];
         for (auto&& ni = nd.beginOutNbr(); ni != nd.endOutNbr(); ++ni) {
             int v = *ni;
-            if (nd_to_hop_.find(v) == nd_to_hop_.end() &&
-                nd_to_hop.find(v) == nd_to_hop.end()) {
+            if (nd_to_hop.find(v) == nd_to_hop.end()) {
                 nd_to_hop[v] = hop + 1;
                 queue.push(v);
             }
+            if(nd_to_hop_.find(v)==nd_to_hop_.end()){
+                res_nd.insert(v);
+            }
         }
     }
-    return nd_to_hop;
+    
+    return res_nd;
 }
 
 template <class Graph>
-void DirBFS<Graph>::doRevBFS(const int start_nd, const int mx_hop) {
-    if (!graph_.isNode(start_nd)) return;
+void DirBFS<Graph>::doRevBFS(const int start_nd,const int x, const int mx_hop) {
     nd_to_hop_.clear();
+    if (!graph_.isNode(start_nd)) { return;}
+    if(x>=0)nd_to_hop_[x]=-1;
     nd_to_hop_[start_nd] = 0;
     std::queue<int> queue;
     queue.push(start_nd);
