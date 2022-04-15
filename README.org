@@ -8,8 +8,10 @@
 **  Install ~cmake~, ~g++~, ~gcc~, and ~libgflags-dev~.
 
   #+begin_src shell
-  sudo apt install cmake g++ gcc libgflags-dev
+  sudo apt install cmake g++ gcc libgflags-dev 7za-full
   #+end_src
+  
+  ~7za-full~ is used for handling gzip compression file IO.
 
 ** Clone ~cpplib~
   Then clone the repository into directory ~$ENV{GIT_REPO}/cpplib~. Here
