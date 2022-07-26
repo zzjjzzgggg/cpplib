@@ -29,8 +29,10 @@ void test_print() {
 
 void test_tsvparser() {
     printf("use file test.dat\n");
-    ioutils::TSVParser ss("test.dat");
-    while (ss.next()) printf("%d ", ss.get<int>(0));
+    ioutils::TSVParser ss("test.dat", ' ');
+    ss.next();
+    printf("%d\n", ss.getNumFields());
+    while (ss.next()) printf("%d\t%d\n", ss.get<int>(0), ss.get<int>(1));
     printf("\n");
 
     ss.reset();

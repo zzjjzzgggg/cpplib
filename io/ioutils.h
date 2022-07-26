@@ -41,6 +41,10 @@ public:
     TSVParser(const std::string& filename, const char sep = '\t')
         : split_ch_(sep), line_NO_(0), filename_(filename) {
         in_ptr_ = getIOIn(filename);
+        if (in_ptr_ == nullptr) {
+            std::cout << "File: " << filename << " does not exist!" << std::endl;
+            std::exit(-1);
+        }
     }
 
     void reset() {
@@ -93,8 +97,7 @@ void savePrVec(const std::vector<std::pair<T1, T2>>& vec,
                const std::string& anno = "", const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
-    for (auto& pr : vec)
-        out_ptr->save(fmt::format(format, pr.first, pr.second));
+    for (auto& pr : vec) out_ptr->save(fmt::format(format, pr.first, pr.second));
     out_ptr->close();
     if (echo) std::cout << "saved to " << filename << std::endl;
 }
@@ -123,8 +126,8 @@ void saveTripletVec(const std::vector<std::tuple<T1, T2, T3>>& vec,
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
     for (auto&& e : vec)
-        out_ptr->save(fmt::format(format, std::get<0>(e), std::get<1>(e),
-                                  std::get<2>(e)));
+        out_ptr->save(
+            fmt::format(format, std::get<0>(e), std::get<1>(e), std::get<2>(e)));
     out_ptr->close();
     if (echo) std::cout << "saved to " << filename << std::endl;
 }
@@ -177,25 +180,22 @@ void saveTupleVec(const std::vector<std::tuple<T...>>& vec,
 // map
 template <typename TKey, typename TVal>
 void saveMap(const std::map<TKey, TVal>& map, const std::string& filename,
-             const std::string& format = "{}\t{}\n",
-             const std::string& anno = "", const bool echo = true) {
+             const std::string& format = "{}\t{}\n", const std::string& anno = "",
+             const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
-    for (auto& pr : map)
-        out_ptr->save(fmt::format(format, pr.first, pr.second));
+    for (auto& pr : map) out_ptr->save(fmt::format(format, pr.first, pr.second));
     if (echo) std::cout << "saved to " << filename << std::endl;
 }
 
 // unordered_map
 template <typename TKey, typename TVal>
 void saveMap(const std::unordered_map<TKey, TVal>& map,
-             const std::string& filename,
-             const std::string& format = "{}\t{}\n",
+             const std::string& filename, const std::string& format = "{}\t{}\n",
              const std::string& anno = "", const bool echo = true) {
     std::unique_ptr<IOOut> out_ptr = getIOOut(filename);
     if (!anno.empty()) out_ptr->save(anno);
-    for (auto& pr : map)
-        out_ptr->save(fmt::format(format, pr.first, pr.second));
+    for (auto& pr : map) out_ptr->save(fmt::format(format, pr.first, pr.second));
     if (echo) std::cout << "saved to " << filename << std::endl;
 }
 
