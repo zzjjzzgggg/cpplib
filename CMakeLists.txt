@@ -24,6 +24,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #   message(FATAL_ERROR "Please install a modern C++ compiler.")
 # endif()
 
+set(gflags_DIR "/usr/lib/x86_64-linux-gnu/cmake/gflags")
 
 set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_BUILD_TYPE Debug)
